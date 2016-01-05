@@ -1,3 +1,4 @@
+"use strict";
 Minesweeper.Service = {}
 
 Minesweeper.Service.Field = class Field {

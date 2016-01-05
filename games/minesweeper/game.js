@@ -1,3 +1,5 @@
+"use strict";
+
 Minesweeper.Game = {}
 
 Minesweeper.Game.Field = class Field {

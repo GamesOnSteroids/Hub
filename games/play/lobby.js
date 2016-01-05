@@ -1,5 +1,6 @@
+"use strict";
 
-Service = class Service {
+class Service {
 
 }
 
@@ -13,7 +14,7 @@ class Player {
 
 }
 
-Lobby = class Lobby {
+class Lobby {
 
   constructor(service) {
     this.server = this.localPlayer = new Player();

@@ -1,3 +1,5 @@
+"use strict";
+
 class Camera {
    constructor() {
      this.scale = { x: 1, y: 1 };
@@ -13,7 +15,7 @@ class Mouse {
 
 }
 
-Game = class Game {
+class Game {
 
   constructor(lobby) {
     this.lobby = lobby;
