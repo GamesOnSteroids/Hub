@@ -17,10 +17,15 @@ class Player {
 class Lobby {
 
   constructor(service) {
+    let otherPlayer = new Player();
+    otherPlayer.id = 0;
+    otherPlayer.team = 0;
+
     this.server = this.localPlayer = new Player();
-    this.server.id = 0;
-    this.server.team = 0;
+    this.server.id = 1;
+    this.server.team = 1;
     this.players = [];
+    this.players.push(this.otherPlayer);
     this.players.push(this.localPlayer);
     this.messageHandlers = [];
     this.gameService = service;

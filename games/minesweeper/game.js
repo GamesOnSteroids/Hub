@@ -141,6 +141,12 @@ Minesweeper.Game.MinesweeperGame = class MinesweeperGame extends Game {
     this.assets.mines[0].src = root + "images/mine-red.png";
     this.assets.flags[0] = new Image();
     this.assets.flags[0].src = root + "images/flag-red.png";
+    this.assets.reveal[1] = new Image();
+    this.assets.reveal[1].src = root + "images/empty-blue.png";
+    this.assets.mines[1] = new Image();
+    this.assets.mines[1].src = root + "images/mine-blue.png";
+    this.assets.flags[1] = new Image();
+    this.assets.flags[1].src = root + "images/flag-blue.png";
 
     this.assets.numbers = [];
     for (let i = 0; i < 8; i++) {
@@ -153,6 +159,7 @@ Minesweeper.Game.MinesweeperGame = class MinesweeperGame extends Game {
   draw() {
     var ctx = this.context;
 
+    ctx.setTransform(1,0,0,1,0,0);
     ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
     ctx.setTransform(this.camera.scale.x,0,0,this.camera.scale.y,this.camera.translate.x,this.camera.translate.y);
@@ -187,7 +194,7 @@ Minesweeper.Game.MinesweeperGame = class MinesweeperGame extends Game {
 
             if (x == ((mousePosition.x / TILE_SIZE) | 0) && y == ((mousePosition.y / TILE_SIZE) | 0)) {
               if (Mouse.button == 1) {
-                ctx.drawImage(this.assets.reveal[0], x * TILE_SIZE, y * TILE_SIZE);
+                ctx.drawImage(this.assets.reveal[this.lobby.localPlayer.team], x * TILE_SIZE, y * TILE_SIZE);
               } else {
                 ctx.drawImage(this.assets.over, x * TILE_SIZE, y * TILE_SIZE);
               }
