@@ -54,7 +54,13 @@ class Game {
   onMouseUp(e) { }
   onMouseDown(e) { }
 
+  on(id, handler) {
+    this.lobby.on(GAME_SERVICE, id, (client, message) => {
+      handler(message); 
+    });
+  }
   send(msg) {
+    msg.service = GAME_SERVICE;
     this.lobby.sendToServer(msg);
   }
 }

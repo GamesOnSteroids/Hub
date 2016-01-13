@@ -7,11 +7,14 @@ Minesweeper.Service.Field = class Field {
 
 Minesweeper.Service.Minefield = class Minefield {
 
-  forAdjecent(x, y, callback) {
+  forAdjecent(fieldId, callback) {
+    let x = (fieldId % this.width) | 0;
+    let y = (fieldId / this.width) | 0;
+
     for (let _y = Math.max(0, y - 1); _y <= Math.min(y + 1, this.height - 1); _y++) {
       for (let _x = Math.max(0, x - 1); _x <= Math.min(x + 1, this.width - 1); _x++) {
-        let fieldId = _x + _y * this.width;
-        callback(fieldId);
+        let _fieldId = _x + _y * this.width;
+        callback(_fieldId);
       }
     }
   }
@@ -37,23 +40,26 @@ Minesweeper.Service.Minefield = class Minefield {
   }
 }
 
-Minesweeper.Service.MinesweeperService = class MinesweeperService extends Service {
+Minesweeper.Service.MinesweeperService = class MinesweeperService extends GameService {
 
   constructor() {
     super();
   }
 
   initialize() {
-    this.lobby.on(CMSG_REVEAL_REQUEST, this.onRevealRequest.bind(this));
-    this.lobby.on(CMSG_FLAG_REQUEST, this.onFlagRequest.bind(this));
-    this.lobby.on(CMSG_MASS_REVEAL_REQUEST, this.onMassRevealRequest.bind(this));
+    this.on(CMSG_REVEAL_REQUEST, this.onRevealRequest.bind(this));
+    this.on(CMSG_FLAG_REQUEST, this.onFlagRequest.bind(this));
+    this.on(CMSG_MASS_REVEAL_REQUEST, this.onMassRevealRequest.bind(this));
     this.minefield = new Minesweeper.Service.Minefield(10, 10);
       this.mines = 20; //TODO: move to game settings
 
   }
 
+  onJoin(client) {
 
-  flag(player, fieldId, flag) {
+  }
+
+  flag(client, fieldId, flag) {
     let field = this.minefield.get(fieldId);
     if (field.isRevealed) {
       return;
@@ -61,20 +67,20 @@ Minesweeper.Service.MinesweeperService = class MinesweeperService extends Servic
 
     field.hasFlag = flag;
     if (flag) {
-      field.owner = player;
+      field.owner = client;
 
-      this.lobby.broadcast({ id: SMSG_FLAG, playerId: field.owner.id, fieldId: fieldId, flag: true });
+      this.broadcast({ id: SMSG_FLAG, playerId: field.owner.id, fieldId: fieldId, flag: true });
     } else {
       field.owner = null;
 
-      this.lobby.broadcast({ id: SMSG_FLAG,fieldId: fieldId, flag: false });
+      this.broadcast({ id: SMSG_FLAG,fieldId: fieldId, flag: false });
     }
 
 
 
   }
 
-  massReveal(player, fieldId) {
+  massReveal(client, fieldId) {
 
     let field = this.minefield.get(fieldId);
     if (!field.isRevealed || field.adjecentMines == 0 || field.hasMine) {
@@ -82,50 +88,43 @@ Minesweeper.Service.MinesweeperService = class MinesweeperService extends Servic
     }
 
 
-    let x = (fieldId % this.minefield.width) | 0;
-    let y = (fieldId / this.minefield.width) | 0;
 
     let flags = 0;
-    this.minefield.forAdjecent(x, y, (fieldId) => {
+    this.minefield.forAdjecent(fieldId, (fieldId) => {
         let field = this.minefield.get(fieldId);
-        if (field.hasFlag) {
+        if (field.hasFlag || (field.isRevealed && field.hasMine)) {
           flags++;
         }
     });
 
     if (flags == field.adjecentMines) {
-      this.minefield.forAdjecent(x, y, (fieldId) => {
+      this.minefield.forAdjecent(fieldId, (fieldId) => {
         if (!this.isRevealed && !this.hasFlag) { // reveal all non flagged
-          this.reveal(player, fieldId);
+          this.reveal(client, fieldId);
         }
       });
     }
 
   }
 
-  reveal(player, fieldId) {
-    if (!this.minefield.generated) {
-      this.generate(msg.fieldId)
-    }
+  reveal(client, fieldId) {
+
     let field = this.minefield.get(fieldId);
     if (field.isRevealed) {
       return;
     }
-    if (field.hasFlag && field.owner.id == player.id) { // Can not reveal your own flags
+    if (field.hasFlag && field.owner.id == client.id) { // Can not reveal your own flags
       return;
     }
 
     field.isRevealed = true;
-    field.owner = player;
+    field.owner = client;
     field.hasFlag = false;
 
-    let x = (fieldId % this.minefield.width) | 0;
-    let y = (fieldId / this.minefield.width) | 0;
-
-    this.lobby.broadcast({ id: SMSG_REVEAL, playerId: player.id, fieldId: fieldId, adjecentMines: field.adjecentMines, hasMine: field.hasMine });
+    this.broadcast({ id: SMSG_REVEAL, playerId: client.id, fieldId: fieldId, adjecentMines: field.adjecentMines, hasMine: field.hasMine });
 
     if (field.hasFlag) {
-      if (field.owner.id != player.id && field.hasMine) {
+      if (field.owner.id != client.id && field.hasMine) {
         //TODO: boom
       } else {
         //TODO: not possible to click on your flag
@@ -135,10 +134,10 @@ Minesweeper.Service.MinesweeperService = class MinesweeperService extends Servic
 
       } else {
         if (field.adjecentMines == 0) {
-          this.minefield.forAdjecent(x, y, (fieldId) => {
+          this.minefield.forAdjecent(fieldId, (fieldId) => {
               let field = this.minefield.get(fieldId);
               if (!field.hasMine && !field.isRevealed && !field.hasFlag) {
-                this.reveal(player, fieldId);
+                this.reveal(client, fieldId);
               }
           });
         }
@@ -146,23 +145,23 @@ Minesweeper.Service.MinesweeperService = class MinesweeperService extends Servic
     }
   }
 
-  onFlagRequest(player, msg) {
-    this.flag(player, msg.fieldId, msg.flag);
+  onFlagRequest(client, msg) {
+    this.flag(client, msg.fieldId, msg.flag);
   }
 
-  onMassRevealRequest(player, msg) {
+  onMassRevealRequest(client, msg) {
 
-    this.massReveal(player, msg.fieldId);
+    this.massReveal(client, msg.fieldId);
   }
 
-  onRevealRequest(player, msg) {
+  onRevealRequest(client, msg) {
     //todo: sanitize input
 
     if (!this.minefield.generated) {
       this.generate(msg.fieldId)
     }
 
-    this.reveal(player, msg.fieldId);
+    this.reveal(client, msg.fieldId);
 
   }
 
@@ -194,7 +193,7 @@ Minesweeper.Service.MinesweeperService = class MinesweeperService extends Servic
          let fieldId = x + y * result.width;
          let field = result.fields[fieldId];
          field.adjecentMines = 0;
-         this.minefield.forAdjecent(x, y, (_fieldId) => {
+         this.minefield.forAdjecent(fieldId, (_fieldId) => {
            let _field = result.fields[_fieldId];
            if (_fieldId != fieldId && _field.hasMine) {
              field.adjecentMines++;

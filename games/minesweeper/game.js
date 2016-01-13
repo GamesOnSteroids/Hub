@@ -1,5 +1,6 @@
 "use strict";
 
+
 Minesweeper.Game = {}
 
 Minesweeper.Game.Field = class Field {
@@ -8,11 +9,14 @@ Minesweeper.Game.Field = class Field {
 
 Minesweeper.Game.Minefield = class Minefield {
 
-  forAdjecent(x, y, callback) {
+  forAdjecent(fieldId, callback) {
+    let x = (fieldId % this.width) | 0;
+    let y = (fieldId / this.width) | 0;
+
     for (let _y = Math.max(0, y - 1); _y <= Math.min(y + 1, this.height - 1); _y++) {
       for (let _x = Math.max(0, x - 1); _x <= Math.min(x + 1, this.width - 1); _x++) {
-        let fieldId = _x + _y * this.width;
-        callback(fieldId);
+        let _fieldId = _x + _y * this.width;
+        callback(_fieldId);
       }
     }
   }
@@ -44,8 +48,8 @@ Minesweeper.Game.MinesweeperGame = class MinesweeperGame extends Game {
     super(lobby);
 
     this.minefield = new Minesweeper.Game.Minefield(10, 10);
-    this.lobby.on(SMSG_REVEAL, this.onReveal.bind(this));
-    this.lobby.on(SMSG_FLAG, this.onFlag.bind(this));
+    this.on(SMSG_REVEAL, this.onReveal.bind(this));
+    this.on(SMSG_FLAG, this.onFlag.bind(this));
 
     this.canvas.width = this.minefield.width * TILE_SIZE * 4;
     this.canvas.height = this.minefield.height * TILE_SIZE * 4;
@@ -62,7 +66,7 @@ Minesweeper.Game.MinesweeperGame = class MinesweeperGame extends Game {
     }
 
     if (field.owner != null) {
-      if (field.owner.id == this.lobby.localPlayer.id) {
+      if (field.owner.id == this.lobby.localClient.id) {
         this.send({id: CMSG_FLAG_REQUEST, fieldId: x + y * this.minefield.width, flag: false});
       }
     } else {
@@ -73,15 +77,16 @@ Minesweeper.Game.MinesweeperGame = class MinesweeperGame extends Game {
   }
 
   massReveal(x, y) {
-    let field = this.minefield.get(x + y * this.minefield.width);
+    let fieldId = x + y * this.minefield.width;
+    let field = this.minefield.get(fieldId);
     if (!field.isRevealed) {
       return;
     }
 
     let flags = 0
-    this.minefield.forAdjecent(x, y, (fieldId) => {
+    this.minefield.forAdjecent(fieldId, (fieldId) => {
       let field = this.minefield.get(fieldId);
-      if (field.hasFlag) {
+      if (field.hasFlag || (field.isRevealed && field.hasMine)) {
         flags++;
       }
     });
@@ -102,16 +107,16 @@ Minesweeper.Game.MinesweeperGame = class MinesweeperGame extends Game {
     //TODO: play sound
   }
 
-  onFlag(player, msg) {
+  onFlag(msg) {
     let field = this.minefield.get(msg.fieldId);
-    field.owner = this.lobby.players[msg.playerId];
+    field.owner = this.lobby.clients.find(c => c.id == msg.playerId);
     field.hasFlag = msg.flag;
   }
 
-  onReveal(player, msg) {
+  onReveal(msg) {
     let field = this.minefield.get(msg.fieldId);
     field.isRevealed = true;
-    field.owner = this.lobby.players[msg.playerId];
+    field.owner = this.lobby.clients.find(c => c.id == msg.playerId);
     field.adjecentMines = msg.adjecentMines;
     field.hasMine = msg.hasMine;
     if (field.hasMine) {
@@ -194,7 +199,7 @@ Minesweeper.Game.MinesweeperGame = class MinesweeperGame extends Game {
 
             if (x == ((mousePosition.x / TILE_SIZE) | 0) && y == ((mousePosition.y / TILE_SIZE) | 0)) {
               if (Mouse.button == 1) {
-                ctx.drawImage(this.assets.reveal[this.lobby.localPlayer.team], x * TILE_SIZE, y * TILE_SIZE);
+                ctx.drawImage(this.assets.reveal[this.lobby.localClient.team], x * TILE_SIZE, y * TILE_SIZE);
               } else {
                 ctx.drawImage(this.assets.over, x * TILE_SIZE, y * TILE_SIZE);
               }
