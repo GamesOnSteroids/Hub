@@ -99,7 +99,8 @@ Minesweeper.Service.MinesweeperService = class MinesweeperService extends GameSe
 
     if (flags == field.adjecentMines) {
       this.minefield.forAdjecent(fieldId, (fieldId) => {
-        if (!this.isRevealed && !this.hasFlag) { // reveal all non flagged
+        let field = this.minefield.get(fieldId);
+        if (!field.isRevealed && !field.hasFlag) { // reveal all non flagged
           this.reveal(client, fieldId);
         }
       });
