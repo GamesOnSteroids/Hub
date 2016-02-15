@@ -14,9 +14,9 @@ module Play {
 
 
     export class Service {
-        public lobby:ServerLobby;
+        public lobby:Lobby;
 
-        constructor(lobby:ServerLobby) {
+        constructor(lobby:Lobby) {
             this.lobby = lobby;
         }
     }
@@ -48,7 +48,7 @@ module Play {
         configuration: any;
     }
 
-    export abstract class Lobby {
+    export class Lobby {
         static current:Lobby;
 
         public game:Game;

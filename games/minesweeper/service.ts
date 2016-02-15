@@ -2,7 +2,7 @@ module Minesweeper.Service {
 
     import Client = Play.Client;
     import GameService = Play.GameService;
-    import ServerLobby = Play.ServerLobby;
+    import Lobby = Play.Lobby;
 
     class Field {
         public isRevealed:boolean;
@@ -57,7 +57,7 @@ module Minesweeper.Service {
         private mines:number;
         private flaggedMines:number;
 
-        constructor(lobby:ServerLobby) {
+        constructor(lobby:Lobby) {
             super(lobby);
 
             let configuration: GameConfiguration = lobby.configuration;
