@@ -88,6 +88,7 @@ var Minesweeper;
                 field.owner = this.lobby.clients.find(c => c.id == msg.playerId);
                 field.adjecentMines = msg.adjacentMines;
                 field.hasMine = msg.hasMine;
+                field.hasFlag = false;
                 if (field.hasMine) {
                 }
             }

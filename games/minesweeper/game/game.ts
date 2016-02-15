@@ -102,7 +102,7 @@ module Minesweeper.Game {
                 id: MessageId.CMSG_REVEAL_REQUEST,
                 fieldId: x + y * this.minefield.width,
                 doubt: doubt
-            })
+            });
 
             //TODO: play sound
         }
@@ -119,6 +119,7 @@ module Minesweeper.Game {
             field.owner = this.lobby.clients.find(c => c.id == msg.playerId);
             field.adjecentMines = msg.adjacentMines;
             field.hasMine = msg.hasMine;
+            field.hasFlag = false;
             if (field.hasMine) {
                 //TODO: explosion sound
                 //TODO: screen shake

@@ -19,13 +19,14 @@ class LobbyComponent extends React.Component {
             maxPlayers: 2,
             width: 10,
             height: 10,
-            mines: 10
+            mines: 1
         };
         let lobbyService = new FirebaseLobbyService();
         lobbyService.findLobby(gameConfiguration);
     }
     render() {
-        return (React.createElement("div", null, "lobby ", this.props.game));
+        var progressBarStyle = { width: "100%" };
+        return (React.createElement("div", null, React.createElement("div", {"className": "row"}, React.createElement("div", {"className": "col-md-8"}, React.createElement("div", {"className": "row"}, React.createElement("div", {"className": "col-md-12"}, React.createElement("div", {"className": "progress"}, React.createElement("div", {"className": "progress-bar progress-bar-striped active", "role": "progressbar", "aria-valuenow": "100", "aria-valuemin": "0", "aria-valuemax": "100", "style": progressBarStyle}, React.createElement("span", null, "Searching for players"))))), React.createElement("div", null, React.createElement("div", {"className": "row"}, React.createElement("div", {"className": "col-md-12"}, React.createElement("div", null, "Player 1"), React.createElement("div", null, "Player 2"))))), React.createElement("div", {"className": "col-md-4"}, React.createElement("div", null, React.createElement("textarea", {"className": "form-control", "rows": "3"}), React.createElement("div", {"className": "input-group"}, React.createElement("input", {"type": "text", "className": "form-control", "placeholder": "Text input"}), React.createElement("span", {"className": "input-group-btn"}, React.createElement("button", {"className": "btn  btn-primary btn-block glyphicon glyphicon-envelope"}))))))));
     }
 }
 class GameDescription extends React.Component {
@@ -33,7 +34,7 @@ class GameDescription extends React.Component {
         ReactRouter.browserHistory.pushState({ game: "minesweeper" }, '/lobby');
     }
     render() {
-        return (React.createElement("div", null, React.createElement("h3", null, "Minesweeper on Steroids"), React.createElement("div", null, React.createElement("img", {"src": ".png"}), React.createElement("p", null, "Mines go boom boom!"), React.createElement("span", null, "Currently playing: 30 players")), React.createElement("div", {"className": "btn-group-vertical", "role": "group"}, React.createElement("button", {"type": "button", "className": "btn btn-primary", "onClick": this.startGame}, React.createElement("span", {"className": "glyphicon glyphicon-align-left"}), "Play 1v1 now!"), React.createElement("button", {"type": "button", "className": "btn btn-default"}, React.createElement("span", {"className": "glyphicon glyphicon-align-left"}), "Play with friend"))));
+        return (React.createElement("div", null, React.createElement("h3", null, "Minesweeper on Steroids"), React.createElement("div", null, React.createElement("img", {"src": ".png"}), React.createElement("p", null, "Mines go boom boom!"), React.createElement("span", null, "Currently playing: ? games")), React.createElement("div", {"className": "btn-group-vertical", "role": "group"}, React.createElement("button", {"type": "button", "className": "btn btn-primary", "onClick": this.startGame}, React.createElement("span", {"className": "glyphicon glyphicon-align-left"}), "Play 1v1 now!"), React.createElement("button", {"type": "button", "className": "btn btn-default"}, React.createElement("span", {"className": "glyphicon glyphicon-align-left"}), "Play with friend"))));
     }
 }
 class GameList extends React.Component {

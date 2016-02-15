@@ -58,15 +58,50 @@ class LobbyComponent extends React.Component<any, any> {
             maxPlayers: 2,
             width: 10,
             height: 10,
-            mines: 10
+            mines: 1
         };
         let lobbyService: ILobbyService = new FirebaseLobbyService();
         lobbyService.findLobby(gameConfiguration);
     }
 
     render() {
+        var progressBarStyle = {width: "100%"};
         return (
-            <div>lobby {this.props.game}</div>
+            <div>
+                <div className="row">
+                    <div className="col-md-8">
+                        <div className="row">
+                            <div className="col-md-12">
+                                <div className="progress">
+                                    <div className="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style={progressBarStyle}>
+                                        <span>Searching for players</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div className="row">
+                                <div className="col-md-12">
+                                    <div>Player 1</div>
+                                    <div>Player 2</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="col-md-4">
+                        <div>
+                            <textarea className="form-control" rows="3"></textarea>
+                            <div className="input-group">
+                                <input type="text" className="form-control" placeholder="Text input"></input>
+                                <span className="input-group-btn">
+                                    <button className="btn  btn-primary btn-block glyphicon glyphicon-envelope"></button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
         )
     }
 }
@@ -85,7 +120,7 @@ class GameDescription extends React.Component<any, any> {
                 <div>
                     <img src=".png"/>
                     <p>Mines go boom boom!</p>
-                    <span>Currently playing: 30 players</span>
+                    <span>Currently playing: ? games</span>
                 </div>
                 <div className="btn-group-vertical" role="group">
                     <button type="button" className="btn btn-primary" onClick={this.startGame}>
