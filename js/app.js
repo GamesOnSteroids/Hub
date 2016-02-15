@@ -6,28 +6,6 @@ window.RTCSessionDescription = window.RTCSessionDescription || window.mozRTCSess
 window.RTCIceCandidate = window.mozRTCIceCandidate || window.RTCIceCandidate;
 class Chat extends React.Component {
 }
-class MinesweeperScore extends React.Component {
-}
-class MinesweeperGameOver extends React.Component {
-    render() {
-        return (React.createElement("div", null, React.createElement("p", null, "GAME OVER")));
-    }
-}
-class MinesweeperApp extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = { isGameOver: false };
-    }
-    componentDidMount() {
-        Lobby.current.game = new Minesweeper.Game.MinesweeperGame(Lobby.current, Lobby.current.configuration);
-        Lobby.current.game.onGameOverCallback = () => {
-            this.setState({ isGameOver: true });
-        };
-    }
-    render() {
-        return (React.createElement("div", null, React.createElement("p", null, "\"MinesweeperApp\""), React.createElement("canvas", {"id": "game-canvas"}), this.state.isGameOver ? React.createElement(MinesweeperGameOver, null) : null));
-    }
-}
 class Header extends React.Component {
     render() {
         return (React.createElement("nav", {"className": "navbar navbar-inverse navbar-fixed-top"}, React.createElement("div", {"className": "container"}, React.createElement("div", {"className": "navbar-header"}, React.createElement("button", {"type": "button", "className": "navbar-toggle collapsed", "data-toggle": "collapse", "data-target": "#navbar", "aria-expanded": "false", "aria-controls": "navbar"}, React.createElement("span", {"className": "sr-only"}, "Toggle navigation"), React.createElement("span", {"className": "icon-bar"}), React.createElement("span", {"className": "icon-bar"}), React.createElement("span", {"className": "icon-bar"})), React.createElement(ReactRouter.Link, {"className": "navbar-brand", "to": `/`}, "Games on Steroids")), React.createElement("div", {"id": "navbar", "className": "collapse navbar-collapse"}, React.createElement("ul", {"className": "nav navbar-nav"}, React.createElement("li", {"className": "active"}, React.createElement(ReactRouter.Link, {"to": `/lobby`}, "Test")), React.createElement("li", null, React.createElement("a", {"href": "#about"}, "About")), React.createElement("li", null, React.createElement("a", {"href": "#contact"}, "Contact")))))));

@@ -1,6 +1,5 @@
 var Play;
 (function (Play) {
-    var MinesweeperService = Minesweeper.Service.MinesweeperService;
     class LobbyService {
         onJoin(client, message) {
             let c = new Play.Client();
@@ -42,6 +41,21 @@ var Play;
     }
     Play.LobbyService = LobbyService;
     class FirebaseLobbyService extends LobbyService {
+        onJoinRequest(client, msg) {
+            super.onJoinRequest(client, msg);
+            let firebase = new Firebase("https://fiery-inferno-1131.firebaseio.com/");
+            let lobbyRef = firebase.child("lobby").child(this.lobby.configuration.lobbyId);
+            lobbyRef.transaction((data) => {
+                if (data != null) {
+                    data.playerCount += 1;
+                }
+                return data;
+            }, (error, commited, snapshot) => {
+                if (error != null) {
+                    console.error(error);
+                }
+            }, true);
+        }
         findLobby(configuration) {
             return new Promise((resolve, reject) => {
                 let firebase = new Firebase("https://fiery-inferno-1131.firebaseio.com/");
@@ -51,7 +65,7 @@ var Play;
                         let lobbyRef = null;
                         let found = snapshot.forEach((snapshot) => {
                             let value = snapshot.val();
-                            if (Object.keys(value.playerCount).length < value.maxPlayers) {
+                            if (value.playerCount < value.maxPlayers) {
                                 lobbyRef = snapshot.ref();
                                 return true;
                             }
@@ -64,24 +78,27 @@ var Play;
                                 createdAt: new Date(),
                             };
                             let lobbyRef = lobbiesRef.push();
-                            lobbyRef.set(lobbyDescription);
-                            configuration.lobbyId = lobbyRef.key();
-                            let lobby = this.lobby = new Play.Lobby(configuration);
-                            lobby.clientGUID = guid();
-                            lobby.on(Play.ServiceType.Lobby, Play.LobbyMessageId.CMSG_JOIN_REQUEST, this.onJoinRequest.bind(this));
-                            let localClient = lobby.localClient = new Play.Client();
-                            localClient.id = lobby.clientGUID;
-                            localClient.name = "server";
-                            localClient.team = 0;
-                            let localConnection = new Play.LocalConnection();
-                            localConnection.messageHandler = (msg) => { lobby.onMessage(localClient, msg); };
-                            localClient.connection = localConnection;
-                            lobby.serverConnection = localConnection;
-                            lobby.clients.push(localClient);
-                            let gameService = new MinesweeperService(lobby);
-                            let signalingService = new Play.FirebaseSignalingService();
-                            signalingService.createSignalingServer(lobby);
-                            resolve(lobby);
+                            lobbyRef.set(lobbyDescription, () => {
+                                configuration.lobbyId = lobbyRef.key();
+                                let lobby = this.lobby = new Play.Lobby(configuration);
+                                lobby.clientGUID = guid();
+                                lobby.on(Play.ServiceType.Lobby, Play.LobbyMessageId.CMSG_JOIN_REQUEST, this.onJoinRequest.bind(this));
+                                let localClient = lobby.localClient = new Play.Client();
+                                localClient.id = lobby.clientGUID;
+                                localClient.name = "server";
+                                localClient.team = 0;
+                                let localConnection = new Play.LocalConnection();
+                                localConnection.messageHandler = (msg) => {
+                                    lobby.onMessage(localClient, msg);
+                                };
+                                localClient.connection = localConnection;
+                                lobby.serverConnection = localConnection;
+                                lobby.clients.push(localClient);
+                                let gameService = new Minesweeper.Service.MinesweeperService(lobby);
+                                let signalingService = new Play.FirebaseSignalingService();
+                                signalingService.createSignalingServer(lobby);
+                                resolve(lobby);
+                            });
                         }
                         else {
                             configuration.lobbyId = lobbyRef.key();
