@@ -96,7 +96,7 @@ var Minesweeper;
                     });
                 }
             }
-            reveal(client, fieldId, doubt = false) {
+            reveal(client, fieldId, doubt) {
                 let field = this.minefield.get(fieldId);
                 if (field.isRevealed) {
                     return;

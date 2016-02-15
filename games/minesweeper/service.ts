@@ -136,7 +136,7 @@ module Minesweeper.Service {
         }
 
 
-        reveal(client:Client, fieldId:number, doubt:boolean = false) {
+        reveal(client:Client, fieldId:number, doubt?:boolean) {
 
             let field = this.minefield.get(fieldId);
             if (field.isRevealed) {
