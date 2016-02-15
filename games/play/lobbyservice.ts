@@ -1,5 +1,5 @@
 module Play {
-
+    "use strict";
     export interface ILobbyService {
         findLobby(gameConfiguration):Promise<Lobby>;
     }

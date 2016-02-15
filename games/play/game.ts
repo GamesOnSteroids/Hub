@@ -1,5 +1,5 @@
-
 module Play {
+    "use strict";
     interface Point2D {
         x: number;
         y: number;

@@ -1,5 +1,5 @@
 module Minesweeper.Game {
-
+    "use strict";
     import Camera = Play.Camera;
     import Game = Play.Game;
     import Mouse = Play.Mouse;

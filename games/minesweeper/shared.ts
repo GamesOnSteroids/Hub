@@ -1,4 +1,5 @@
 module Minesweeper {
+    "use strict";
     import GameMessage = Play.GameMessage;
 
     export enum MessageId {

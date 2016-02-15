@@ -1,5 +1,6 @@
 var Play;
 (function (Play) {
+    "use strict";
     class Camera {
         constructor() {
             this.scale = { x: 1, y: 1 };

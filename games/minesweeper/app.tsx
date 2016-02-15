@@ -1,4 +1,4 @@
-
+"use strict";
 class MinesweeperScore extends React.Component<any, any> {
 
 }

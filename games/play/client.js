@@ -1,5 +1,6 @@
 var Play;
 (function (Play) {
+    "use strict";
     class LocalConnection {
         send(msg) {
             this.messageHandler(msg);

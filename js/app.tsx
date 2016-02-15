@@ -1,3 +1,4 @@
+"use strict";
 import Lobby = Play.Lobby;
 import LobbyService = Play.FirebaseLobbyService;
 import ILobbyService = Play.ILobbyService;

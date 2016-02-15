@@ -1,3 +1,4 @@
+"use strict";
 class MinesweeperScore extends React.Component {
 }
 class MinesweeperGameOver extends React.Component {

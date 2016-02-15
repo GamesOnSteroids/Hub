@@ -1,5 +1,6 @@
 var Play;
 (function (Play) {
+    "use strict";
     (function (ServiceType) {
         ServiceType[ServiceType["Lobby"] = 1] = "Lobby";
         ServiceType[ServiceType["Game"] = 2] = "Game";

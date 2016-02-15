@@ -1,5 +1,5 @@
 module Play {
-
+    "use strict";
 
     export var servers = {
         iceServers: [

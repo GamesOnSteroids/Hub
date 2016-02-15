@@ -2,6 +2,7 @@ var Minesweeper;
 (function (Minesweeper) {
     var Game;
     (function (Game_1) {
+        "use strict";
         var Camera = Play.Camera;
         var Game = Play.Game;
         var Mouse = Play.Mouse;

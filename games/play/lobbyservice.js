@@ -1,5 +1,6 @@
 var Play;
 (function (Play) {
+    "use strict";
     class LobbyService {
         onJoin(client, message) {
             let c = new Play.Client();

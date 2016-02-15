@@ -1,4 +1,5 @@
 module Minesweeper.Game {
+    "use strict";
     import Client = Play.Client;
 
     export class Field {

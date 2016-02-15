@@ -1,5 +1,5 @@
 module Minesweeper.Service {
-
+    "use strict";
     import Client = Play.Client;
     import GameService = Play.GameService;
     import Lobby = Play.Lobby;

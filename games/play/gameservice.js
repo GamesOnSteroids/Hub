@@ -1,5 +1,6 @@
 var Play;
 (function (Play) {
+    "use strict";
     class GameService extends Play.Service {
         constructor(lobby) {
             super(lobby);

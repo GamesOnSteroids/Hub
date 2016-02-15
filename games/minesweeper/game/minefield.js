@@ -2,6 +2,7 @@ var Minesweeper;
 (function (Minesweeper) {
     var Game;
     (function (Game) {
+        "use strict";
         class Field {
         }
         Game.Field = Field;

@@ -2,6 +2,7 @@ var Minesweeper;
 (function (Minesweeper) {
     var Service;
     (function (Service) {
+        "use strict";
         var GameService = Play.GameService;
         class Field {
         }

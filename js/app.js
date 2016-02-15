@@ -1,3 +1,4 @@
+"use strict";
 var Lobby = Play.Lobby;
 var LobbyService = Play.FirebaseLobbyService;
 var FirebaseLobbyService = Play.FirebaseLobbyService;

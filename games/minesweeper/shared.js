@@ -1,5 +1,6 @@
 var Minesweeper;
 (function (Minesweeper) {
+    "use strict";
     (function (MessageId) {
         MessageId[MessageId["CMSG_REVEAL_REQUEST"] = 1] = "CMSG_REVEAL_REQUEST";
         MessageId[MessageId["SMSG_REVEAL"] = 2] = "SMSG_REVEAL";
