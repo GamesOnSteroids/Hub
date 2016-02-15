@@ -90,7 +90,7 @@ class LobbyComponent extends React.Component<any, any> {
                     </div>
                     <div className="col-md-4">
                         <div>
-                            <textarea className="form-control" rows="3"></textarea>
+                            <textarea className="form-control"></textarea>
                             <div className="input-group">
                                 <input type="text" className="form-control" placeholder="Text input"></input>
                                 <span className="input-group-btn">
