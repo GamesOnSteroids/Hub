@@ -46,7 +46,7 @@ module Minesweeper.Service {
             }
         }
 
-        get(fieldId) {
+        get(fieldId: number) {
             return this.fields[fieldId];
         }
     }
@@ -82,7 +82,7 @@ module Minesweeper.Service {
             this.broadcast({id: MessageId.SMSG_GAME_OVER})
         }
 
-        flag(client, fieldId, flag) {
+        flag(client: Client, fieldId: number, flag: boolean) {
             let field = this.minefield.get(fieldId);
             if (field.isRevealed) {
                 return;

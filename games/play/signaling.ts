@@ -18,15 +18,14 @@ module Play {
 
 
     export interface ISignalingService {
-        createSignalingServer(lobby: Lobby);
-        createSignalingClient(lobby: Lobby);
+        createSignalingServer(lobby:Lobby): void;
+        createSignalingClient(lobby:Lobby): void;
     }
 
     export class FirebaseSignalingService implements ISignalingService {
 
 
-
-        onServerSdpMessage(lobby: Lobby, channel:Firebase, snapshot:FirebaseDataSnapshot) {
+        onServerSdpMessage(lobby:Lobby, channel:Firebase, snapshot:FirebaseDataSnapshot) {
             let value = snapshot.val();
 
             if (value.type == "offer") {
@@ -43,8 +42,8 @@ module Play {
                 client.connection = connection;
 
                 pc.ondatachannel = (e) => {
-                    connection.dataChannel = e["channel"];
-                    connection.dataChannel.onmessage = (e) =>{
+                    connection.dataChannel = <RTCDataChannel>((<any>e)["channel"]);
+                    connection.dataChannel.onmessage = (e) => {
                         let message = JSON.parse(e.data);
                         connection.messageHandler(message);
                     };
@@ -75,13 +74,14 @@ module Play {
                 let candidate = new RTCIceCandidate(JSON.parse(value.candidate));
                 let client = lobby.clients.find(c => c.id == value.source);
                 let peerConnection = (<Peer2PeerConnection>client.connection).peerConnection;
-                peerConnection.addIceCandidate(candidate, () => {}, console.error);
+                peerConnection.addIceCandidate(candidate, () => {
+                }, console.error);
                 snapshot.ref().remove();
             }
         }
 
 
-        createSignalingServer(lobby: Lobby) {
+        createSignalingServer(lobby:Lobby) {
             let firebase = new Firebase("https://fiery-inferno-1131.firebaseio.com/");
             let lobbyRef = firebase.child("lobby").child(lobby.configuration.lobbyId);
             let sdpRef = lobbyRef.child("sdp");
@@ -92,8 +92,7 @@ module Play {
         }
 
 
-
-        onClientSdpMessage(lobby, channel, snapshot) {
+        onClientSdpMessage(lobby: Lobby, snapshot: FirebaseDataSnapshot) {
             let value = snapshot.val();
 
             if (value.type == "answer" && value.target == lobby.clientGUID) {
@@ -105,24 +104,25 @@ module Play {
 
             } else if (value.type == "candidate" && (value.target != null && value.target == lobby.clientGUID)) {
                 let candidate = new RTCIceCandidate(JSON.parse(value.candidate));
-                (<Peer2PeerConnection>lobby.serverConnection).peerConnection.addIceCandidate(candidate, () => {}, console.error);
+                (<Peer2PeerConnection>lobby.serverConnection).peerConnection.addIceCandidate(candidate, () => {
+                }, console.error);
                 snapshot.ref().remove();
             }
         }
 
-        createSignalingClient(lobby: Lobby) {
+        createSignalingClient(lobby:Lobby) {
             let firebase = new Firebase("https://fiery-inferno-1131.firebaseio.com/");
             let lobbyRef = firebase.child("lobby").child(lobby.configuration.lobbyId);
 
             let sdpRef = lobbyRef.child("sdp");
             sdpRef.on("child_added", (snapshot) => {
-                this.onClientSdpMessage(lobby, sdpRef, snapshot);
+                this.onClientSdpMessage(lobby, snapshot);
             });
 
             let pc = new RTCPeerConnection(servers);
             let channel = pc.createDataChannel(lobby.clientGUID, {ordered: true});
 
-            let connection =  new Peer2PeerConnection();
+            let connection = new Peer2PeerConnection();
             connection.peerConnection = pc;
             connection.dataChannel = channel;
             connection.messageHandler = (msg) => lobby.onMessage(null, msg);
@@ -132,7 +132,7 @@ module Play {
             channel.onopen = (event) => {
                 console.log("connection open");
                 let readyState = channel.readyState;
-                channel.onmessage = (e) =>{
+                channel.onmessage = (e) => {
                     let message = JSON.parse(e.data);
                     connection.messageHandler(message);
                 };

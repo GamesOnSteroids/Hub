@@ -11,8 +11,8 @@ var Minesweeper;
             constructor(lobby, configuration) {
                 super(lobby);
                 this.minefield = new Game_1.Minefield(configuration.width, configuration.height);
-                this.canvas.width = this.minefield.width * TILE_SIZE * 4;
-                this.canvas.height = this.minefield.height * TILE_SIZE * 4;
+                this.canvas.width = this.minefield.width * TILE_SIZE + TILE_SIZE * 2;
+                this.canvas.height = this.minefield.height * TILE_SIZE + TILE_SIZE * 2;
                 this.load();
                 this.on(Minesweeper.MessageId.SMSG_REVEAL, this.onReveal.bind(this));
                 this.on(Minesweeper.MessageId.SMSG_FLAG, this.onFlag.bind(this));

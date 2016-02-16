@@ -53,7 +53,7 @@ module Play {
         static current:Lobby;
 
         public game:Game;
-        protected messageHandlers;
+        protected messageHandlers: Array<Array<(client: Client, msg: IMessage)=>void>>;
 
         public clientGUID: string;
         public localClient:Client;
@@ -64,7 +64,7 @@ module Play {
         public serverConnection: IConnection;
 
 
-        constructor(configuration) {
+        constructor(configuration: any) {
             Lobby.current = this;
 
             this.configuration = configuration;
@@ -103,7 +103,7 @@ module Play {
             }
         }
 
-        broadcast(msg): void {
+        broadcast(msg: IMessage): void {
             for (let client of this.clients) {
                 client.connection.send(msg);
             }

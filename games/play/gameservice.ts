@@ -17,7 +17,7 @@ module Play {
 
         broadcast<T extends GameMessage>(msg:T): void {
             (<any>msg).service = ServiceType.Game;
-            this.lobby.broadcast(msg);
+            this.lobby.broadcast(<any>msg);
         }
 
         sendTo<T extends GameMessage>(client:Client, msg:T): void {

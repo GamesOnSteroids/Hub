@@ -22,8 +22,8 @@ module Minesweeper.Game {
 
             this.minefield = new Minefield(configuration.width, configuration.height);
 
-            this.canvas.width = this.minefield.width * TILE_SIZE * 4;
-            this.canvas.height = this.minefield.height * TILE_SIZE * 4;
+            this.canvas.width = this.minefield.width * TILE_SIZE + TILE_SIZE * 2;
+            this.canvas.height = this.minefield.height * TILE_SIZE + TILE_SIZE * 2;
 
             this.load();
 
@@ -38,7 +38,7 @@ module Minesweeper.Game {
 
         }
 
-        flag(x, y) {
+        flag(x: number, y: number) {
             let field = this.minefield.get(x + y * this.minefield.width);
 
             if (field.isRevealed) {
@@ -64,7 +64,7 @@ module Minesweeper.Game {
 
         }
 
-        massReveal(x, y) {
+        massReveal(x: number, y: number) {
             let fieldId = x + y * this.minefield.width;
             let field = this.minefield.get(fieldId);
             if (!field.isRevealed) {
@@ -87,7 +87,7 @@ module Minesweeper.Game {
             }
         }
 
-        reveal(x, y) {
+        reveal(x:number, y:number) {
             let field = this.minefield.get(x + y * this.minefield.width);
 
             if (field.isRevealed) {
@@ -219,7 +219,7 @@ module Minesweeper.Game {
             }
         }
 
-        onMouseDown(e) {
+        onMouseDown(e: MouseEvent) {
 
             if (Mouse.button == 2) {
                 let position = this.camera.unproject(e.offsetX, e.offsetY);
@@ -231,7 +231,7 @@ module Minesweeper.Game {
             }
         }
 
-        onMouseUp(e) {
+        onMouseUp(e: MouseEvent) {
             if (Mouse.button == 1 || Mouse.button == 3) {
                 let position = this.camera.unproject(e.offsetX, e.offsetY);
 

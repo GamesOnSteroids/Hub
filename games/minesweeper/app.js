@@ -2,6 +2,9 @@
 class MinesweeperScore extends React.Component {
 }
 class MinesweeperGameOver extends React.Component {
+    playAgain() {
+        console.log("again");
+    }
     render() {
         var overlayStyle = {
             position: "absolute",
@@ -17,12 +20,12 @@ class MinesweeperGameOver extends React.Component {
             textShadow: "-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000",
             textAlign: "center"
         };
-        return (React.createElement("div", {"style": overlayStyle}, React.createElement("div", null, React.createElement("h2", null, "GAME OVER"), React.createElement("br", null), React.createElement("button", {"className": "btn btn-default"}, "Play again"))));
+        return (React.createElement("div", {"style": overlayStyle}, React.createElement("div", null, React.createElement("h2", null, "GAME OVER"), React.createElement("br", null), React.createElement("button", {"className": "btn btn-default", "onClick": this.playAgain}, "Play again"))));
     }
 }
 class MinesweeperApp extends React.Component {
-    constructor(props) {
-        super(props);
+    constructor() {
+        super();
         this.state = { isGameOver: false };
     }
     componentDidMount() {
@@ -32,8 +35,8 @@ class MinesweeperApp extends React.Component {
         };
     }
     render() {
-        var gameStyle = { position: "relative" };
-        return (React.createElement("div", {"style": gameStyle}, React.createElement("p", null, "\"MinesweeperApp\""), React.createElement("canvas", {"id": "game-canvas"}), this.state.isGameOver ? React.createElement(MinesweeperGameOver, null) : null));
+        var gameStyle = { position: "relative", textAlign: "center" };
+        return (React.createElement("div", {"style": gameStyle}, React.createElement("h3", null, "Minesweeper"), React.createElement("canvas", {"id": "game-canvas"}), this.state.isGameOver ? React.createElement(MinesweeperGameOver, null) : null));
     }
 }
 //# sourceMappingURL=app.js.map

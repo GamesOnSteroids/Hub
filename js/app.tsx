@@ -12,7 +12,19 @@ window.RTCIceCandidate = window.mozRTCIceCandidate || window.RTCIceCandidate;
 
 
 class Chat extends React.Component<any, any> {
-
+    render() {
+        return (
+            <div>
+                <textarea className="form-control"></textarea>
+                <div className="input-group">
+                    <input type="text" className="form-control" placeholder="Type your message..."/>
+                    <span className="input-group-btn">
+                        <button
+                            className="btn  btn-primary btn-block glyphicon glyphicon-envelope"></button>
+                    </span>
+                </div>
+            </div>);
+    }
 }
 
 
@@ -22,27 +34,7 @@ class Header extends React.Component<any, any> {
             <nav className="navbar navbar-inverse navbar-fixed-top">
                 <div className="container">
                     <div className="navbar-header">
-                        <button type="button" className="navbar-toggle collapsed" data-toggle="collapse"
-                                data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-                            <span className="sr-only">Toggle navigation</span>
-                            <span className="icon-bar"></span>
-                            <span className="icon-bar"></span>
-                            <span className="icon-bar"></span>
-                        </button>
                         <ReactRouter.Link className="navbar-brand" to={`/`}>Games on Steroids</ReactRouter.Link>
-                    </div>
-                    <div id="navbar" className="collapse navbar-collapse">
-                        <ul className="nav navbar-nav">
-                            <li className="active">
-                                <ReactRouter.Link to={`/lobby`}>Test</ReactRouter.Link>
-                            </li>
-                            <li>
-                                <a href="#about">About</a>
-                            </li>
-                            <li>
-                                <a href="#contact">Contact</a>
-                            </li>
-                        </ul>
                     </div>
                 </div>
             </nav>
@@ -52,20 +44,9 @@ class Header extends React.Component<any, any> {
 
 
 class LobbyComponent extends React.Component<any, any> {
-    componentDidMount():void {
-        let gameConfiguration = {
-            gameId: "minesweeper",
-            maxPlayers: 2,
-            width: 10,
-            height: 10,
-            mines: 1
-        };
-        let lobbyService: ILobbyService = new FirebaseLobbyService();
-        lobbyService.findLobby(gameConfiguration);
-    }
+
 
     render() {
-        var progressBarStyle = {width: "100%"};
         return (
             <div>
                 <div className="row">
@@ -73,7 +54,8 @@ class LobbyComponent extends React.Component<any, any> {
                         <div className="row">
                             <div className="col-md-12">
                                 <div className="progress">
-                                    <div className="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style={progressBarStyle}>
+                                    <div className="progress-bar progress-bar-striped active" role="progressbar"
+                                         style={{width: "100%"}}>
                                         <span>Searching for players</span>
                                     </div>
                                 </div>
@@ -89,15 +71,7 @@ class LobbyComponent extends React.Component<any, any> {
                         </div>
                     </div>
                     <div className="col-md-4">
-                        <div>
-                            <textarea className="form-control"></textarea>
-                            <div className="input-group">
-                                <input type="text" className="form-control" placeholder="Text input"></input>
-                                <span className="input-group-btn">
-                                    <button className="btn  btn-primary btn-block glyphicon glyphicon-envelope"></button>
-                                </span>
-                            </div>
-                        </div>
+                        <Chat />
                     </div>
                 </div>
 
@@ -109,38 +83,101 @@ class LobbyComponent extends React.Component<any, any> {
 
 class GameDescription extends React.Component<any, any> {
 
-    startGame() {
-        ReactRouter.browserHistory.pushState({game: "minesweeper"}, '/lobby');
+    constructor() {
+        super();
+        this.startGame = this.startGame.bind(this);
+    }
+
+    startGame(configuration:any) {
+        configuration.gameId = this.props.game.id;
+
+        let lobbyService:ILobbyService = new FirebaseLobbyService();
+        lobbyService.findLobby(configuration).then((lobby) => {
+            ReactRouter.hashHistory.pushState(null, `/lobby/${lobby.configuration.lobbyId}`);
+        });
     }
 
     render() {
         return (
             <div>
-                <h3>Minesweeper on Steroids</h3>
+                <h3>{this.props.game.name}</h3>
                 <div>
-                    <img src=".png"/>
-                    <p>Mines go boom boom!</p>
+                    <p>{this.props.game.description}</p>
                     <span>Currently playing: ? games</span>
                 </div>
                 <div className="btn-group-vertical" role="group">
-                    <button type="button" className="btn btn-primary" onClick={this.startGame}>
+                    { this.props.game.configurations.map( (configuration: any) => (
+                    <button key={configuration.id} type="button"
+                            className={configuration.id == "default" ? "btn btn-primary" : "btn btn-default"}
+                            onClick={this.startGame.bind(this, configuration)}>
                         <span className="glyphicon glyphicon-align-left"/>
-                        Play 1v1 now!
-                    </button>
-                    <button type="button" className="btn btn-default">
-                        <span className="glyphicon glyphicon-align-left"/>
-                        Play with friend
-                    </button>
+                        {configuration.name}
+                    </button>)) }
                 </div>
             </div>
         );
     }
 }
+
+var games = [
+    {
+        id: "minesweeper",
+        name: "Minesweeper on Steroids",
+        configurations: [
+            {
+                id: "default",
+                name: "Play 1v1 now!",
+                maxPlayers: 2,
+                width: 10,
+                height: 10,
+                mines: 1
+            },
+            {
+                id: "friend",
+                name: "Play with friend",
+                maxPlayers: 2,
+                width: 10,
+                height: 10,
+                mines: 1
+            }
+        ]
+    },
+    {
+        id: "chess",
+        name: "Chess on Steroids",
+        configurations: []
+    }
+];
+
 class GameList extends React.Component<any, any> {
+
+    constructor() {
+        super();
+    }
+
+    render() {
+        let gameList:any[] = [];
+        for (let game of games) {
+            gameList.push(<GameDescription key={game.id} game={game}/>);
+        }
+        return (
+            <div>
+                {gameList}
+            </div>
+        );
+    }
+}
+
+class NoMatch extends React.Component<any, any> {
+
+    constructor() {
+        super();
+    }
+
     render() {
         return (
             <div>
-                <GameDescription game="minesweeper"/>
+                404
             </div>
         );
     }
@@ -155,26 +192,22 @@ class App extends React.Component<any, any> {
                 {this.props.children}
 
 
-                <footer className="footer">
-                    <p>&copy; 2016 Games on Steroids</p>
-                </footer>
-
             </div>
         );
     }
 }
 
-var createHistory = ((window as any).History as HistoryModule.Module).createHistory;
-
+//var createHistory = ((window as any).History as HistoryModule.Module).createHistory;
 //ReactRouter.browserHistory = createHistory();
 
 ReactDOM.render((
-    <ReactRouter.Router history={ReactRouter.browserHistory}>
+    <ReactRouter.Router history={ReactRouter.hashHistory}>
         <ReactRouter.Route path="/" component={App}>
-            <ReactRouter.IndexRoute component={LobbyComponent}/>
+            <ReactRouter.IndexRoute component={GameList}/>
             <ReactRouter.Route path="/games" component={GameList}/>
             <ReactRouter.Route path="/minesweeper" component={MinesweeperApp}/>
-            <ReactRouter.Route path="/lobby" component={LobbyComponent}/>
+            <ReactRouter.Route path="/lobby/:lobbyId" component={LobbyComponent}/>
+            <ReactRouter.Route path="*" component={NoMatch}/>
         </ReactRouter.Route>
     </ReactRouter.Router>
 ), document.getElementById('content'));

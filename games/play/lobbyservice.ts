@@ -1,11 +1,11 @@
 module Play {
     "use strict";
     export interface ILobbyService {
-        findLobby(gameConfiguration):Promise<Lobby>;
+        findLobby(gameConfiguration:any):Promise<Lobby>;
     }
 
     export abstract class LobbyService implements ILobbyService {
-        abstract findLobby(gameConfiguration):Promise<Lobby>;
+        abstract findLobby(gameConfiguration:any):Promise<Lobby>;
 
         public lobby: Lobby;
 
@@ -76,7 +76,7 @@ module Play {
             }, true);
         }
 
-        findLobby(configuration):Promise<Lobby> {
+        findLobby(configuration:any):Promise<Lobby> {
             return new Promise<Lobby>((resolve, reject) => {
                 let firebase = new Firebase("https://fiery-inferno-1131.firebaseio.com/");
                 let lobbiesRef = firebase.child("lobby");

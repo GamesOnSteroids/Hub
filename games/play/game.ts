@@ -8,7 +8,7 @@ module Play {
         public scale:Point2D = {x: 1, y: 1};
         public translate:Point2D = {x: 20, y: 20};
 
-        unproject(x, y):Point2D {
+        unproject(x:number, y:number):Point2D {
             return {x: (x - this.translate.x) / this.scale.x, y: (y - this.translate.y) / this.scale.y};
         }
     }
@@ -27,7 +27,7 @@ module Play {
 
         public onGameOverCallback:() => void;
 
-        constructor(lobby) {
+        constructor(lobby:Lobby) {
             this.lobby = lobby;
             this.canvas = <HTMLCanvasElement>document.getElementById("game-canvas");
             this.context = this.canvas.getContext("2d");
@@ -62,26 +62,26 @@ module Play {
             window.requestAnimationFrame(this.tick);
         }
 
-        tick(time) {
+        tick(time: number) {
             this.draw(time);
             this.update(time);
 
             window.requestAnimationFrame(this.tick);
         }
 
-        draw(time) {
+        draw(time: number) {
         }
 
-        update(time) {
+        update(time: number) {
         }
 
-        onMouseUp(e) {
+        onMouseUp(e: MouseEvent) {
         }
 
-        onMouseDown(e) {
+        onMouseDown(e: MouseEvent) {
         }
 
-        on<T extends GameMessage>(id, handler:(message:T) => void):void {
+        on<T extends GameMessage>(id: number, handler:(message:T) => void):void {
             this.lobby.on(ServiceType.Game, id, (client:Client, message:IMessage) => {
                 handler(<any>message);
             });

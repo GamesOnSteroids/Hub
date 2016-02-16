@@ -1,14 +1,14 @@
 module Play {
     "use strict";
     export interface IConnection {
-        send(msg): void;
+        send(msg: any): void;
     }
 
     export class LocalConnection implements IConnection {
 
         public messageHandler: (msg:IMessage) => void;
 
-        send(msg):void {
+        send(msg: any):void {
             this.messageHandler(msg);
         }
     }
@@ -19,7 +19,7 @@ module Play {
         public dataChannel:RTCDataChannel;
         public messageHandler: (msg:IMessage) => void;
 
-        send(msg):void {
+        send(msg: any):void {
             this.dataChannel.send(JSON.stringify(msg))
         }
     }
@@ -31,7 +31,7 @@ module Play {
         public connection:IConnection;
 
 
-        send(msg):void {
+        send(msg: any):void {
             this.connection.send(msg);
         }
 
