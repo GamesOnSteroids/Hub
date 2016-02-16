@@ -49,7 +49,7 @@ var Minesweeper;
                     return;
                 }
                 let flags = 0;
-                this.minefield.forAdjecent(fieldId, (fieldId) => {
+                this.minefield.forAdjacent(fieldId, (fieldId) => {
                     let field = this.minefield.get(fieldId);
                     if (field.hasFlag || (field.isRevealed && field.hasMine)) {
                         flags++;

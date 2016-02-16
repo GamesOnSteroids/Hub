@@ -15,7 +15,6 @@ module Play {
     }
 
 
-
     export class ServerLobby {
 
         protected messageHandlers:Array<Array<(client:Client, msg:IMessage)=>void>>;
@@ -23,9 +22,11 @@ module Play {
         public clients:Client[] = [];
 
         public configuration:any;
+        public lobbyId:string;
 
-        constructor(configuration:any) {
+        constructor(lobbyId:string, configuration:any) {
 
+            this.lobbyId = lobbyId;
             this.configuration = configuration;
 
 
@@ -58,18 +59,32 @@ module Play {
 
 
         onJoinRequest(client:Client, msg:JoinRequestMessage) {
+            console.log("ServerLobby.onJoinRequest");
+
             client.name = msg.name;
             client.team = msg.team;
 
             for (let other of this.clients) {
-                client.connection.send(<JoinMessage>{
-                    service: ServiceType.Lobby,
-                    id: LobbyMessageId.SMSG_JOIN,
-                    name: other.name,
-                    clientId: other.id,
-                    team: other.team
-                }); // send other players to connecting player
-                if (other.id != client.id) {
+                if (other.id == client.id) {
+                    client.connection.send(<JoinMessage>{
+                        service: ServiceType.Lobby,
+                        id: LobbyMessageId.SMSG_JOIN,
+                        name: other.name,
+                        clientId: other.id,
+                        team: other.team,
+                        isYou: true,
+                        configuration: this.configuration
+                    });
+                } else {
+                    client.connection.send(<JoinMessage>{
+                        service: ServiceType.Lobby,
+                        id: LobbyMessageId.SMSG_JOIN,
+                        name: other.name,
+                        clientId: other.id,
+                        team: other.team,
+                        isReady: other.isReady
+                    }); // send other players to connecting player
+
                     other.connection.send(<JoinMessage> {
                         service: ServiceType.Lobby,
                         id: LobbyMessageId.SMSG_JOIN,
@@ -79,14 +94,17 @@ module Play {
                     }); // send connecting player to other players
                 }
             }
-            //TODO: for debug only
-            this.broadcast(<GameStartMessage>{
-                service: ServiceType.Lobby,
-                id: LobbyMessageId.SMSG_GAME_START,
-                configuration: this.configuration
-            });
 
-            new LobbyService().onClientJoined(this, client);
+            if (this.clients.length == this.configuration.maxPlayers) {
+                //TODO: for debug only
+                this.broadcast(<GameStartMessage>{
+                    service: ServiceType.Lobby,
+                    id: LobbyMessageId.SMSG_GAME_START
+                });
+            }
+
+            //TODO: inject this
+            new FirebaseLobbyService().onClientJoined(this, client);
         }
     }
 }

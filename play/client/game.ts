@@ -1,9 +1,11 @@
 module Play {
     "use strict";
+
     interface Point2D {
         x: number;
         y: number;
     }
+
     export class Camera {
         public scale:Point2D = {x: 1, y: 1};
         public translate:Point2D = {x: 20, y: 20};
@@ -58,30 +60,32 @@ module Play {
             };
 
             this.tick = this.tick.bind(this);
+        }
 
+        start() {
             window.requestAnimationFrame(this.tick);
         }
 
-        tick(time: number) {
+        tick(time:number) {
             this.draw(time);
             this.update(time);
 
             window.requestAnimationFrame(this.tick);
         }
 
-        draw(time: number) {
+        draw(time:number) {
         }
 
-        update(time: number) {
+        update(time:number) {
         }
 
-        onMouseUp(e: MouseEvent) {
+        onMouseUp(e:MouseEvent) {
         }
 
-        onMouseDown(e: MouseEvent) {
+        onMouseDown(e:MouseEvent) {
         }
 
-        on<T extends GameMessage>(id: number, handler:(message:T) => void):void {
+        on<T extends GameMessage>(id:number, handler:(message:T) => void):void {
             this.lobby.on(ServiceType.Game, id, (message:IMessage) => {
                 handler(<any>message);
             });

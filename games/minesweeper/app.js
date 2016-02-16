@@ -1,8 +1,9 @@
+var ClientLobby = Play.ClientLobby;
 "use strict";
 class MinesweeperScore extends React.Component {
 }
 class MinesweeperGameOver extends React.Component {
-    playAgain() {
+    backToLobby() {
         console.log("again");
     }
     render() {
@@ -20,7 +21,7 @@ class MinesweeperGameOver extends React.Component {
             textShadow: "-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000",
             textAlign: "center"
         };
-        return (React.createElement("div", {"style": overlayStyle}, React.createElement("div", null, React.createElement("h2", null, "GAME OVER"), React.createElement("br", null), React.createElement("button", {"className": "btn btn-default", "onClick": this.playAgain}, "Play again"))));
+        return (React.createElement("div", {"style": overlayStyle}, React.createElement("div", null, React.createElement("h2", null, "GAME OVER"), React.createElement("br", null), React.createElement("button", {"className": "btn btn-default", "type": "submit", "onClick": this.backToLobby}, "Back to Lobby"))));
     }
 }
 class MinesweeperApp extends React.Component {
@@ -29,8 +30,9 @@ class MinesweeperApp extends React.Component {
         this.state = { isGameOver: false };
     }
     componentDidMount() {
-        Lobby.current.game = new Minesweeper.Game.MinesweeperGame(Lobby.current, Lobby.current.configuration);
-        Lobby.current.game.onGameOverCallback = () => {
+        ClientLobby.current.game = new Minesweeper.Game.MinesweeperGame(ClientLobby.current, ClientLobby.current.configuration);
+        ClientLobby.current.game.start();
+        ClientLobby.current.game.onGameOverCallback = () => {
             this.setState({ isGameOver: true });
         };
     }

@@ -14,13 +14,13 @@ module Play {
 
         public serverConnection:IConnection;
 
-        public gameStarted:()=>void;
+        public gameStarted = false;
+        public gameStartedCallback:()=>void;
 
-        constructor(configuration:any) {
-            ClientLobby.current = this;
+        public lobbyId: string;
 
-            this.configuration = configuration;
-
+        constructor(lobbyId:string) {
+            this.lobbyId = lobbyId;
 
             this.messageHandlers = [];
             this.messageHandlers[ServiceType.Lobby] = [];
@@ -47,15 +47,16 @@ module Play {
         }
 
         onGameStart(message:GameStartMessage) {
-            console.log("game start");
+            console.log("ClientLobby.onGameStart");
 
-            if (this.gameStarted != null) {
-                this.gameStarted();
+            this.gameStarted = true;
+            if (this.gameStartedCallback != null) {
+                this.gameStartedCallback();
             }
         }
 
         onJoin(message:JoinMessage) {
-            this.configuration = message.configuration;
+            console.log("ClientLobby.onJoin");
 
             let c = new Client();
             c.id = message.clientId;
@@ -64,7 +65,8 @@ module Play {
 
             this.clients.push(c);
 
-            if (c.id == this.clientGUID) {
+            if (message.isYou) {
+                this.configuration = message.configuration;
                 this.localClient = c;
             }
         }

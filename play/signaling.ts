@@ -83,7 +83,7 @@ module Play {
 
         createSignalingServer(lobby:ServerLobby) {
             let firebase = new Firebase("https://fiery-inferno-1131.firebaseio.com/");
-            let lobbyRef = firebase.child("lobby").child(lobby.configuration.lobbyId);
+            let lobbyRef = firebase.child("lobby").child(lobby.lobbyId);
             let sdpRef = lobbyRef.child("sdp");
             sdpRef.on("child_added", (snapshot) => {
                 this.onServerSdpMessage(lobby, sdpRef, snapshot);
@@ -112,7 +112,7 @@ module Play {
 
         createSignalingClient(lobby:ClientLobby) {
             let firebase = new Firebase("https://fiery-inferno-1131.firebaseio.com/");
-            let lobbyRef = firebase.child("lobby").child(lobby.configuration.lobbyId);
+            let lobbyRef = firebase.child("lobby").child(lobby.lobbyId);
 
             let sdpRef = lobbyRef.child("sdp");
             sdpRef.on("child_added", (snapshot) => {

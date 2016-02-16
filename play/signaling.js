@@ -63,7 +63,7 @@ var Play;
         }
         createSignalingServer(lobby) {
             let firebase = new Firebase("https://fiery-inferno-1131.firebaseio.com/");
-            let lobbyRef = firebase.child("lobby").child(lobby.configuration.lobbyId);
+            let lobbyRef = firebase.child("lobby").child(lobby.lobbyId);
             let sdpRef = lobbyRef.child("sdp");
             sdpRef.on("child_added", (snapshot) => {
                 this.onServerSdpMessage(lobby, sdpRef, snapshot);
@@ -86,7 +86,7 @@ var Play;
         }
         createSignalingClient(lobby) {
             let firebase = new Firebase("https://fiery-inferno-1131.firebaseio.com/");
-            let lobbyRef = firebase.child("lobby").child(lobby.configuration.lobbyId);
+            let lobbyRef = firebase.child("lobby").child(lobby.lobbyId);
             let sdpRef = lobbyRef.child("sdp");
             sdpRef.on("child_added", (snapshot) => {
                 this.onClientSdpMessage(lobby, snapshot);

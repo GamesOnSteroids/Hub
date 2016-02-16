@@ -1,6 +1,4 @@
 "use strict";
-var LobbyService = Play.FirebaseLobbyService;
-var FirebaseLobbyService = Play.FirebaseLobbyService;
 window.RTCPeerConnection = window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection;
 window.RTCSessionDescription = window.RTCSessionDescription || window.mozRTCSessionDescription || window.webkitRTCSessionDescription;
 window.RTCIceCandidate = window.mozRTCIceCandidate || window.RTCIceCandidate;

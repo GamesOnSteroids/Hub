@@ -4,7 +4,7 @@ var Play;
     class FirebaseLobbyService {
         onClientJoined(lobby, client) {
             let firebase = new Firebase("https://fiery-inferno-1131.firebaseio.com/");
-            let lobbyRef = firebase.child("lobby").child(lobby.configuration.lobbyId);
+            let lobbyRef = firebase.child("lobby").child(lobby.lobbyId);
             lobbyRef.transaction((data) => {
                 if (data != null) {
                     data.playerCount += 1;
@@ -32,21 +32,21 @@ var Play;
                         });
                         if (!found) {
                             let lobbyDescription = {
-                                playerCount: 1,
+                                playerCount: 0,
                                 maxPlayers: configuration.maxPlayers,
                                 gameId: configuration.gameId,
                                 createdAt: new Date(),
                             };
                             let lobbyRef = lobbiesRef.push();
                             lobbyRef.set(lobbyDescription, () => {
-                                configuration.lobbyId = lobbyRef.key();
-                                let clientLobby = new Play.ClientLobby(configuration);
+                                let lobbyId = lobbyRef.key();
+                                let clientLobby = new Play.ClientLobby(lobbyId);
                                 clientLobby.clientGUID = guid();
                                 let localClient = clientLobby.localClient = new Play.Client();
                                 localClient.id = clientLobby.clientGUID;
                                 localClient.name = "server";
                                 localClient.team = 0;
-                                let serverLobby = new Play.ServerLobby(configuration);
+                                let serverLobby = new Play.ServerLobby(lobbyId, configuration);
                                 let gameService = new Minesweeper.Service.MinesweeperService(serverLobby);
                                 let signalingService = new Play.FirebaseSignalingService();
                                 signalingService.createSignalingServer(serverLobby);
@@ -71,8 +71,8 @@ var Play;
                             });
                         }
                         else {
-                            configuration.lobbyId = lobbyRef.key();
-                            let lobby = new Play.ClientLobby(configuration);
+                            let lobbyId = lobbyRef.key();
+                            let lobby = new Play.ClientLobby(lobbyId);
                             lobby.clientGUID = guid();
                             let signalingService = new Play.FirebaseSignalingService();
                             signalingService.createSignalingClient(lobby);

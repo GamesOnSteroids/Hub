@@ -32,7 +32,9 @@ module Play {
         clientId: string;
         name: string;
         team: number;
-        configuration: any;
+        isReady: boolean;
+        configuration?:any;
+        isYou?: boolean;
     }
 
     export interface GameStartMessage extends IMessage {

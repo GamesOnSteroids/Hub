@@ -3,7 +3,7 @@ module Minesweeper.Game {
     import Camera = Play.Camera;
     import Game = Play.Game;
     import Mouse = Play.Mouse;
-    import Lobby = Play.Lobby;
+    import ClientLobby = Play.ClientLobby;
 
 
     const TILE_SIZE = 20;
@@ -17,7 +17,7 @@ module Minesweeper.Game {
         private isGameOver:boolean;
 
 
-        constructor(lobby: Lobby, configuration: GameConfiguration) {
+        constructor(lobby: ClientLobby, configuration: GameConfiguration) {
             super(lobby);
 
             this.minefield = new Minefield(configuration.width, configuration.height);
@@ -34,8 +34,6 @@ module Minesweeper.Game {
             this.canvas.style.cursor = "pointer";
 
             this.camera = new Camera();
-
-
         }
 
         flag(x: number, y: number) {
@@ -72,7 +70,7 @@ module Minesweeper.Game {
             }
 
             let flags = 0;
-            this.minefield.forAdjecent(fieldId, (fieldId) => {
+            this.minefield.forAdjacent(fieldId, (fieldId) => {
                 let field = this.minefield.get(fieldId);
                 if (field.hasFlag || (field.isRevealed && field.hasMine)) {
                     flags++;

@@ -18,7 +18,7 @@ var Minesweeper;
                     }
                 }
             }
-            forAdjecent(fieldId, callback) {
+            forAdjacent(fieldId, callback) {
                 let x = (fieldId % this.width) | 0;
                 let y = (fieldId / this.width) | 0;
                 for (let _y = Math.max(0, y - 1); _y <= Math.min(y + 1, this.height - 1); _y++) {

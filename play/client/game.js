@@ -51,6 +51,8 @@ var Play;
                 return false;
             };
             this.tick = this.tick.bind(this);
+        }
+        start() {
             window.requestAnimationFrame(this.tick);
         }
         tick(time) {

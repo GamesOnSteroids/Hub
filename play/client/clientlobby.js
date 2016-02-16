@@ -1,10 +1,10 @@
 var Play;
 (function (Play) {
     class ClientLobby {
-        constructor(configuration) {
+        constructor(lobbyId) {
             this.clients = [];
-            ClientLobby.current = this;
-            this.configuration = configuration;
+            this.gameStarted = false;
+            this.lobbyId = lobbyId;
             this.messageHandlers = [];
             this.messageHandlers[Play.ServiceType.Lobby] = [];
             this.messageHandlers[Play.ServiceType.Game] = [];
@@ -24,19 +24,21 @@ var Play;
             }
         }
         onGameStart(message) {
-            console.log("game start");
-            if (this.gameStarted != null) {
-                this.gameStarted();
+            console.log("ClientLobby.onGameStart");
+            this.gameStarted = true;
+            if (this.gameStartedCallback != null) {
+                this.gameStartedCallback();
             }
         }
         onJoin(message) {
-            this.configuration = message.configuration;
+            console.log("ClientLobby.onJoin");
             let c = new Play.Client();
             c.id = message.clientId;
             c.name = message.name;
             c.team = message.team;
             this.clients.push(c);
-            if (c.id == this.clientGUID) {
+            if (message.isYou) {
+                this.configuration = message.configuration;
                 this.localClient = c;
             }
         }

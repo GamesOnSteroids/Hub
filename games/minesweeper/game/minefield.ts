@@ -15,7 +15,7 @@ module Minesweeper.Game {
         public height:number;
         private fields:Field[];
 
-        forAdjecent(fieldId: number, callback: (fieldId: number)=>void) {
+        forAdjacent(fieldId: number, callback: (fieldId: number)=>void) {
             let x = (fieldId % this.width) | 0;
             let y = (fieldId / this.width) | 0;
 

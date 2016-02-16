@@ -1,3 +1,4 @@
+import ClientLobby = Play.ClientLobby;
 "use strict";
 class MinesweeperScore extends React.Component<any, any> {
 
@@ -5,7 +6,7 @@ class MinesweeperScore extends React.Component<any, any> {
 
 class MinesweeperGameOver extends React.Component<any, any> {
 
-    playAgain() {
+    backToLobby() {
         console.log("again");
     }
 
@@ -29,7 +30,7 @@ class MinesweeperGameOver extends React.Component<any, any> {
                 <div>
                 <h2>GAME OVER</h2>
                 <br/>
-                <button className="btn btn-default" onClick={this.playAgain}>Play again</button>
+                <button className="btn btn-default" type="submit" onClick={this.backToLobby}>Back to Lobby</button>
                 </div>
             </div>
         )
@@ -44,9 +45,9 @@ class MinesweeperApp extends React.Component<any, any> {
     }
 
     componentDidMount() {
-        Lobby.current.game = new Minesweeper.Game.MinesweeperGame(Lobby.current, Lobby.current.configuration);
-
-        Lobby.current.game.onGameOverCallback = () => {
+        ClientLobby.current.game = new Minesweeper.Game.MinesweeperGame(ClientLobby.current, ClientLobby.current.configuration);
+        ClientLobby.current.game.start();
+        ClientLobby.current.game.onGameOverCallback = () => {
             this.setState({isGameOver: true});
         }
     }

@@ -19,7 +19,7 @@ var Minesweeper;
                     this.fields.push(field);
                 }
             }
-            forAdjecent(fieldId, callback) {
+            forAdjacent(fieldId, callback) {
                 let x = (fieldId % this.width) | 0;
                 let y = (fieldId / this.width) | 0;
                 for (let _y = Math.max(0, y - 1); _y <= Math.min(y + 1, this.height - 1); _y++) {
@@ -81,14 +81,14 @@ var Minesweeper;
                     return;
                 }
                 let flags = 0;
-                this.minefield.forAdjecent(fieldId, (fieldId) => {
+                this.minefield.forAdjacent(fieldId, (fieldId) => {
                     let field = this.minefield.get(fieldId);
                     if (field.hasFlag || (field.isRevealed && field.hasMine)) {
                         flags++;
                     }
                 });
                 if (flags == field.adjacentMines) {
-                    this.minefield.forAdjecent(fieldId, (fieldId) => {
+                    this.minefield.forAdjacent(fieldId, (fieldId) => {
                         let field = this.minefield.get(fieldId);
                         if (!field.isRevealed && !field.hasFlag) {
                             this.reveal(client, fieldId);
@@ -134,7 +134,7 @@ var Minesweeper;
                     }
                     else {
                         if (field.adjacentMines == 0) {
-                            this.minefield.forAdjecent(fieldId, (fieldId) => {
+                            this.minefield.forAdjacent(fieldId, (fieldId) => {
                                 let field = this.minefield.get(fieldId);
                                 if (!field.hasMine && !field.isRevealed && !field.hasFlag) {
                                     this.reveal(client, fieldId);
@@ -177,7 +177,7 @@ var Minesweeper;
                         let fieldId = x + y * result.width;
                         let field = result.fields[fieldId];
                         field.adjacentMines = 0;
-                        this.minefield.forAdjecent(fieldId, (_fieldId) => {
+                        this.minefield.forAdjacent(fieldId, (_fieldId) => {
                             let _field = result.fields[_fieldId];
                             if (_fieldId != fieldId && _field.hasMine) {
                                 field.adjacentMines++;

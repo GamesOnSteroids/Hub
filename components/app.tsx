@@ -1,8 +1,6 @@
 "use strict";
 
-import LobbyService = Play.FirebaseLobbyService;
-import ILobbyService = Play.ILobbyService;
-import FirebaseLobbyService = Play.FirebaseLobbyService;
+
 
 window.RTCPeerConnection = window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection;
 window.RTCSessionDescription = window.RTCSessionDescription || window.mozRTCSessionDescription || window.webkitRTCSessionDescription;

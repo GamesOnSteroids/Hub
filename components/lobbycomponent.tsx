@@ -1,16 +1,17 @@
-class LobbyComponent extends React.Component<any, any> {
 
+class LobbyComponent extends React.Component<any, any> {
 
     constructor() {
         super();
+        this.state = {gameRunning: Play.ClientLobby.current.gameStarted};
 
-        ClientLobby.current.gameStarted = () => {
+        Play.ClientLobby.current.gameStartedCallback = () => {
             this.setState({gameRunning: true});
         }
     }
 
     render() {
-        if (this.state.gameRunning) {
+        if (!this.state.gameRunning) {
             return (
                 <div>
                     <div className="row">

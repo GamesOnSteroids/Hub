@@ -1,8 +1,9 @@
 module Minesweeper.Service {
     "use strict";
+
     import Client = Play.Client;
     import GameService = Play.GameService;
-    import Lobby = Play.Lobby;
+    import ServerLobby = Play.ServerLobby;
 
     class Field {
         public isRevealed:boolean;
@@ -18,7 +19,7 @@ module Minesweeper.Service {
         public generated:boolean;
         public fields:Field[];
 
-        forAdjecent(fieldId:number, callback:(fieldId:number) => void) {
+        forAdjacent(fieldId:number, callback:(fieldId:number) => void) {
             let x = (fieldId % this.width) | 0;
             let y = (fieldId / this.width) | 0;
 
@@ -57,7 +58,7 @@ module Minesweeper.Service {
         private mines:number;
         private flaggedMines:number;
 
-        constructor(lobby:Lobby) {
+        constructor(lobby:ServerLobby) {
             super(lobby);
 
             let configuration: GameConfiguration = lobby.configuration;
@@ -117,7 +118,7 @@ module Minesweeper.Service {
 
 
             let flags = 0;
-            this.minefield.forAdjecent(fieldId, (fieldId) => {
+            this.minefield.forAdjacent(fieldId, (fieldId) => {
                 let field = this.minefield.get(fieldId);
                 if (field.hasFlag || (field.isRevealed && field.hasMine)) {
                     flags++;
@@ -125,7 +126,7 @@ module Minesweeper.Service {
             });
 
             if (flags == field.adjacentMines) {
-                this.minefield.forAdjecent(fieldId, (fieldId) => {
+                this.minefield.forAdjacent(fieldId, (fieldId) => {
                     let field = this.minefield.get(fieldId);
                     if (!field.isRevealed && !field.hasFlag) { // reveal all non flagged
                         this.reveal(client, fieldId);
@@ -180,7 +181,7 @@ module Minesweeper.Service {
                     this.checkGameOver();
                 } else { // reveal empty field
                     if (field.adjacentMines == 0) {
-                        this.minefield.forAdjecent(fieldId, (fieldId) => {
+                        this.minefield.forAdjacent(fieldId, (fieldId) => {
                             let field = this.minefield.get(fieldId);
                             if (!field.hasMine && !field.isRevealed && !field.hasFlag) {
                                 this.reveal(client, fieldId);
@@ -239,7 +240,7 @@ module Minesweeper.Service {
                     let fieldId = x + y * result.width;
                     let field = result.fields[fieldId];
                     field.adjacentMines = 0;
-                    this.minefield.forAdjecent(fieldId, (_fieldId) => {
+                    this.minefield.forAdjacent(fieldId, (_fieldId) => {
                         let _field = result.fields[_fieldId];
                         if (_fieldId != fieldId && _field.hasMine) {
                             field.adjacentMines++;
