@@ -21,13 +21,13 @@ module Play {
 
 
     export class Game {
-        protected lobby:Lobby;
+        protected lobby:ClientLobby;
         protected canvas:HTMLCanvasElement;
         protected context:CanvasRenderingContext2D;
 
         public onGameOverCallback:() => void;
 
-        constructor(lobby:Lobby) {
+        constructor(lobby:ClientLobby) {
             this.lobby = lobby;
             this.canvas = <HTMLCanvasElement>document.getElementById("game-canvas");
             this.context = this.canvas.getContext("2d");
@@ -82,7 +82,7 @@ module Play {
         }
 
         on<T extends GameMessage>(id: number, handler:(message:T) => void):void {
-            this.lobby.on(ServiceType.Game, id, (client:Client, message:IMessage) => {
+            this.lobby.on(ServiceType.Game, id, (message:IMessage) => {
                 handler(<any>message);
             });
         }

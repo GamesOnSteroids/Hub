@@ -6,7 +6,7 @@ module Play {
 
     export class GameService extends Service {
 
-        constructor(lobby:Lobby) {
+        constructor(lobby:ServerLobby) {
             super(lobby);
         }
 

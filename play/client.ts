@@ -4,12 +4,27 @@ module Play {
         send(msg: any): void;
     }
 
-    export class LocalConnection implements IConnection {
+    export class LocalClientConnection implements IConnection {
 
         public messageHandler: (msg:IMessage) => void;
 
         send(msg: any):void {
             this.messageHandler(msg);
+        }
+    }
+
+    export class LocalServerConnection implements IConnection {
+
+        public messageHandler: (client: Client, msg:IMessage) => void;
+
+        private client: Client;
+
+        constructor(client: Client) {
+            this.client = client;
+        }
+
+        send(msg: any):void {
+            this.messageHandler(this.client, msg);
         }
     }
 

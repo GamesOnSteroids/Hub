@@ -67,7 +67,7 @@ var Play;
         onMouseDown(e) {
         }
         on(id, handler) {
-            this.lobby.on(Play.ServiceType.Game, id, (client, message) => {
+            this.lobby.on(Play.ServiceType.Game, id, (message) => {
                 handler(message);
             });
         }
