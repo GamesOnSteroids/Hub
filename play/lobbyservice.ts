@@ -26,17 +26,17 @@ module Play {
 
         findLobby(configuration:any):Promise<ClientLobby> {
             return new Promise<ClientLobby>((resolve, reject) => {
-                let firebase = new Firebase("https://fiery-inferno-1131.firebaseio.com/");
-                let lobbiesRef = firebase.child("lobby");
+                let lobbiesRef = new Firebase("https://fiery-inferno-1131.firebaseio.com/").child("lobby");
 
                 // no desired game
                 if (configuration.lobbyId == null) {
 
+                    // try to find relevant games
                     lobbiesRef.once("value", (snapshot) => {
                         let lobbyRef:Firebase = null;
                         let found = snapshot.forEach((snapshot) => {
                             let value = snapshot.val();
-                            if (value.playerCount < value.maxPlayers) {
+                            if (value.playerCount < value.maxPlayers && value.gameId == configuration.gameId) {
                                 lobbyRef = snapshot.ref();
                                 return true;
                             }
@@ -58,7 +58,7 @@ module Play {
                                 let clientLobby = new ClientLobby(lobbyId);
                                 clientLobby.clientGUID = guid();
 
-                                let localClient = clientLobby.localClient = new Client();
+                                let localClient = new Client();
                                 localClient.id = clientLobby.clientGUID;
                                 localClient.name = "server";
                                 localClient.team = 0;
@@ -66,11 +66,9 @@ module Play {
 
                                 let serverLobby = new ServerLobby(lobbyId, configuration);
 
-                                let gameService = new Minesweeper.Service.MinesweeperService(serverLobby);
-                                //serverLobby.gameService = gameService;
-
-                                let signalingService = new FirebaseSignalingService();
-                                signalingService.createSignalingServer(serverLobby);
+                                let signalingService = new SignalingService();
+                                var ref = new Firebase("https://fiery-inferno-1131.firebaseio.com/").child("lobby").child(serverLobby.lobbyId).child("sdp");
+                                signalingService.createSignalingServer(serverLobby, new FirebaseSignalingChannel(ref));
 
 
                                 let localServerConnection = new LocalServerConnection(localClient);
@@ -89,12 +87,7 @@ module Play {
 
 
                                 serverLobby.clients.push(localClient);
-                                clientLobby.sendToServer<JoinRequestMessage>({
-                                    service: ServiceType.Lobby,
-                                    id: <number>LobbyMessageId.CMSG_JOIN_REQUEST,
-                                    name: "myName",
-                                    team: 1
-                                });
+                                clientLobby.join();
 
                                 resolve(clientLobby);
                             });
@@ -103,8 +96,9 @@ module Play {
                             let lobby = new ClientLobby(lobbyId);
                             lobby.clientGUID = guid();
 
-                            let signalingService = new FirebaseSignalingService();
-                            signalingService.createSignalingClient(lobby);
+                            let signalingService = new SignalingService();
+                            var ref = new Firebase("https://fiery-inferno-1131.firebaseio.com/").child("lobby").child(lobby.lobbyId).child("sdp");
+                            signalingService.createSignalingClient(lobby, new FirebaseSignalingChannel(ref));
 
                             resolve(lobby);
                         }

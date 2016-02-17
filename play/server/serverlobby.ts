@@ -23,6 +23,8 @@ module Play {
 
         public configuration:any;
         public lobbyId:string;
+        public state: LobbyState = LobbyState.IN_LOBBY;
+        public gameService: GameService;
 
         constructor(lobbyId:string, configuration:any) {
 
@@ -35,11 +37,12 @@ module Play {
             this.messageHandlers[ServiceType.Game] = [];
 
 
-            this.on(ServiceType.Lobby, LobbyMessageId.CMSG_JOIN_REQUEST, this.onJoinRequest.bind(this));
+            this.on<JoinRequestMessage>(ServiceType.Lobby, LobbyMessageId.CMSG_JOIN_REQUEST, this.onJoinRequest.bind(this));
+            this.on<ReadyMessage>(ServiceType.Lobby, LobbyMessageId.CMSG_READY, this.onReady.bind(this));
         }
 
 
-        on(service:ServiceType, messageId:number, callback:(client:Client, msg:IMessage) => void) {
+        on<T extends IMessage>(service:ServiceType, messageId:number, callback:(client:Client, msg:T) => void) {
             this.messageHandlers[service][messageId] = callback;
         }
 
@@ -51,57 +54,92 @@ module Play {
             }
         }
 
-        broadcast(msg:IMessage):void {
+        broadcast<T extends IMessage>(msg:T):void {
             for (let client of this.clients) {
                 client.connection.send(msg);
             }
         }
 
 
+        gameOver() {
+            for (let client of this.clients) {
+                client.isReady = false;
+            }
+            this.broadcast<GameOverMessage>({service: ServiceType.Lobby, id: LobbyMessageId.SMSG_GAME_OVER});
+
+            this.state = LobbyState.IN_LOBBY;
+            this.messageHandlers[ServiceType.Game] = [];
+        }
+
+
+        startGame() {
+            this.gameService = new Minesweeper.Service.MinesweeperService(this);
+            this.state = LobbyState.GAME_RUNNING;
+            this.broadcast(<GameStartMessage>{
+                service: ServiceType.Lobby,
+                id: LobbyMessageId.SMSG_GAME_START
+            });
+        }
+
+
+
+        onReady(client: Client, msg:ReadyMessage) {
+            console.log("ServerLobby.onReady");
+            if (this.state != LobbyState.IN_LOBBY) {
+                return;
+            }
+            client.isReady = true;
+
+            let readyCount = 0;
+            for (let c of this.clients) {
+                if (c.isReady) {
+                    readyCount++;
+                }
+            }
+
+            if (readyCount == this.configuration.maxPlayers) {
+                this.startGame();
+            }
+        }
+
         onJoinRequest(client:Client, msg:JoinRequestMessage) {
             console.log("ServerLobby.onJoinRequest");
+//TODO: if the game is already running, disconnect client
 
             client.name = msg.name;
-            client.team = msg.team;
+            client.team = this.clients.indexOf(client);
 
             for (let other of this.clients) {
                 if (other.id == client.id) {
-                    client.connection.send(<JoinMessage>{
+                    client.connection.send(<PlayerJoinedMessage>{
                         service: ServiceType.Lobby,
-                        id: LobbyMessageId.SMSG_JOIN,
+                        id: LobbyMessageId.SMSG_PLAYER_JOINED,
                         name: other.name,
-                        clientId: other.id,
+                        playerId: other.id,
                         team: other.team,
                         isYou: true,
                         configuration: this.configuration
                     });
                 } else {
-                    client.connection.send(<JoinMessage>{
+                    client.connection.send(<PlayerJoinedMessage>{
                         service: ServiceType.Lobby,
-                        id: LobbyMessageId.SMSG_JOIN,
+                        id: LobbyMessageId.SMSG_PLAYER_JOINED,
                         name: other.name,
-                        clientId: other.id,
+                        playerId: other.id,
                         team: other.team,
                         isReady: other.isReady
                     }); // send other players to connecting player
 
-                    other.connection.send(<JoinMessage> {
+                    other.connection.send(<PlayerJoinedMessage> {
                         service: ServiceType.Lobby,
-                        id: LobbyMessageId.SMSG_JOIN,
+                        id: LobbyMessageId.SMSG_PLAYER_JOINED,
                         name: client.name,
-                        clientId: client.id,
+                        playerId: client.id,
                         team: client.team
                     }); // send connecting player to other players
                 }
             }
 
-            if (this.clients.length == this.configuration.maxPlayers) {
-                //TODO: for debug only
-                this.broadcast(<GameStartMessage>{
-                    service: ServiceType.Lobby,
-                    id: LobbyMessageId.SMSG_GAME_START
-                });
-            }
 
             //TODO: inject this
             new FirebaseLobbyService().onClientJoined(this, client);

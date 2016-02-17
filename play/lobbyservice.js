@@ -18,14 +18,13 @@ var Play;
         }
         findLobby(configuration) {
             return new Promise((resolve, reject) => {
-                let firebase = new Firebase("https://fiery-inferno-1131.firebaseio.com/");
-                let lobbiesRef = firebase.child("lobby");
+                let lobbiesRef = new Firebase("https://fiery-inferno-1131.firebaseio.com/").child("lobby");
                 if (configuration.lobbyId == null) {
                     lobbiesRef.once("value", (snapshot) => {
                         let lobbyRef = null;
                         let found = snapshot.forEach((snapshot) => {
                             let value = snapshot.val();
-                            if (value.playerCount < value.maxPlayers) {
+                            if (value.playerCount < value.maxPlayers && value.gameId == configuration.gameId) {
                                 lobbyRef = snapshot.ref();
                                 return true;
                             }
@@ -42,14 +41,14 @@ var Play;
                                 let lobbyId = lobbyRef.key();
                                 let clientLobby = new Play.ClientLobby(lobbyId);
                                 clientLobby.clientGUID = guid();
-                                let localClient = clientLobby.localClient = new Play.Client();
+                                let localClient = new Play.Client();
                                 localClient.id = clientLobby.clientGUID;
                                 localClient.name = "server";
                                 localClient.team = 0;
                                 let serverLobby = new Play.ServerLobby(lobbyId, configuration);
-                                let gameService = new Minesweeper.Service.MinesweeperService(serverLobby);
-                                let signalingService = new Play.FirebaseSignalingService();
-                                signalingService.createSignalingServer(serverLobby);
+                                let signalingService = new Play.SignalingService();
+                                var ref = new Firebase("https://fiery-inferno-1131.firebaseio.com/").child("lobby").child(serverLobby.lobbyId).child("sdp");
+                                signalingService.createSignalingServer(serverLobby, new Play.FirebaseSignalingChannel(ref));
                                 let localServerConnection = new Play.LocalServerConnection(localClient);
                                 localServerConnection.messageHandler = (client, msg) => {
                                     serverLobby.onMessage(localClient, msg);
@@ -61,12 +60,7 @@ var Play;
                                 };
                                 localClient.connection = localClientConnection;
                                 serverLobby.clients.push(localClient);
-                                clientLobby.sendToServer({
-                                    service: Play.ServiceType.Lobby,
-                                    id: Play.LobbyMessageId.CMSG_JOIN_REQUEST,
-                                    name: "myName",
-                                    team: 1
-                                });
+                                clientLobby.join();
                                 resolve(clientLobby);
                             });
                         }
@@ -74,8 +68,9 @@ var Play;
                             let lobbyId = lobbyRef.key();
                             let lobby = new Play.ClientLobby(lobbyId);
                             lobby.clientGUID = guid();
-                            let signalingService = new Play.FirebaseSignalingService();
-                            signalingService.createSignalingClient(lobby);
+                            let signalingService = new Play.SignalingService();
+                            var ref = new Firebase("https://fiery-inferno-1131.firebaseio.com/").child("lobby").child(lobby.lobbyId).child("sdp");
+                            signalingService.createSignalingClient(lobby, new Play.FirebaseSignalingChannel(ref));
                             resolve(lobby);
                         }
                     });

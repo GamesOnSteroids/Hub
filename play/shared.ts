@@ -10,11 +10,12 @@ module Play {
 
     export enum LobbyMessageId {
         CMSG_JOIN_REQUEST = 1,
-        SMSG_JOIN = 2,
-        SMSG_GAME_START = 3
-
+        SMSG_PLAYER_JOINED = 2,
+        SMSG_GAME_START = 3,
+        SMSG_GAME_OVER = 4,
+        CMSG_READY = 5,
+        SMSG_PLAYER_READY = 6,
     }
-
 
 
     export interface IMessage {
@@ -22,17 +23,28 @@ module Play {
         id: number;
     }
 
+    export interface GameOverMessage extends IMessage {
+
+    }
+
+
+    export interface ReadyMessage extends IMessage {
+
+    }
+
+    export interface PlayerReadyMessage extends IMessage {
+        playerId: string;
+    }
 
     export interface JoinRequestMessage extends IMessage {
         name: string;
         team: number;
     }
 
-    export interface JoinMessage extends IMessage {
-        clientId: string;
+    export interface PlayerJoinedMessage extends IMessage {
+        playerId: string;
         name: string;
         team: number;
-        isReady: boolean;
         configuration?:any;
         isYou?: boolean;
     }

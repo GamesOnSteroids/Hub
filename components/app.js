@@ -11,9 +11,9 @@ var games = [
                 id: "default",
                 name: "Play 1v1 now!",
                 maxPlayers: 2,
-                width: 10,
-                height: 10,
-                mines: 1
+                width: 16,
+                height: 16,
+                mines: 40
             },
             {
                 id: "friend",

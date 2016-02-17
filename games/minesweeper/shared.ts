@@ -7,8 +7,7 @@ module Minesweeper {
         SMSG_REVEAL = 2,
         CMSG_FLAG_REQUEST = 3,
         SMSG_FLAG = 4,
-        CMSG_MASS_REVEAL_REQUEST = 5,
-        SMSG_GAME_OVER = 6,
+        CMSG_MASS_REVEAL_REQUEST = 5
     }
 
 
@@ -18,9 +17,6 @@ module Minesweeper {
         mines: number;
     }
 
-    export interface GameOverMessage extends GameMessage {
-
-    }
 
     export interface RevealMessage extends GameMessage {
         playerId: string;

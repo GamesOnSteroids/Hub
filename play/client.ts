@@ -39,12 +39,7 @@ module Play {
         }
     }
 
-    //export class PlayerInfo {
-    //    public id:string;
-    //    public name:string;
-    //    public team:number;
-    //
-    //}
+
 
     export class Client {
         public id:string;

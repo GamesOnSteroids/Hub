@@ -61,27 +61,24 @@ module Minesweeper.Service {
         constructor(lobby:ServerLobby) {
             super(lobby);
 
-            let configuration: GameConfiguration = lobby.configuration;
-
             this.on(MessageId.CMSG_REVEAL_REQUEST, this.onRevealRequest.bind(this));
             this.on(MessageId.CMSG_FLAG_REQUEST, this.onFlagRequest.bind(this));
             this.on(MessageId.CMSG_MASS_REVEAL_REQUEST, this.onMassRevealRequest.bind(this));
+
+            let configuration = this.lobby.configuration;
+
             this.minefield = new Minefield(configuration.width, configuration.height);
             this.mines = configuration.mines;
             this.flaggedMines = 0;
         }
 
-
-
         checkGameOver() {
             if (this.flaggedMines == this.mines) {
-                this.gameOver();
+                this.lobby.gameOver();
             }
         }
 
-        gameOver() {
-            this.broadcast({id: MessageId.SMSG_GAME_OVER})
-        }
+
 
         flag(client: Client, fieldId: number, flag: boolean) {
             let field = this.minefield.get(fieldId);

@@ -14,11 +14,10 @@ var Play;
         },
         optional: []
     };
-    class FirebaseSignalingService {
-        onServerSdpMessage(server, channel, snapshot) {
-            let value = snapshot.val();
+    class SignalingService {
+        onServerSdpMessage(server, channel, value) {
             if (value.type == "offer") {
-                console.log("offer");
+                console.log("SignalingService.offer");
                 let pc = new RTCPeerConnection(Play.servers);
                 let client = new Play.Client();
                 client.id = value.source;
@@ -36,7 +35,7 @@ var Play;
                 server.clients.push(client);
                 pc.onicecandidate = (event) => {
                     if (event.candidate != null) {
-                        channel.push({
+                        channel.send({
                             type: "candidate",
                             target: value.source,
                             candidate: JSON.stringify(event.candidate)
@@ -47,10 +46,10 @@ var Play;
                 pc.setRemoteDescription(offer);
                 pc.createAnswer((answer) => {
                     pc.setLocalDescription(answer, () => {
-                        channel.push({ type: "answer", target: value.source, answer: JSON.stringify(answer) });
+                        channel.send({ type: "answer", target: value.source, answer: JSON.stringify(answer) });
                     });
                 }, console.error);
-                snapshot.ref().remove();
+                return true;
             }
             else if (value.type == "candidate" && value.target == null) {
                 let candidate = new RTCIceCandidate(JSON.parse(value.candidate));
@@ -58,65 +57,55 @@ var Play;
                 let peerConnection = client.connection.peerConnection;
                 peerConnection.addIceCandidate(candidate, () => {
                 }, console.error);
-                snapshot.ref().remove();
+                return true;
             }
+            return false;
         }
-        createSignalingServer(lobby) {
-            let firebase = new Firebase("https://fiery-inferno-1131.firebaseio.com/");
-            let lobbyRef = firebase.child("lobby").child(lobby.lobbyId);
-            let sdpRef = lobbyRef.child("sdp");
-            sdpRef.on("child_added", (snapshot) => {
-                this.onServerSdpMessage(lobby, sdpRef, snapshot);
+        createSignalingServer(lobby, channel) {
+            channel.onReceive((snapshot) => {
+                return this.onServerSdpMessage(lobby, channel, snapshot);
             });
         }
-        onClientSdpMessage(lobby, snapshot) {
-            let value = snapshot.val();
+        onClientSdpMessage(lobby, value) {
             if (value.type == "answer" && value.target == lobby.clientGUID) {
-                console.log("answer");
+                console.log("SignalingService.answer");
                 let answer = new RTCSessionDescription(JSON.parse(value.answer));
                 lobby.serverConnection.peerConnection.setRemoteDescription(answer);
-                snapshot.ref().remove();
+                return true;
             }
             else if (value.type == "candidate" && (value.target != null && value.target == lobby.clientGUID)) {
                 let candidate = new RTCIceCandidate(JSON.parse(value.candidate));
                 lobby.serverConnection.peerConnection.addIceCandidate(candidate, () => {
                 }, console.error);
-                snapshot.ref().remove();
+                return true;
             }
+            return false;
         }
-        createSignalingClient(lobby) {
-            let firebase = new Firebase("https://fiery-inferno-1131.firebaseio.com/");
-            let lobbyRef = firebase.child("lobby").child(lobby.lobbyId);
-            let sdpRef = lobbyRef.child("sdp");
-            sdpRef.on("child_added", (snapshot) => {
-                this.onClientSdpMessage(lobby, snapshot);
+        createSignalingClient(lobby, channel) {
+            channel.onReceive((data) => {
+                return this.onClientSdpMessage(lobby, data);
             });
             let pc = new RTCPeerConnection(Play.servers);
-            let channel = pc.createDataChannel(lobby.clientGUID, { ordered: true });
+            let dataChannel = pc.createDataChannel(lobby.clientGUID, { ordered: true });
             let connection = new Play.Peer2PeerConnection();
             connection.peerConnection = pc;
-            connection.dataChannel = channel;
+            connection.dataChannel = dataChannel;
             connection.messageHandler = (msg) => lobby.onMessage(msg);
             lobby.serverConnection = connection;
-            channel.onopen = (event) => {
-                console.log("connection open");
-                let readyState = channel.readyState;
-                channel.onmessage = (e) => {
+            dataChannel.onopen = (event) => {
+                console.log("SignalingService.dataChannel.onopen");
+                let readyState = dataChannel.readyState;
+                dataChannel.onmessage = (e) => {
                     let message = JSON.parse(e.data);
                     connection.messageHandler(message);
                 };
                 if (readyState == "open") {
-                    lobby.sendToServer({
-                        service: Play.ServiceType.Lobby,
-                        id: Play.LobbyMessageId.CMSG_JOIN_REQUEST,
-                        name: "myName",
-                        team: 1
-                    });
+                    lobby.join();
                 }
             };
             pc.onicecandidate = (event) => {
                 if (event.candidate != null) {
-                    sdpRef.push({
+                    channel.send({
                         type: "candidate",
                         source: lobby.clientGUID,
                         candidate: JSON.stringify(event.candidate)
@@ -124,12 +113,13 @@ var Play;
                 }
             };
             pc.createOffer((offer) => {
+                console.log("SignalingService.createOffer");
                 pc.setLocalDescription(offer, () => {
-                    sdpRef.push({ type: "offer", source: lobby.clientGUID, offer: JSON.stringify(offer) });
+                    channel.send({ type: "offer", source: lobby.clientGUID, offer: JSON.stringify(offer) });
                 });
             }, console.error, Play.options);
         }
     }
-    Play.FirebaseSignalingService = FirebaseSignalingService;
+    Play.SignalingService = SignalingService;
 })(Play || (Play = {}));
-//# sourceMappingURL=signaling.js.map
+//# sourceMappingURL=signalingservice.js.map

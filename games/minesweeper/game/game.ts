@@ -14,7 +14,6 @@ module Minesweeper.Game {
         private camera:Play.Camera;
         private minefield:Minefield;
         private assets:any;
-        private isGameOver:boolean;
 
 
         constructor(lobby: ClientLobby, configuration: GameConfiguration) {
@@ -29,12 +28,12 @@ module Minesweeper.Game {
 
             this.on(MessageId.SMSG_REVEAL, this.onReveal.bind(this));
             this.on(MessageId.SMSG_FLAG, this.onFlag.bind(this));
-            this.on(MessageId.SMSG_GAME_OVER, this.onGameOver.bind(this));
 
             this.canvas.style.cursor = "pointer";
 
             this.camera = new Camera();
         }
+
 
         flag(x: number, y: number) {
             let field = this.minefield.get(x + y * this.minefield.width);
@@ -44,7 +43,7 @@ module Minesweeper.Game {
             }
 
             if (field.owner != null) {
-                if (field.owner.id == this.lobby.localClient.id) {
+                if (field.owner.id == this.lobby.localPlayer.id) {
                     this.send<FlagRequestMessage>({
                         id: MessageId.CMSG_FLAG_REQUEST,
                         fieldId: x + y * this.minefield.width,
@@ -91,7 +90,7 @@ module Minesweeper.Game {
             if (field.isRevealed) {
                 return;
             }
-            if (field.hasFlag && field.owner.team == this.lobby.localClient.team) {
+            if (field.hasFlag && field.owner.team == this.lobby.localPlayer.team) {
                 return;
             }
             let doubt = field.hasFlag;
@@ -107,29 +106,23 @@ module Minesweeper.Game {
 
         onFlag(msg:FlagMessage) {
             let field = this.minefield.get(msg.fieldId);
-            field.owner = this.lobby.clients.find(c => c.id == msg.playerId);
+            field.owner = this.lobby.players.find(p => p.id == msg.playerId);
             field.hasFlag = msg.flag;
         }
 
         onReveal(msg:RevealMessage) {
             let field = this.minefield.get(msg.fieldId);
             field.isRevealed = true;
-            field.owner = this.lobby.clients.find(c => c.id == msg.playerId);
+            field.owner = this.lobby.players.find(p => p.id == msg.playerId);
             field.adjecentMines = msg.adjacentMines;
             field.hasMine = msg.hasMine;
             field.hasFlag = false;
+
             if (field.hasMine) {
                 //TODO: explosion sound
                 //TODO: screen shake
             }
 
-        }
-
-        onGameOver(msg:GameOverMessage) {
-            this.isGameOver = true;
-            if (this.onGameOverCallback != null) {
-                this.onGameOverCallback();
-            }
         }
 
         load() {
@@ -203,7 +196,7 @@ module Minesweeper.Game {
 
                             if (x == ((mousePosition.x / TILE_SIZE) | 0) && y == ((mousePosition.y / TILE_SIZE) | 0)) {
                                 if (Mouse.button == 1) {
-                                    ctx.drawImage(this.assets.reveal[this.lobby.localClient.team], x * TILE_SIZE, y * TILE_SIZE);
+                                    ctx.drawImage(this.assets.reveal[this.lobby.localPlayer.team], x * TILE_SIZE, y * TILE_SIZE);
                                 } else {
                                     ctx.drawImage(this.assets.over, x * TILE_SIZE, y * TILE_SIZE);
                                 }

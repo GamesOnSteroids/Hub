@@ -1,10 +1,11 @@
 module Minesweeper.Game {
+
     "use strict";
-    import Client = Play.Client;
+    import PlayerInfo = Play.PlayerInfo;
 
     export class Field {
         public isRevealed:boolean;
-        public owner:Client;
+        public owner:PlayerInfo;
         public hasFlag:boolean;
         public hasMine:boolean;
         public adjecentMines:number;

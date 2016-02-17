@@ -4,7 +4,7 @@ module Play {
         id: number;
     }
 
-    export class GameService extends Service {
+    export abstract class GameService extends Service {
 
         constructor(lobby:ServerLobby) {
             super(lobby);

@@ -27,8 +27,6 @@ module Play {
         protected canvas:HTMLCanvasElement;
         protected context:CanvasRenderingContext2D;
 
-        public onGameOverCallback:() => void;
-
         constructor(lobby:ClientLobby) {
             this.lobby = lobby;
             this.canvas = <HTMLCanvasElement>document.getElementById("game-canvas");
@@ -36,20 +34,18 @@ module Play {
             this.canvas.onmousemove = (e) => {
                 Mouse.x = e.offsetX;
                 Mouse.y = e.offsetY;
-
+                Mouse.button = e.buttons;
             };
             this.canvas.onmouseup = (e) => {
                 Mouse.x = e.offsetX;
                 Mouse.y = e.offsetY;
                 this.onMouseUp(e);
-                if (e.button == 0) Mouse.button &= ~1;
-                if (e.button == 2) Mouse.button &= ~2;
+                Mouse.button = e.buttons;
             };
             this.canvas.onmousedown = (e) => {
                 Mouse.x = e.offsetX;
                 Mouse.y = e.offsetY;
-                if (e.button == 0) Mouse.button |= 1;
-                if (e.button == 2) Mouse.button |= 2;
+                Mouse.button = e.buttons;
                 this.onMouseDown(e);
             };
             this.canvas.oncontextmenu = (e) => {
@@ -60,13 +56,16 @@ module Play {
             };
 
             this.tick = this.tick.bind(this);
-        }
-
-        start() {
             window.requestAnimationFrame(this.tick);
         }
 
+
+
         tick(time:number) {
+            if (this.lobby.state != LobbyState.GAME_RUNNING) {
+                return;
+            }
+
             this.draw(time);
             this.update(time);
 
