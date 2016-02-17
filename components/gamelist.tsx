@@ -1,4 +1,4 @@
-
+"use strict";
 class GameList extends React.Component<any, any> {
 
     constructor() {

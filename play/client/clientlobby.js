@@ -1,5 +1,6 @@
 var Play;
 (function (Play) {
+    "use strict";
     (function (LobbyState) {
         LobbyState[LobbyState["IN_LOBBY"] = 0] = "IN_LOBBY";
         LobbyState[LobbyState["GAME_RUNNING"] = 1] = "GAME_RUNNING";

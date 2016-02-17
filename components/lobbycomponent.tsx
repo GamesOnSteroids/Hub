@@ -1,3 +1,4 @@
+"use strict";
 import LobbyState = Play.LobbyState;
 import PlayerInfo = Play.PlayerInfo;
 

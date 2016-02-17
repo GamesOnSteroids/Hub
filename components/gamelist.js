@@ -1,3 +1,4 @@
+"use strict";
 class GameList extends React.Component {
     constructor() {
         super();

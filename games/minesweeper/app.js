@@ -1,5 +1,5 @@
-var ClientLobby = Play.ClientLobby;
 "use strict";
+var ClientLobby = Play.ClientLobby;
 class MinesweeperApp extends React.Component {
     constructor() {
         super();

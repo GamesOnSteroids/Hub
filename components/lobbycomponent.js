@@ -1,3 +1,4 @@
+"use strict";
 var LobbyState = Play.LobbyState;
 var PlayerInfo = Play.PlayerInfo;
 class GameOver extends React.Component {

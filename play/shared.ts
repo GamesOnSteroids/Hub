@@ -1,7 +1,6 @@
 module Play {
     "use strict";
 
-    "use strict";
     export enum ServiceType {
         Lobby = 1,
         Game = 2,

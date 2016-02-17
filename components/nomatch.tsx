@@ -1,4 +1,4 @@
-
+"use strict";
 class NoMatch extends React.Component<any, any> {
 
     constructor() {

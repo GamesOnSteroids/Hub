@@ -1,5 +1,5 @@
 module Play {
-
+    "use strict";
     export enum LobbyState {
         IN_LOBBY,
         GAME_RUNNING,

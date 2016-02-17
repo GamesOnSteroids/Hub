@@ -1,5 +1,6 @@
-import ClientLobby = Play.ClientLobby;
 "use strict";
+
+import ClientLobby = Play.ClientLobby;
 
 class MinesweeperApp extends React.Component<any, any> {
 
