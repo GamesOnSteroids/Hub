@@ -30,7 +30,6 @@ class GameDescription extends React.Component<any, any> {
                     <button key={configuration.id} type="button"
                             className={configuration.id == "default" ? "btn btn-primary" : "btn btn-default"}
                             onClick={this.startGame.bind(this, configuration)}>
-                        <span className="glyphicon glyphicon-align-left"/>
                         {configuration.name}
                     </button>)) }
                 </div>

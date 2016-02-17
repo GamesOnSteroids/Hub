@@ -17,4 +17,4 @@ var Play;
     })(Play.LobbyMessageId || (Play.LobbyMessageId = {}));
     var LobbyMessageId = Play.LobbyMessageId;
 })(Play || (Play = {}));
-//# sourceMappingURL=shared.js.map
+//# sourceMappingURL=messages.js.map

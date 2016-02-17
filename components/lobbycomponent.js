@@ -38,6 +38,7 @@ class LobbyComponent extends React.Component {
         var lobby = Play.ClientLobby.current;
         this.state = { state: lobby.state, players: lobby.players };
         lobby.changeListener = (lobby, completed) => {
+            console.log("LobbyComponent.changeListener");
             this.setState({ state: lobby.state, players: lobby.players }, completed);
         };
     }

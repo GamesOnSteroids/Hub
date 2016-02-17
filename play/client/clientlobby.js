@@ -32,15 +32,14 @@ var Play;
                 handler(msg);
             }
         }
-        changeState(state, completed) {
-            console.log("ClientLobby.changeState", state);
-            this.state = state;
+        emitChange(completed) {
             if (this.changeListener != null) {
                 this.changeListener(this, completed);
             }
         }
         backToLobby() {
-            this.changeState(LobbyState.IN_LOBBY, () => {
+            this.state = LobbyState.IN_LOBBY;
+            this.emitChange(() => {
                 this.ready();
             });
         }
@@ -48,7 +47,7 @@ var Play;
             this.sendToServer({
                 service: Play.ServiceType.Lobby,
                 id: Play.LobbyMessageId.CMSG_JOIN_REQUEST,
-                name: guid(),
+                name: localStorage.getItem("nickname"),
                 team: 1
             });
             this.ready();
@@ -65,15 +64,19 @@ var Play;
         onGameOver(message) {
             console.log("ClientLobby.onGameOver");
             this.messageHandlers[Play.ServiceType.Game] = [];
-            this.changeState(LobbyState.GAME_OVER);
+            this.state = LobbyState.GAME_OVER;
+            this.emitChange();
         }
         onGameStart(message) {
             console.log("ClientLobby.onGameStart");
-            this.changeState(LobbyState.GAME_RUNNING);
+            this.game = new Minesweeper.Game.MinesweeperGame(this);
+            this.state = LobbyState.GAME_RUNNING;
+            this.emitChange();
         }
         onJoin(message) {
             console.log("ClientLobby.onJoin");
             let player = new Play.PlayerInfo();
+            player.gameData = {};
             player.id = message.playerId;
             player.name = message.name;
             player.team = message.team;
@@ -82,9 +85,7 @@ var Play;
                 this.configuration = message.configuration;
                 this.localPlayer = player;
             }
-            if (this.changeListener != null) {
-                this.changeListener(this, null);
-            }
+            this.emitChange();
         }
     }
     Play.ClientLobby = ClientLobby;

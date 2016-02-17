@@ -24,13 +24,37 @@ var games = [
                 mines: 40
             },
             {
+                id: "3players",
+                name: "Play 1v1v1 now!",
+                maxPlayers: 3,
+                width: 16,
+                height: 16,
+                mines: 40
+            },
+            {
                 id: "friend",
                 name: "Play with friend",
                 maxPlayers: 2,
                 width: 10,
                 height: 10,
                 mines: 1
-            }
+            },
+            {
+                id: "solo",
+                name: "Play Solo!",
+                maxPlayers: 1,
+                width: 16,
+                height: 16,
+                mines: 40
+            },
+            {
+                id: "debug",
+                name: "debug",
+                maxPlayers: 1,
+                width: 10,
+                height: 10,
+                mines: 2
+            },
         ]
     },
     {

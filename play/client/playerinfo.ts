@@ -6,5 +6,6 @@ module Play {
         public name:string;
         public team:number;
         public isReady: boolean;
+        public gameData: any;
     }
 }

@@ -3,11 +3,40 @@ var Play;
     "use strict";
     class Camera {
         constructor() {
-            this.scale = { x: 1, y: 1 };
-            this.translate = { x: 20, y: 20 };
+            this.scaleX = 1;
+            this.scaleY = 1;
+            this.translateX = 0;
+            this.translateY = 0;
+            this.shakeDuration = 0;
         }
         unproject(x, y) {
-            return { x: (x - this.translate.x) / this.scale.x, y: (y - this.translate.y) / this.scale.y };
+            return { x: (x - this.translateX) / this.scaleX, y: (y - this.translateY) / this.scaleY };
+        }
+        update(delta) {
+            if (this.shakeDuration > 0) {
+                this.shakeTimer += delta;
+                let x = Math.random() * 2 - 1;
+                let y = Math.random() * 2 - 1;
+                x *= this.shakeMagnitude;
+                y *= this.shakeMagnitude;
+                this.translateX += x;
+                this.translateY += y;
+                if (this.shakeTimer > this.shakeDuration) {
+                    this.translateX = this.originalPositionX;
+                    this.translateY = this.originalPositionY;
+                    this.shakeDuration = 0;
+                }
+            }
+        }
+        shake(magnitude, duration) {
+            if (this.shakeDuration != 0) {
+                return;
+            }
+            this.shakeMagnitude = magnitude;
+            this.shakeDuration = duration;
+            this.shakeTimer = 0;
+            this.originalPositionX = this.translateX;
+            this.originalPositionY = this.translateY;
         }
     }
     Play.Camera = Camera;
@@ -20,6 +49,8 @@ var Play;
     class Game {
         constructor(lobby) {
             this.lobby = lobby;
+        }
+        initialize() {
             this.canvas = document.getElementById("game-canvas");
             this.context = this.canvas.getContext("2d");
             this.canvas.onmousemove = (e) => {
@@ -46,19 +77,22 @@ var Play;
                 return false;
             };
             this.tick = this.tick.bind(this);
+            this.lastFrame = performance.now();
             window.requestAnimationFrame(this.tick);
         }
         tick(time) {
-            if (this.lobby.state != Play.LobbyState.GAME_RUNNING) {
+            let delta = time - this.lastFrame;
+            if (this.lobby.state != Play.LobbyState.GAME_RUNNING && this.lobby.state != Play.LobbyState.GAME_OVER) {
                 return;
             }
-            this.draw(time);
-            this.update(time);
+            this.draw(delta);
+            this.update(delta);
+            this.lastFrame = time;
             window.requestAnimationFrame(this.tick);
         }
-        draw(time) {
+        draw(delta) {
         }
-        update(time) {
+        update(delta) {
         }
         onMouseUp(e) {
         }

@@ -1,5 +1,6 @@
 module Play {
     "use strict";
+
     export enum LobbyState {
         IN_LOBBY,
         GAME_RUNNING,
@@ -57,16 +58,16 @@ module Play {
             }
         }
 
-        private changeState(state: LobbyState, completed?: ()=>void): void {
-            console.log("ClientLobby.changeState", state);
-            this.state = state;
+
+        private emitChange(completed?: ()=>void) {
             if (this.changeListener != null) {
                 this.changeListener(this, completed);
             }
         }
 
         backToLobby() {
-            this.changeState(LobbyState.IN_LOBBY, () => {
+            this.state = LobbyState.IN_LOBBY;
+            this.emitChange(() => {
                 this.ready();
             });
         }
@@ -76,7 +77,7 @@ module Play {
             this.sendToServer<JoinRequestMessage>({
                 service: ServiceType.Lobby,
                 id: <number>LobbyMessageId.CMSG_JOIN_REQUEST,
-                name: guid(),
+                name: localStorage.getItem("nickname"),
                 team: 1
             });
             this.ready();
@@ -97,19 +98,25 @@ module Play {
         onGameOver(message:GameOverMessage) {
             console.log("ClientLobby.onGameOver");
             this.messageHandlers[ServiceType.Game] = [];
-            this.changeState(LobbyState.GAME_OVER);
+            this.state = LobbyState.GAME_OVER;
+            this.emitChange();
         }
 
         onGameStart(message:GameStartMessage) {
             console.log("ClientLobby.onGameStart");
 
-            this.changeState(LobbyState.GAME_RUNNING);
+
+            this.game = new Minesweeper.Game.MinesweeperGame(this);
+
+            this.state = LobbyState.GAME_RUNNING;
+            this.emitChange();
         }
 
         onJoin(message:PlayerJoinedMessage) {
             console.log("ClientLobby.onJoin");
 
             let player = new PlayerInfo();
+            player.gameData = {};
             player.id = message.playerId;
             player.name = message.name;
             player.team = message.team;
@@ -122,9 +129,7 @@ module Play {
             }
 
 
-            if (this.changeListener != null) {
-                this.changeListener(this, null);
-            }
+            this.emitChange();
         }
     }
 

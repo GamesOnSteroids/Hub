@@ -7,9 +7,14 @@ module Minesweeper {
         SMSG_REVEAL = 2,
         CMSG_FLAG_REQUEST = 3,
         SMSG_FLAG = 4,
-        CMSG_MASS_REVEAL_REQUEST = 5
+        CMSG_MASS_REVEAL_REQUEST = 5,
+        SMSG_SCORE = 6,
     }
 
+    export interface ScoreMessage extends GameMessage{
+        playerId: string;
+        score: number;
+    }
 
     export interface GameConfiguration {
         width: number;
@@ -24,7 +29,8 @@ module Minesweeper {
         adjacentMines: number;
         hasMine: boolean;
     }
-    export interface FlagMessage {
+
+    export interface FlagMessage extends GameMessage{
         playerId: string;
         fieldId: number;
         flag: boolean;

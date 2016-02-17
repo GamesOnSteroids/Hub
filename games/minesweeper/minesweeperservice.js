@@ -46,8 +46,29 @@ var Minesweeper;
             }
             checkGameOver() {
                 if (this.flaggedMines == this.mines) {
-                    this.lobby.gameOver();
+                    this.gameOver();
                 }
+            }
+            gameOver() {
+                for (let i = 0; i < this.minefield.width * this.minefield.height; i++) {
+                    let field = this.minefield.get(i);
+                    if (field.hasFlag) {
+                        if (field.hasMine) {
+                            this.score(field.owner, MinesweeperService.SCORE_INCORRECT_FLAG);
+                        }
+                        else {
+                            this.score(field.owner, MinesweeperService.SCORE_CORRECT_FLAG);
+                        }
+                    }
+                }
+                this.lobby.gameOver();
+            }
+            score(client, score) {
+                this.broadcast({
+                    id: Minesweeper.MessageId.SMSG_SCORE,
+                    playerId: client.id,
+                    score: score
+                });
             }
             flag(client, fieldId, flag) {
                 let field = this.minefield.get(fieldId);
@@ -57,7 +78,7 @@ var Minesweeper;
                 field.hasFlag = flag;
                 if (flag) {
                     field.owner = client;
-                    this.broadcast({ id: Minesweeper.MessageId.SMSG_FLAG, playerId: field.owner.id, fieldId: fieldId, flag: true });
+                    this.broadcast({ id: Minesweeper.MessageId.SMSG_FLAG, playerId: client.id, fieldId: fieldId, flag: true });
                     if (field.hasMine) {
                         this.flaggedMines++;
                         this.checkGameOver();
@@ -65,7 +86,7 @@ var Minesweeper;
                 }
                 else {
                     field.owner = null;
-                    this.broadcast({ id: Minesweeper.MessageId.SMSG_FLAG, fieldId: fieldId, flag: false });
+                    this.broadcast({ id: Minesweeper.MessageId.SMSG_FLAG, playerId: client.id, fieldId: fieldId, flag: false });
                     if (field.hasMine) {
                         this.flaggedMines--;
                         this.checkGameOver();
@@ -78,13 +99,17 @@ var Minesweeper;
                     return;
                 }
                 let flags = 0;
+                let unknownFields = 0;
                 this.minefield.forAdjacent(fieldId, (fieldId) => {
                     let field = this.minefield.get(fieldId);
                     if (field.hasFlag || (field.isRevealed && field.hasMine)) {
                         flags++;
                     }
+                    if (!field.isRevealed && !field.hasFlag) {
+                        unknownFields++;
+                    }
                 });
-                if (flags == field.adjacentMines) {
+                if (flags == field.adjacentMines && unknownFields > 0) {
                     this.minefield.forAdjacent(fieldId, (fieldId) => {
                         let field = this.minefield.get(fieldId);
                         if (!field.isRevealed && !field.hasFlag) {
@@ -106,6 +131,7 @@ var Minesweeper;
                         return;
                     }
                 }
+                let oldOwner = field.owner;
                 field.isRevealed = true;
                 field.owner = client;
                 field.hasFlag = false;
@@ -118,14 +144,19 @@ var Minesweeper;
                 });
                 if (field.hasFlag) {
                     if (field.hasMine) {
+                        this.score(oldOwner, MinesweeperService.SCORE_EXPLOSION);
+                        this.score(field.owner, MinesweeperService.SCORE_CORRECT_DOUBT);
                         this.mines--;
                         this.checkGameOver();
                     }
                     else {
+                        this.score(oldOwner, MinesweeperService.SCORE_CORRECT_FLAG);
+                        this.score(field.owner, MinesweeperService.SCORE_INCORRECT_DOUBT);
                     }
                 }
                 else {
                     if (field.hasMine) {
+                        this.score(field.owner, MinesweeperService.SCORE_EXPLOSION);
                         this.mines--;
                         this.checkGameOver();
                     }
@@ -185,7 +216,12 @@ var Minesweeper;
                 result.generated = true;
             }
         }
+        MinesweeperService.SCORE_INCORRECT_FLAG = -5000;
+        MinesweeperService.SCORE_CORRECT_FLAG = 2500;
+        MinesweeperService.SCORE_CORRECT_DOUBT = 7500;
+        MinesweeperService.SCORE_INCORRECT_DOUBT = 100;
+        MinesweeperService.SCORE_EXPLOSION = -5000;
         Service.MinesweeperService = MinesweeperService;
     })(Service = Minesweeper.Service || (Minesweeper.Service = {}));
 })(Minesweeper || (Minesweeper = {}));
-//# sourceMappingURL=service.js.map
+//# sourceMappingURL=minesweeperservice.js.map

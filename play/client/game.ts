@@ -1,17 +1,55 @@
 module Play {
     "use strict";
 
-    interface Point2D {
-        x: number;
-        y: number;
-    }
-
     export class Camera {
-        public scale:Point2D = {x: 1, y: 1};
-        public translate:Point2D = {x: 20, y: 20};
+        public scaleX = 1;
+        public scaleY = 1;
+        public translateX = 0;
+        public translateY = 0;
 
-        unproject(x:number, y:number):Point2D {
-            return {x: (x - this.translate.x) / this.scale.x, y: (y - this.translate.y) / this.scale.y};
+        private shakeMagnitude: number;
+        private shakeDuration: number = 0;
+        private shakeTimer: number;
+        private originalPositionX: number;
+        private originalPositionY: number;
+
+        unproject(x:number, y:number):{x: number, y: number} {
+            return {x: (x - this.translateX) / this.scaleX, y: (y - this.translateY) / this.scaleY};
+        }
+
+        update(delta: number) {
+
+            if (this.shakeDuration > 0) {
+                this.shakeTimer += delta;
+
+
+                let x = Math.random() * 2 - 1;
+                let y = Math.random() * 2 - 1;
+                x *= this.shakeMagnitude ;
+                y *= this.shakeMagnitude ;
+
+                this.translateX += x;
+                this.translateY += y;
+
+                if (this.shakeTimer > this.shakeDuration) {
+                    this.translateX = this.originalPositionX;
+                    this.translateY = this.originalPositionY;
+                    this.shakeDuration = 0;
+                }
+
+            }
+        }
+
+        shake(magnitude: number, duration: number) {
+            if (this.shakeDuration != 0) {
+                return;
+            }
+
+            this.shakeMagnitude = magnitude;
+            this.shakeDuration = duration;
+            this.shakeTimer = 0;
+            this.originalPositionX = this.translateX;
+            this.originalPositionY = this.translateY;
         }
     }
 
@@ -27,8 +65,13 @@ module Play {
         protected canvas:HTMLCanvasElement;
         protected context:CanvasRenderingContext2D;
 
+        private lastFrame: number;
+
         constructor(lobby:ClientLobby) {
             this.lobby = lobby;
+        }
+
+        initialize() {
             this.canvas = <HTMLCanvasElement>document.getElementById("game-canvas");
             this.context = this.canvas.getContext("2d");
             this.canvas.onmousemove = (e) => {
@@ -56,26 +99,27 @@ module Play {
             };
 
             this.tick = this.tick.bind(this);
+            this.lastFrame = performance.now();
             window.requestAnimationFrame(this.tick);
         }
 
-
-
         tick(time:number) {
-            if (this.lobby.state != LobbyState.GAME_RUNNING) {
+            let delta = time - this.lastFrame;
+            if (this.lobby.state != LobbyState.GAME_RUNNING && this.lobby.state != LobbyState.GAME_OVER) {
                 return;
             }
 
-            this.draw(time);
-            this.update(time);
+            this.draw(delta);
+            this.update(delta);
 
+            this.lastFrame = time;
             window.requestAnimationFrame(this.tick);
         }
 
-        draw(time:number) {
+        draw(delta:number) {
         }
 
-        update(time:number) {
+        update(delta:number) {
         }
 
         onMouseUp(e:MouseEvent) {

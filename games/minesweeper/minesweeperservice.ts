@@ -54,6 +54,12 @@ module Minesweeper.Service {
 
     export class MinesweeperService extends GameService {
 
+        static SCORE_INCORRECT_FLAG = -5000;
+        static SCORE_CORRECT_FLAG = 2500;
+        static SCORE_CORRECT_DOUBT = 7500;
+        static SCORE_INCORRECT_DOUBT = 100;
+        static SCORE_EXPLOSION = -5000;
+
         private minefield:Minefield;
         private mines:number;
         private flaggedMines:number;
@@ -74,10 +80,32 @@ module Minesweeper.Service {
 
         checkGameOver() {
             if (this.flaggedMines == this.mines) {
-                this.lobby.gameOver();
+                this.gameOver();
             }
         }
 
+        gameOver() {
+            for (let i = 0; i < this.minefield.width * this.minefield.height; i++) {
+                let field = this.minefield.get(i);
+                if (field.hasFlag) {
+                    if (field.hasMine) {
+                        this.score(field.owner, MinesweeperService.SCORE_INCORRECT_FLAG);
+                    } else {
+                        this.score(field.owner, MinesweeperService.SCORE_CORRECT_FLAG);
+                    }
+                }
+            }
+            this.lobby.gameOver();
+        }
+
+
+        score(client: Client, score: number) {
+            this.broadcast<ScoreMessage>({
+                id: MessageId.SMSG_SCORE,
+                playerId: client.id,
+                score: score
+            })
+        }
 
 
         flag(client: Client, fieldId: number, flag: boolean) {
@@ -89,14 +117,14 @@ module Minesweeper.Service {
             field.hasFlag = flag;
             if (flag) {
                 field.owner = client;
-                this.broadcast({id: MessageId.SMSG_FLAG, playerId: field.owner.id, fieldId: fieldId, flag: true});
+                this.broadcast<FlagMessage>({id: MessageId.SMSG_FLAG, playerId: client.id, fieldId: fieldId, flag: true});
                 if (field.hasMine) {
                     this.flaggedMines++;
                     this.checkGameOver();
                 }
             } else {
                 field.owner = null;
-                this.broadcast({id: MessageId.SMSG_FLAG, fieldId: fieldId, flag: false});
+                this.broadcast<FlagMessage>({id: MessageId.SMSG_FLAG, playerId: client.id, fieldId: fieldId, flag: false});
                 if (field.hasMine) {
                     this.flaggedMines--;
                     this.checkGameOver();
@@ -115,14 +143,18 @@ module Minesweeper.Service {
 
 
             let flags = 0;
+            let unknownFields = 0;
             this.minefield.forAdjacent(fieldId, (fieldId) => {
                 let field = this.minefield.get(fieldId);
                 if (field.hasFlag || (field.isRevealed && field.hasMine)) {
                     flags++;
                 }
+                if (!field.isRevealed && !field.hasFlag ) { // are there any unrevealed unflagged fields left?
+                    unknownFields++;
+                }
             });
 
-            if (flags == field.adjacentMines) {
+            if (flags == field.adjacentMines && unknownFields > 0) {
                 this.minefield.forAdjacent(fieldId, (fieldId) => {
                     let field = this.minefield.get(fieldId);
                     if (!field.isRevealed && !field.hasFlag) { // reveal all non flagged
@@ -151,6 +183,7 @@ module Minesweeper.Service {
                 }
             }
 
+            let oldOwner = field.owner;
             field.isRevealed = true;
             field.owner = client;
             field.hasFlag = false;
@@ -165,15 +198,17 @@ module Minesweeper.Service {
 
             if (field.hasFlag) {
                 if (field.hasMine) { // doubt mine
-                    //TODO
+                    this.score(oldOwner, MinesweeperService.SCORE_EXPLOSION);
+                    this.score(field.owner, MinesweeperService.SCORE_CORRECT_DOUBT);
                     this.mines--;
                     this.checkGameOver();
                 } else { // doubt empty field
-                    //TODO
+                    this.score(oldOwner, MinesweeperService.SCORE_CORRECT_FLAG);
+                    this.score(field.owner, MinesweeperService.SCORE_INCORRECT_DOUBT);
                 }
             } else {
                 if (field.hasMine) { // reveal mine
-                    //TODO
+                    this.score(field.owner, MinesweeperService.SCORE_EXPLOSION);
                     this.mines--;
                     this.checkGameOver();
                 } else { // reveal empty field
