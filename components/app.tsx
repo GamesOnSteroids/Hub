@@ -87,7 +87,6 @@ ReactDOM.render((
         <ReactRouter.Route path="/" component={App}>
             <ReactRouter.IndexRoute component={GameList}/>
             <ReactRouter.Route path="/games" component={GameList}/>
-            <ReactRouter.Route path="/minesweeper" component={MinesweeperApp}/>
             <ReactRouter.Route path="/lobby/:lobbyId" component={LobbyComponent}/>
             <ReactRouter.Route path="*" component={NoMatch}/>
         </ReactRouter.Route>

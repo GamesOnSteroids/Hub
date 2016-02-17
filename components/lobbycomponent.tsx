@@ -1,6 +1,7 @@
 "use strict";
-import LobbyState = Play.LobbyState;
-import PlayerInfo = Play.PlayerInfo;
+import LobbyState = Play.Client.LobbyState;
+import PlayerInfo = Play.Client.PlayerInfo;
+import ClientLobby = Play.Client.ClientLobby;
 
 
 class GameOver extends React.Component<any, any> {
@@ -52,7 +53,7 @@ class LobbyComponent extends React.Component<any, {state: LobbyState, players: P
 
     constructor() {
         super();
-        var lobby = Play.ClientLobby.current;
+        var lobby = ClientLobby.current;
         this.state = {state: lobby.state, players: lobby.players};
 
         lobby.changeListener = (lobby, completed) => {
@@ -63,7 +64,7 @@ class LobbyComponent extends React.Component<any, {state: LobbyState, players: P
 
     backToLobby() {
         console.log("LobbyComponent.backToLobby");
-        Play.ClientLobby.current.backToLobby();
+        ClientLobby.current.backToLobby();
     }
 
     render():JSX.Element {
@@ -98,7 +99,7 @@ class LobbyComponent extends React.Component<any, {state: LobbyState, players: P
                 </div>
             )
         } else if (this.state.state == LobbyState.GAME_RUNNING || this.state.state == LobbyState.GAME_OVER) {
-            var game = React.createElement(MinesweeperApp);
+            var game = React.createElement(Minesweeper.Client.MinesweeperApp);
             return (<div>
                 {game}
                 {this.state.state == LobbyState.GAME_OVER?<GameOver onBackToLobby={this.backToLobby}/>:""}

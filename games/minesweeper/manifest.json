@@ -1,5 +1,8 @@
 {
   "name": "Minesweeper",
-  "minPlayers": 2,
-  "maxPlayers": 4
+  "configurations": [
+    {
+
+    }
+  ]
 }
