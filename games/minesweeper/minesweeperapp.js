@@ -1,6 +1,6 @@
-var MinesweeperGame = Minesweeper.Game.MinesweeperGame;
 "use strict";
 var ClientLobby = Play.ClientLobby;
+var MinesweeperGame = Minesweeper.Game.MinesweeperGame;
 class MinesweeperScore extends React.Component {
     render() {
         var totalFlags = 0;

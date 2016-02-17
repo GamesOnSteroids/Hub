@@ -1,7 +1,7 @@
-import MinesweeperGame = Minesweeper.Game.MinesweeperGame;
 "use strict";
 
 import ClientLobby = Play.ClientLobby;
+import MinesweeperGame = Minesweeper.Game.MinesweeperGame;
 
 class MinesweeperScore extends React.Component<{players: PlayerInfo[], mines: number}, any> {
     render() {
