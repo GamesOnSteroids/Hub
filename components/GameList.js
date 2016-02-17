@@ -11,4 +11,4 @@ class GameList extends React.Component {
         return (React.createElement("div", null, gameList));
     }
 }
-//# sourceMappingURL=gamelist.js.map
+//# sourceMappingURL=GameList.js.map

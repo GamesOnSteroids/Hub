@@ -7,4 +7,4 @@ class NoMatch extends React.Component {
         return (React.createElement("div", null, "404"));
     }
 }
-//# sourceMappingURL=nomatch.js.map
+//# sourceMappingURL=NoMatch.js.map

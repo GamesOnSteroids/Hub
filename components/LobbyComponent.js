@@ -60,4 +60,4 @@ class LobbyComponent extends React.Component {
         }
     }
 }
-//# sourceMappingURL=lobbycomponent.js.map
+//# sourceMappingURL=LobbyComponent.js.map
