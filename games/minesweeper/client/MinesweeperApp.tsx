@@ -9,7 +9,7 @@ module Minesweeper.Client {
         constructor() {
             super();
 
-            let game:any = ClientLobby.current.game;
+            let game = ClientLobby.current.game as MinesweeperGame;
 
             this.state = {
                 players: ClientLobby.current.players,
@@ -20,17 +20,17 @@ module Minesweeper.Client {
         componentDidMount() {
             console.log("MinesweeperApp.componentDidMount");
 
-            let game:any = ClientLobby.current.game;
+            let game = ClientLobby.current.game as MinesweeperGame;
 
             game.initialize();
 
-            game.changeListener = (game:MinesweeperGame) => {
+            game.changeListener.register( (game:MinesweeperGame) => {
                 console.log("MinesweeperApp.changeListener");
                 this.setState({
                     players: ClientLobby.current.players,
                     remainingMines: game.remainingMines
                 })
-            }
+            });
         }
 
         render() {

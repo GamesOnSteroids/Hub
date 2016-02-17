@@ -37,6 +37,8 @@ module Play.Server {
 
             this.on<JoinRequestMessage>(ServiceType.Lobby, LobbyMessageId.CMSG_JOIN_REQUEST, this.onJoinRequest.bind(this));
             this.on<ReadyMessage>(ServiceType.Lobby, LobbyMessageId.CMSG_READY, this.onReady.bind(this));
+            this.on<ChatMessage>(ServiceType.Lobby, LobbyMessageId.CMSG_CHAT, this.onChat.bind(this));
+
         }
 
 
@@ -70,7 +72,7 @@ module Play.Server {
         }
 
 
-        startGame() {
+        startGame(): void {
             this.gameService = new Minesweeper.Server.MinesweeperService(this);
             this.state = LobbyState.GAME_RUNNING;
             this.broadcast(<GameStartMessage>{
@@ -81,7 +83,16 @@ module Play.Server {
 
 
 
-        onReady(client: Client, msg:ReadyMessage) {
+        onChat(client: Client, msg:ChatMessage): void {
+            this.broadcast<PlayerChatMessage>({
+                id: LobbyMessageId.SMSG_PLAYER_CHAT,
+                service: ServiceType.Lobby,
+                playerId: client.id,
+                text: msg.text
+            });
+        }
+
+        onReady(client: Client, msg:ReadyMessage): void {
             console.log("ServerLobby.onReady");
             if (this.state != LobbyState.IN_LOBBY) {
                 return;

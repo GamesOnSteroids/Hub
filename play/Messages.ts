@@ -7,8 +7,7 @@ module Play {
 
     export enum ServiceType {
         Lobby = 1,
-        Game = 2,
-        Chat = 3,
+        Game = 2
     }
 
     export enum LobbyMessageId {
@@ -18,12 +17,22 @@ module Play {
         SMSG_GAME_OVER = 4,
         CMSG_READY = 5,
         SMSG_PLAYER_READY = 6,
+        CMSG_CHAT = 7,
+        SMSG_PLAYER_CHAT = 8
     }
 
 
     export interface IMessage {
         service: ServiceType;
         id: number;
+    }
+
+    export interface ChatMessage extends IMessage {
+        text: string
+    }
+    export interface PlayerChatMessage extends IMessage {
+        playerId: string;
+        text: string;
     }
 
     export interface GameOverMessage extends IMessage {

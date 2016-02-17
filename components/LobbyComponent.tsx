@@ -56,10 +56,10 @@ class LobbyComponent extends React.Component<any, {state: LobbyState, players: P
         var lobby = ClientLobby.current;
         this.state = {state: lobby.state, players: lobby.players};
 
-        lobby.changeListener = (lobby, completed) => {
+        lobby.changeListener.register( (lobby, completed) => {
             console.log("LobbyComponent.changeListener");
             this.setState({state: lobby.state, players: lobby.players}, completed);
-        }
+        });
     }
 
     backToLobby() {

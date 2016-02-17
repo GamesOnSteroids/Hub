@@ -1,3 +1,4 @@
+import ReactElement = __React.ReactElement;
 "use strict";
 class GameList extends React.Component<any, any> {
 
@@ -6,7 +7,7 @@ class GameList extends React.Component<any, any> {
     }
 
     render() {
-        let gameList:any[] = [];
+        let gameList:JSX.Element[] = [];
         for (let game of games) {
             gameList.push(<GameDescription key={game.id} game={game}/>);
         }

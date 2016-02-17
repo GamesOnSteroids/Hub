@@ -8,6 +8,17 @@ module Play.Client {
         GAME_OVER
     }
 
+    export class ChatLog {
+        public author: string;
+        public date: Date;
+        public text: string;
+
+        constructor(date: Date, author: string, text: string) {
+            this.date = date;
+            this.author = author;
+            this.text = text;
+        }
+    }
     export class ClientLobby {
         static current:ClientLobby;
 
@@ -20,11 +31,13 @@ module Play.Client {
 
         public configuration:any;
 
+        public messageLog: ChatLog[] = [];
+
         public serverConnection:IConnection;
 
 
         public state:LobbyState = LobbyState.IN_LOBBY;
-        public changeListener:(value:ClientLobby, completed: ()=>void)=> void;
+        public changeListener = new EventDispatcher<ClientLobby>();
 
         public lobbyId:string;
 
@@ -39,6 +52,7 @@ module Play.Client {
             this.on<PlayerJoinedMessage>(ServiceType.Lobby, LobbyMessageId.SMSG_PLAYER_JOINED, this.onJoin.bind(this));
             this.on<GameOverMessage>(ServiceType.Lobby, LobbyMessageId.SMSG_GAME_OVER, this.onGameOver.bind(this));
             this.on<PlayerReadyMessage>(ServiceType.Lobby, LobbyMessageId.SMSG_PLAYER_READY, this.onPlayerReady.bind(this));
+            this.on<PlayerChatMessage>(ServiceType.Lobby, LobbyMessageId.SMSG_PLAYER_CHAT, this.onPlayerChat.bind(this));
 
 
         }
@@ -60,20 +74,26 @@ module Play.Client {
         }
 
 
-        private emitChange(completed?: ()=>void) {
-            if (this.changeListener != null) {
-                this.changeListener(this, completed);
-            }
+        private emitChange(completed?: ()=>void): void {
+            this.changeListener.fire(this, completed);
         }
 
-        backToLobby() {
+        public sendChat(message: string): void {
+            this.sendToServer<ChatMessage>({
+                id: LobbyMessageId.CMSG_CHAT,
+                service: ServiceType.Lobby,
+                text: message
+            })
+        }
+
+        public backToLobby(): void {
             this.state = LobbyState.IN_LOBBY;
             this.emitChange(() => {
                 this.ready();
             });
         }
 
-        join() {
+        join(): void {
 
             this.sendToServer<JoinRequestMessage>({
                 service: ServiceType.Lobby,
@@ -88,6 +108,12 @@ module Play.Client {
             console.log("ClientLobby.ready");
             // preload assets
             this.sendToServer<ReadyMessage>({service:ServiceType.Lobby, id: LobbyMessageId.CMSG_READY});
+        }
+
+        onPlayerChat(message: PlayerChatMessage) {
+            let player = this.players.find(p=>p.id == message.playerId);
+            this.messageLog.push(new ChatLog(new Date(), player.name, message.text));
+            this.emitChange();
         }
 
         onPlayerReady(message: PlayerReadyMessage) {

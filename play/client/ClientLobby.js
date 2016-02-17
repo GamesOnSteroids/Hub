@@ -9,10 +9,20 @@ var Play;
             LobbyState[LobbyState["GAME_OVER"] = 2] = "GAME_OVER";
         })(Client.LobbyState || (Client.LobbyState = {}));
         var LobbyState = Client.LobbyState;
+        class ChatLog {
+            constructor(date, author, text) {
+                this.date = date;
+                this.author = author;
+                this.text = text;
+            }
+        }
+        Client.ChatLog = ChatLog;
         class ClientLobby {
             constructor(lobbyId) {
                 this.players = [];
+                this.messageLog = [];
                 this.state = LobbyState.IN_LOBBY;
+                this.changeListener = new Client.EventDispatcher();
                 this.lobbyId = lobbyId;
                 this.messageHandlers = [];
                 this.messageHandlers[Play.ServiceType.Lobby] = [];
@@ -21,6 +31,7 @@ var Play;
                 this.on(Play.ServiceType.Lobby, Play.LobbyMessageId.SMSG_PLAYER_JOINED, this.onJoin.bind(this));
                 this.on(Play.ServiceType.Lobby, Play.LobbyMessageId.SMSG_GAME_OVER, this.onGameOver.bind(this));
                 this.on(Play.ServiceType.Lobby, Play.LobbyMessageId.SMSG_PLAYER_READY, this.onPlayerReady.bind(this));
+                this.on(Play.ServiceType.Lobby, Play.LobbyMessageId.SMSG_PLAYER_CHAT, this.onPlayerChat.bind(this));
             }
             sendToServer(msg) {
                 this.serverConnection.send(msg);
@@ -35,9 +46,14 @@ var Play;
                 }
             }
             emitChange(completed) {
-                if (this.changeListener != null) {
-                    this.changeListener(this, completed);
-                }
+                this.changeListener.fire(this, completed);
+            }
+            sendChat(message) {
+                this.sendToServer({
+                    id: Play.LobbyMessageId.CMSG_CHAT,
+                    service: Play.ServiceType.Lobby,
+                    text: message
+                });
             }
             backToLobby() {
                 this.state = LobbyState.IN_LOBBY;
@@ -57,6 +73,11 @@ var Play;
             ready() {
                 console.log("ClientLobby.ready");
                 this.sendToServer({ service: Play.ServiceType.Lobby, id: Play.LobbyMessageId.CMSG_READY });
+            }
+            onPlayerChat(message) {
+                let player = this.players.find(p => p.id == message.playerId);
+                this.messageLog.push(new ChatLog(new Date(), player.name, message.text));
+                this.emitChange();
             }
             onPlayerReady(message) {
                 console.log("ClientLobby.onPlayerReady");

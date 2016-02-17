@@ -22,6 +22,7 @@ var Play;
                 this.messageHandlers[Play.ServiceType.Game] = [];
                 this.on(Play.ServiceType.Lobby, Play.LobbyMessageId.CMSG_JOIN_REQUEST, this.onJoinRequest.bind(this));
                 this.on(Play.ServiceType.Lobby, Play.LobbyMessageId.CMSG_READY, this.onReady.bind(this));
+                this.on(Play.ServiceType.Lobby, Play.LobbyMessageId.CMSG_CHAT, this.onChat.bind(this));
             }
             on(service, messageId, callback) {
                 this.messageHandlers[service][messageId] = callback;
@@ -51,6 +52,14 @@ var Play;
                 this.broadcast({
                     service: Play.ServiceType.Lobby,
                     id: Play.LobbyMessageId.SMSG_GAME_START
+                });
+            }
+            onChat(client, msg) {
+                this.broadcast({
+                    id: Play.LobbyMessageId.SMSG_PLAYER_CHAT,
+                    service: Play.ServiceType.Lobby,
+                    playerId: client.id,
+                    text: msg.text
                 });
             }
             onReady(client, msg) {

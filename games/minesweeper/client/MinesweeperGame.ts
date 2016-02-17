@@ -1,4 +1,5 @@
 module Minesweeper.Client {
+    import EventDispatcher = Play.Client.EventDispatcher;
     "use strict";
     import Camera = Play.Client.Camera;
     import Game = Play.Client.Game;
@@ -14,7 +15,7 @@ module Minesweeper.Client {
         private camera:Camera;
         private minefield:Minefield;
         private assets:any;
-        public changeListener:(game:MinesweeperGame)=>void;
+        public changeListener = new EventDispatcher<MinesweeperGame>();
         public remainingMines:number;
 
         constructor(lobby:ClientLobby) {
@@ -161,9 +162,7 @@ module Minesweeper.Client {
         }
 
         emitChange() {
-            if (this.changeListener != null) {
-                this.changeListener(this);
-            }
+            this.changeListener.fire(this);
         }
 
         onReveal(msg:RevealMessage) {

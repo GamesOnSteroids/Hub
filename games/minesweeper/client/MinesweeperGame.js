@@ -2,6 +2,7 @@ var Minesweeper;
 (function (Minesweeper) {
     var Client;
     (function (Client) {
+        var EventDispatcher = Play.Client.EventDispatcher;
         "use strict";
         var Camera = Play.Client.Camera;
         var Game = Play.Client.Game;
@@ -11,6 +12,7 @@ var Minesweeper;
         class MinesweeperGame extends Game {
             constructor(lobby) {
                 super(lobby);
+                this.changeListener = new EventDispatcher();
                 let configuration = this.lobby.configuration;
                 this.remainingMines = configuration.mines;
                 for (let player of this.lobby.players) {
@@ -126,9 +128,7 @@ var Minesweeper;
                 this.emitChange();
             }
             emitChange() {
-                if (this.changeListener != null) {
-                    this.changeListener(this);
-                }
+                this.changeListener.fire(this);
             }
             onReveal(msg) {
                 let field = this.minefield.get(msg.fieldId);
