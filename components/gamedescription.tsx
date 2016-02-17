@@ -11,7 +11,7 @@ class GameDescription extends React.Component<any, any> {
 
         let lobbyService:Play.ILobbyService = new Play.FirebaseLobbyService();
         lobbyService.findLobby(configuration).then((lobby) => {
-            ClientLobby.current = lobby;
+            Play.ClientLobby.current = lobby;
 
             ReactRouter.hashHistory.pushState(null, `/lobby/${lobby.lobbyId}`);
         });
