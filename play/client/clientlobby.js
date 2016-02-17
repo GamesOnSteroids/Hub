@@ -83,7 +83,7 @@ var Play;
                 this.localPlayer = player;
             }
             if (this.changeListener != null) {
-                this.changeListener(this);
+                this.changeListener(this, null);
             }
         }
     }

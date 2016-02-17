@@ -123,7 +123,7 @@ module Play {
 
 
             if (this.changeListener != null) {
-                this.changeListener(this);
+                this.changeListener(this, null);
             }
         }
     }
