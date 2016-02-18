@@ -1,6 +1,7 @@
 module Minesweeper.Client {
-    import EventDispatcher = Play.Client.EventDispatcher;
     "use strict";
+    
+    import EventDispatcher = Play.Client.EventDispatcher;
     import Camera = Play.Client.Camera;
     import Game = Play.Client.Game;
     import Mouse = Play.Client.Mouse;

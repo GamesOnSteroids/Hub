@@ -2,8 +2,8 @@ var Minesweeper;
 (function (Minesweeper) {
     var Client;
     (function (Client) {
-        var EventDispatcher = Play.Client.EventDispatcher;
         "use strict";
+        var EventDispatcher = Play.Client.EventDispatcher;
         var Camera = Play.Client.Camera;
         var Game = Play.Client.Game;
         var Mouse = Play.Client.Mouse;
