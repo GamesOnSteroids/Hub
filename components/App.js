@@ -24,6 +24,14 @@ var games = [
                 mines: 40
             },
             {
+                id: "4players",
+                name: "Play with 4 players now!",
+                maxPlayers: 4,
+                width: 16,
+                height: 16,
+                mines: 40
+            },
+            {
                 id: "friend",
                 name: "Play with friend",
                 maxPlayers: 2,
