@@ -1,3 +1,4 @@
+import SyntheticEvent = __React.SyntheticEvent;
 "use strict";
 
 class Header extends React.Component<any, any> {
@@ -21,8 +22,8 @@ class Header extends React.Component<any, any> {
     }
 
 
-    onNicknameChange(e: Synteh) {
-        var nickname = e.target.value;
+    onNicknameChange(e: SyntheticEvent) {
+        var nickname = (e.target as HTMLInputElement).value;
         if (nickname == null || nickname == "") {
             nickname = this.generateName();
         }
@@ -43,7 +44,7 @@ class Header extends React.Component<any, any> {
                     <div id="navbar" className="navbar-collapse collapse">
                         <form className="navbar-form navbar-right">
                             <div className="form-group">
-                                <input type="text" placeholder="Nickname" className="form-control" onChange={this.onNicknameChange} value={localStorage.getItem("nickname")} />
+                                <input type="text" placeholder="Nickname" className="form-control" onChange={this.onNicknameChange} value={localStorage.getItem("nickname")} autoComplete="nickname" />
                             </div>
                         </form>
                     </div>

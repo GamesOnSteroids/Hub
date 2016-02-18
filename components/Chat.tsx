@@ -15,15 +15,17 @@ class ChatMessageComponent extends React.Component<ChatLog, any> {
 
 class Chat extends React.Component<any, {messageLog: ChatLog[] }> {
 
+    private stateChangeToken:number;
+
     constructor() {
         super();
-        var lobby = ClientLobby.current;
+        let lobby = ClientLobby.current;
 
         this.state = {
             messageLog: lobby.messageLog
         };
 
-        lobby.changeListener.register((lobby) => {
+        this.stateChangeToken = lobby.changeListener.register((lobby:ClientLobby) => {
             this.setState({
                 messageLog: lobby.messageLog
             }, () => {
@@ -32,6 +34,12 @@ class Chat extends React.Component<any, {messageLog: ChatLog[] }> {
             })
         });
     }
+
+    componentWillUnmount() {
+        let lobby = ClientLobby.current;
+        lobby.changeListener.unregister(this.stateChangeToken);
+    }
+
 
     sendMessage(e:React.SyntheticEvent) {
         let input = document.getElementById("chatMessage") as HTMLInputElement;
@@ -55,7 +63,7 @@ class Chat extends React.Component<any, {messageLog: ChatLog[] }> {
                 </div>
                 <form onSubmit={this.sendMessage}>
                     <div className="input-group">
-                        <input id="chatMessage" type="text" className="form-control"
+                        <input id="chatMessage" type="text" className="form-control" autoComplete="off"
                                placeholder="Type your message..."/>
                         <span className="input-group-btn">
                             <button type="submit"

@@ -5,6 +5,7 @@ module Minesweeper.Client {
 
 
     export class MinesweeperApp extends React.Component<any, {players: PlayerInfo[], remainingMines: number}> {
+        private stateChangeToken:number;
 
         constructor() {
             super();
@@ -24,13 +25,18 @@ module Minesweeper.Client {
 
             game.initialize();
 
-            game.changeListener.register( (game:MinesweeperGame) => {
+            this.stateChangeToken = game.changeListener.register( (game:MinesweeperGame) => {
                 console.log("MinesweeperApp.changeListener");
                 this.setState({
                     players: ClientLobby.current.players,
                     remainingMines: game.remainingMines
                 })
             });
+        }
+        componentWillUnmount() {
+            let game = ClientLobby.current.game as MinesweeperGame;
+            game.changeListener.unregister(this.stateChangeToken);
+
         }
 
         render() {

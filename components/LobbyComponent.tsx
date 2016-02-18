@@ -51,15 +51,24 @@ class PlayerList extends React.Component<{players: PlayerInfo[]}, any> {
 
 class LobbyComponent extends React.Component<any, {state: LobbyState, players: PlayerInfo[]}> {
 
+    private changeListenerToken: number;
+
     constructor() {
         super();
+        console.log("LobbyComponent.constructor");
         var lobby = ClientLobby.current;
         this.state = {state: lobby.state, players: lobby.players};
 
-        lobby.changeListener.register( (lobby, completed) => {
+        this.changeListenerToken = lobby.changeListener.register( (lobby, completed) => {
             console.log("LobbyComponent.changeListener");
             this.setState({state: lobby.state, players: lobby.players}, completed);
         });
+    }
+
+    componentWillUnmount() {
+        console.log("LobbyComponent.componentWillUnmount");
+        var lobby = ClientLobby.current;
+        lobby.changeListener.unregister(this.changeListenerToken);
     }
 
     backToLobby() {

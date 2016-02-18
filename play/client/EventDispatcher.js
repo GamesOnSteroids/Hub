@@ -5,13 +5,21 @@ var Play;
         "use strict";
         class EventDispatcher {
             constructor() {
-                this.callbacks = [];
+                this.lastId = 0;
+                this.callbacks = new Map();
             }
             register(callback) {
-                this.callbacks.push(callback);
+                this.lastId++;
+                this.callbacks.set(this.lastId, callback);
+                return this.lastId;
             }
-            fire(value, completed) {
-                this.callbacks.forEach(c => c(value, completed));
+            unregister(dispatchToken) {
+                this.callbacks.delete(dispatchToken);
+            }
+            dispatch(payload, completed) {
+                for (let callback of this.callbacks.values()) {
+                    callback(payload, completed);
+                }
             }
         }
         Client.EventDispatcher = EventDispatcher;

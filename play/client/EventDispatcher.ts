@@ -4,14 +4,23 @@ module Play.Client {
 
     export class EventDispatcher<T> {
 
-        private callbacks:((value:T, completed?:()=>void)=>void)[] = [];
+        private lastId = 0;
+        private callbacks = new Map<number, ((value:T, completed?:()=>void)=>void)>();
 
-        register(callback:(value:T, completed?:()=>void)=>void) {
-            this.callbacks.push(callback);
+        register(callback:(value:T, completed?:()=>void)=>void): number {
+            this.lastId++;
+            this.callbacks.set(this.lastId, callback);
+            return this.lastId;
         }
 
-        fire(value: T, completed?: () => void) {
-            this.callbacks.forEach( c => c(value, completed));
+        unregister(dispatchToken: number) {
+            this.callbacks.delete(dispatchToken);
+        }
+
+        dispatch(payload: T, completed?: () => void) {
+            for (let callback of this.callbacks.values()) {
+                callback(payload, completed);
+            }
         }
     }
 }

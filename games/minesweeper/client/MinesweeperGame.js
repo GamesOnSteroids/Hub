@@ -128,7 +128,7 @@ var Minesweeper;
                 this.emitChange();
             }
             emitChange() {
-                this.changeListener.fire(this);
+                this.changeListener.dispatch(this);
             }
             onReveal(msg) {
                 let field = this.minefield.get(msg.fieldId);

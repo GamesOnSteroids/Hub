@@ -10,11 +10,11 @@ class ChatMessageComponent extends React.Component {
 class Chat extends React.Component {
     constructor() {
         super();
-        var lobby = ClientLobby.current;
+        let lobby = ClientLobby.current;
         this.state = {
             messageLog: lobby.messageLog
         };
-        lobby.changeListener.register((lobby) => {
+        this.stateChangeToken = lobby.changeListener.register((lobby) => {
             this.setState({
                 messageLog: lobby.messageLog
             }, () => {
@@ -22,6 +22,10 @@ class Chat extends React.Component {
                 chatLog.scrollTop = chatLog.scrollHeight;
             });
         });
+    }
+    componentWillUnmount() {
+        let lobby = ClientLobby.current;
+        lobby.changeListener.unregister(this.stateChangeToken);
     }
     sendMessage(e) {
         let input = document.getElementById("chatMessage");
@@ -34,7 +38,7 @@ class Chat extends React.Component {
             .sort((a, b) => b.date.getDate() - a.date.getDate())
             .map((m, index) => {
             return React.createElement("div", {"key": index}, React.createElement(ChatMessageComponent, {"date": m.date, "text": m.text, "author": m.author}));
-        })), React.createElement("form", {"onSubmit": this.sendMessage}, React.createElement("div", {"className": "input-group"}, React.createElement("input", {"id": "chatMessage", "type": "text", "className": "form-control", "placeholder": "Type your message..."}), React.createElement("span", {"className": "input-group-btn"}, React.createElement("button", {"type": "submit", "className": "btn btn-primary btn-block glyphicon glyphicon-envelope"}))))));
+        })), React.createElement("form", {"onSubmit": this.sendMessage}, React.createElement("div", {"className": "input-group"}, React.createElement("input", {"id": "chatMessage", "type": "text", "className": "form-control", "autoComplete": "off", "placeholder": "Type your message..."}), React.createElement("span", {"className": "input-group-btn"}, React.createElement("button", {"type": "submit", "className": "btn btn-primary btn-block glyphicon glyphicon-envelope"}))))));
     }
 }
 //# sourceMappingURL=Chat.js.map

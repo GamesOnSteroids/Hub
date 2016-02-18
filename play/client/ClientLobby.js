@@ -46,7 +46,7 @@ var Play;
                 }
             }
             emitChange(completed) {
-                this.changeListener.fire(this, completed);
+                this.changeListener.dispatch(this, completed);
             }
             sendChat(message) {
                 this.sendToServer({

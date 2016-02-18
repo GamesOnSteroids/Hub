@@ -75,7 +75,7 @@ module Play.Client {
 
 
         private emitChange(completed?: ()=>void): void {
-            this.changeListener.fire(this, completed);
+            this.changeListener.dispatch(this, completed);
         }
 
         public sendChat(message: string): void {

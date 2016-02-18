@@ -163,7 +163,7 @@ module Minesweeper.Client {
         }
 
         emitChange() {
-            this.changeListener.fire(this);
+            this.changeListener.dispatch(this);
         }
 
         onReveal(msg:RevealMessage) {
