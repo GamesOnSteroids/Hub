@@ -1,4 +1,3 @@
-import SyntheticEvent = __React.SyntheticEvent;
 "use strict";
 
 class Header extends React.Component<any, any> {
@@ -22,8 +21,8 @@ class Header extends React.Component<any, any> {
     }
 
 
-    onNicknameChange(e: SyntheticEvent) {
-        var nickname = (e.target as HTMLInputElement).value;
+    onNicknameChange(e: Synteh) {
+        var nickname = e.target.value;
         if (nickname == null || nickname == "") {
             nickname = this.generateName();
         }

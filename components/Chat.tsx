@@ -3,6 +3,7 @@
 import ChatLog = Play.Client.ChatLog;
 
 class ChatMessageComponent extends React.Component<ChatLog, any> {
+
     render() {
         var date = this.props.date;
         var formattedTime = `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
@@ -25,11 +26,14 @@ class Chat extends React.Component<any, {messageLog: ChatLog[] }> {
         lobby.changeListener.register((lobby) => {
             this.setState({
                 messageLog: lobby.messageLog
+            }, () => {
+                var chatLog = document.getElementById("chatLog");
+                chatLog.scrollTop = chatLog.scrollHeight;
             })
         });
     }
 
-    sendMessage(e: SyntheticEvent) {
+    sendMessage(e:React.SyntheticEvent) {
         let input = document.getElementById("chatMessage") as HTMLInputElement;
         ClientLobby.current.sendChat(input.value);
         input.value = "";
@@ -39,11 +43,14 @@ class Chat extends React.Component<any, {messageLog: ChatLog[] }> {
     render() {
         return (
             <div>
-                <div>
+                <div id="chatLog" style={{height: "250px", overflowY:"scroll", textAlign:"left"}}>
                     {this.state.messageLog
                         .sort((a,b) => b.date.getDate() - a.date.getDate())
-                        .map( (m, index) => { return <ChatMessageComponent key={index} date={m.date} text={m.text}
-                                                                           author={m.author}/>
+                        .map( (m, index) => {
+                        return <div key={index}>
+                            <ChatMessageComponent date={m.date} text={m.text}
+                                                  author={m.author}/>
+                        </div>
                         })}
                 </div>
                 <form onSubmit={this.sendMessage}>

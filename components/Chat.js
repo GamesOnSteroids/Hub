@@ -17,6 +17,9 @@ class Chat extends React.Component {
         lobby.changeListener.register((lobby) => {
             this.setState({
                 messageLog: lobby.messageLog
+            }, () => {
+                var chatLog = document.getElementById("chatLog");
+                chatLog.scrollTop = chatLog.scrollHeight;
             });
         });
     }
@@ -27,10 +30,10 @@ class Chat extends React.Component {
         e.preventDefault();
     }
     render() {
-        return (React.createElement("div", null, React.createElement("div", null, this.state.messageLog
+        return (React.createElement("div", null, React.createElement("div", {"id": "chatLog", "style": { height: "250px", overflowY: "scroll", textAlign: "left" }}, this.state.messageLog
             .sort((a, b) => b.date.getDate() - a.date.getDate())
             .map((m, index) => {
-            return React.createElement(ChatMessageComponent, {"key": index, "date": m.date, "text": m.text, "author": m.author});
+            return React.createElement("div", {"key": index}, React.createElement(ChatMessageComponent, {"date": m.date, "text": m.text, "author": m.author}));
         })), React.createElement("form", {"onSubmit": this.sendMessage}, React.createElement("div", {"className": "input-group"}, React.createElement("input", {"id": "chatMessage", "type": "text", "className": "form-control", "placeholder": "Type your message..."}), React.createElement("span", {"className": "input-group-btn"}, React.createElement("button", {"type": "submit", "className": "btn btn-primary btn-block glyphicon glyphicon-envelope"}))))));
     }
 }
