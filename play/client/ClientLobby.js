@@ -18,12 +18,13 @@ var Play;
         }
         Client.ChatLog = ChatLog;
         class ClientLobby {
-            constructor(lobbyId) {
+            constructor(lobbyId, configuration) {
                 this.players = [];
                 this.messageLog = [];
                 this.state = LobbyState.IN_LOBBY;
                 this.changeListener = new Client.EventDispatcher();
                 this.lobbyId = lobbyId;
+                this.configuration = configuration;
                 this.messageHandlers = [];
                 this.messageHandlers[Play.ServiceType.Lobby] = [];
                 this.messageHandlers[Play.ServiceType.Game] = [];
@@ -105,7 +106,7 @@ var Play;
                 player.team = message.team;
                 this.players.push(player);
                 if (message.isYou) {
-                    this.configuration = message.configuration;
+                    this.configuration.gameConfiguration = message.configuration;
                     this.localPlayer = player;
                 }
                 this.emitChange();

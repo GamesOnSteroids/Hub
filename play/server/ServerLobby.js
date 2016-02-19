@@ -91,7 +91,7 @@ var Play;
                             playerId: other.id,
                             team: other.team,
                             isYou: true,
-                            configuration: this.configuration
+                            configuration: this.configuration.gameConfiguration
                         });
                     }
                     else {

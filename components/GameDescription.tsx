@@ -26,17 +26,20 @@ class GameDescription extends React.Component<any, any> {
 //        }
     }
 
-    startGame(configuration:any) {
+    startGame(configuration: any) {
         console.log("GameDescription.startGame", configuration);
 
-        configuration.gameId = this.props.game.id;
-        configuration.appClass = GameDescription.resolveClass(this.props.game.appClass);
-        configuration.gameClass = GameDescription.resolveClass(this.props.game.gameClass);
-        configuration.serviceClass = GameDescription.resolveClass(this.props.game.serviceClass);
+        let lobbyConfiguration = new Play.LobbyConfiguration();
+        lobbyConfiguration.maxPlayers = configuration.maxPlayers;
+        lobbyConfiguration.gameConfiguration = configuration;
+        lobbyConfiguration.gameId = this.props.game.id;
+        lobbyConfiguration.appClass = GameDescription.resolveClass(this.props.game.appClass);
+        lobbyConfiguration.gameClass = GameDescription.resolveClass(this.props.game.gameClass);
+        lobbyConfiguration.serviceClass = GameDescription.resolveClass(this.props.game.serviceClass);
 
 
         let lobbyService:Play.ILobbyService = new Play.FirebaseLobbyService();
-        lobbyService.findLobby(configuration).then((lobby) => {
+        lobbyService.findLobby(lobbyConfiguration).then((lobby) => {
             Play.Client.ClientLobby.current = lobby;
 
             ReactRouter.hashHistory.pushState(null, `/lobby/${lobby.lobbyId}`);

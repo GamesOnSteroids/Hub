@@ -19,12 +19,12 @@ module Play.Server {
 
         public clients:Client[] = [];
 
-        public configuration:any;
+        public configuration:LobbyConfiguration;
         public lobbyId:string;
         public state: LobbyState = LobbyState.IN_LOBBY;
         public gameService: GameService;
 
-        constructor(lobbyId:string, configuration:any) {
+        constructor(lobbyId:string, configuration:LobbyConfiguration) {
 
             this.lobbyId = lobbyId;
             this.configuration = configuration;
@@ -127,7 +127,7 @@ module Play.Server {
                         playerId: other.id,
                         team: other.team,
                         isYou: true,
-                        configuration: this.configuration
+                        configuration: this.configuration.gameConfiguration
                     });
                 } else {
                     client.connection.send(<PlayerJoinedMessage>{

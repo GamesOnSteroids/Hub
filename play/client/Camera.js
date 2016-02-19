@@ -4,14 +4,17 @@ var Play;
     (function (Client) {
         "use strict";
         class Camera {
-            constructor() {
+            constructor(canvas) {
                 this.scaleX = 1;
                 this.scaleY = 1;
                 this.translateX = 0;
                 this.translateY = 0;
                 this.shakeDuration = 0;
+                this.canvas = canvas;
             }
             unproject(x, y) {
+                x = x * this.canvas.width / this.canvas.clientWidth;
+                y = y * this.canvas.height / this.canvas.clientHeight;
                 return { x: (x - this.translateX) / this.scaleX, y: (y - this.translateY) / this.scaleY };
             }
             update(delta) {

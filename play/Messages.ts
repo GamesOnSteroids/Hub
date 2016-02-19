@@ -1,6 +1,20 @@
 module Play {
     "use strict";
 
+    export class LobbyConfiguration {
+        // lobbyId
+        public lobbyId: string;
+        public gameId: string;
+
+        public appClass: any;
+        public gameClass: any;
+        public serviceClass: any;
+
+        public maxPlayers: number;
+
+        public gameConfiguration: any;
+    }
+
     export interface GameMessage {
         id: number;
     }

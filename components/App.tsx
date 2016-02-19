@@ -54,9 +54,9 @@ var games = [
                 id: "solo",
                 name: "1 Player",
                 maxPlayers: 1,
-                width: 16,
+                width: 30,
                 height: 16,
-                mines: 40
+                mines: 99
             },
             {
                 id: "debug",
@@ -87,7 +87,7 @@ var games = [
 class App extends React.Component<any, any> {
     render() {
         return (
-            <div className="container">
+            <div className="container-fluid">
 
                 <Header />
 

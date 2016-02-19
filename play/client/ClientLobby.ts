@@ -2,6 +2,8 @@ module Play.Client {
     "use strict";
     import IConnection = Play.Server.IConnection;
 
+
+
     export enum LobbyState {
         IN_LOBBY,
         GAME_RUNNING,
@@ -29,7 +31,7 @@ module Play.Client {
         public localPlayer:PlayerInfo;
         public players:PlayerInfo[] = [];
 
-        public configuration:any;
+        public configuration: LobbyConfiguration;
 
         public messageLog: ChatLog[] = [];
 
@@ -41,8 +43,9 @@ module Play.Client {
 
         public lobbyId:string;
 
-        constructor(lobbyId:string) {
+        constructor(lobbyId:string, configuration: LobbyConfiguration) {
             this.lobbyId = lobbyId;
+            this.configuration = configuration;
 
             this.messageHandlers = [];
             this.messageHandlers[ServiceType.Lobby] = [];
@@ -151,7 +154,7 @@ module Play.Client {
             this.players.push(player);
 
             if (message.isYou) {
-                this.configuration = message.configuration;
+                this.configuration.gameConfiguration = message.configuration;
                 this.localPlayer = player;
             }
 

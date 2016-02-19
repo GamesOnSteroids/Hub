@@ -39,7 +39,7 @@ var Minesweeper;
                 this.on(Minesweeper.MessageId.CMSG_REVEAL_REQUEST, this.onRevealRequest.bind(this));
                 this.on(Minesweeper.MessageId.CMSG_FLAG_REQUEST, this.onFlagRequest.bind(this));
                 this.on(Minesweeper.MessageId.CMSG_MASS_REVEAL_REQUEST, this.onMassRevealRequest.bind(this));
-                let configuration = this.lobby.configuration;
+                let configuration = this.lobby.configuration.gameConfiguration;
                 this.minefield = new Minefield(configuration.width, configuration.height);
                 this.mines = configuration.mines;
                 this.flaggedMines = 0;

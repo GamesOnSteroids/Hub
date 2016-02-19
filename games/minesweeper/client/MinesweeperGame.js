@@ -12,7 +12,7 @@ var Minesweeper;
             constructor(lobby) {
                 super(lobby);
                 let configuration = this.lobby.configuration;
-                this.remainingMines = configuration.mines;
+                this.remainingMines = configuration.gameConfiguration.mines;
                 for (let player of this.lobby.players) {
                     player.gameData = {
                         score: 0,
@@ -24,16 +24,17 @@ var Minesweeper;
             }
             initialize() {
                 super.initialize();
-                let configuration = this.lobby.configuration;
+                let configuration = this.lobby.configuration.gameConfiguration;
                 this.minefield = new Client.Minefield(configuration.width, configuration.height);
                 this.canvas.width = this.minefield.width * TILE_SIZE + TILE_SIZE * 2;
                 this.canvas.height = this.minefield.height * TILE_SIZE + TILE_SIZE * 2;
+                this.context.imageSmoothingEnabled = false;
                 this.load();
                 this.on(Minesweeper.MessageId.SMSG_REVEAL, this.onReveal.bind(this));
                 this.on(Minesweeper.MessageId.SMSG_FLAG, this.onFlag.bind(this));
                 this.on(Minesweeper.MessageId.SMSG_SCORE, this.onScore.bind(this));
                 this.canvas.style.cursor = "pointer";
-                this.camera = new Camera();
+                this.camera = new Camera(this.canvas);
                 this.camera.translateX = TILE_SIZE;
                 this.camera.translateY = TILE_SIZE;
                 this.emitChange();

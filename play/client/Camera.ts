@@ -13,7 +13,15 @@ module Play.Client {
         private originalPositionX:number;
         private originalPositionY:number;
 
+        private canvas: HTMLCanvasElement;
+
+        constructor(canvas: HTMLCanvasElement) {
+            this.canvas = canvas;
+        }
+
         unproject(x:number, y:number):{x: number, y: number} {
+            x = x * this.canvas.width / this.canvas.clientWidth;
+            y = y * this.canvas.height / this.canvas.clientHeight;
             return {x: (x - this.translateX) / this.scaleX, y: (y - this.translateY) / this.scaleY};
         }
 

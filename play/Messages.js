@@ -1,6 +1,9 @@
 var Play;
 (function (Play) {
     "use strict";
+    class LobbyConfiguration {
+    }
+    Play.LobbyConfiguration = LobbyConfiguration;
     (function (ServiceType) {
         ServiceType[ServiceType["Lobby"] = 1] = "Lobby";
         ServiceType[ServiceType["Game"] = 2] = "Game";

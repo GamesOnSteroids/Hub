@@ -43,7 +43,7 @@ var Play;
                             let lobbyRef = lobbiesRef.push();
                             lobbyRef.set(lobbyDescription, () => {
                                 let lobbyId = lobbyRef.key();
-                                let clientLobby = new ClientLobby(lobbyId);
+                                let clientLobby = new ClientLobby(lobbyId, configuration);
                                 clientLobby.clientGUID = guid();
                                 let localClient = new Client();
                                 localClient.id = clientLobby.clientGUID;
@@ -70,7 +70,7 @@ var Play;
                         }
                         else {
                             let lobbyId = lobbyRef.key();
-                            let lobby = new ClientLobby(lobbyId);
+                            let lobby = new ClientLobby(lobbyId, configuration);
                             lobby.clientGUID = guid();
                             let signalingService = new Play.SignalingService();
                             var ref = new Firebase("https://fiery-inferno-1131.firebaseio.com/").child("lobby").child(lobby.lobbyId).child("sdp");

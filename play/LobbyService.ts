@@ -8,7 +8,7 @@ module Play {
 
 
     export interface ILobbyService {
-        findLobby(gameConfiguration:any):Promise<ClientLobby>;
+        findLobby(gameConfiguration:LobbyConfiguration):Promise<ClientLobby>;
         onClientJoined(lobby: ServerLobby, client:Client): void;
     }
 
@@ -31,7 +31,7 @@ module Play {
             }, true);
         }
 
-        findLobby(configuration:any):Promise<ClientLobby> {
+        findLobby(configuration:LobbyConfiguration):Promise<ClientLobby> {
             return new Promise<ClientLobby>((resolve, reject) => {
                 let lobbiesRef = new Firebase("https://fiery-inferno-1131.firebaseio.com/").child("lobby");
 
@@ -62,7 +62,7 @@ module Play {
 
                                 let lobbyId = lobbyRef.key();
 
-                                let clientLobby = new ClientLobby(lobbyId);
+                                let clientLobby = new ClientLobby(lobbyId, configuration);
                                 clientLobby.clientGUID = guid();
 
                                 let localClient = new Client();
@@ -100,7 +100,7 @@ module Play {
                             });
                         } else {
                             let lobbyId = lobbyRef.key();
-                            let lobby = new ClientLobby(lobbyId);
+                            let lobby = new ClientLobby(lobbyId, configuration);
                             lobby.clientGUID = guid();
 
                             let signalingService = new SignalingService();

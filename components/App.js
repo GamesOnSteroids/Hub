@@ -38,9 +38,9 @@ var games = [
                 id: "solo",
                 name: "1 Player",
                 maxPlayers: 1,
-                width: 16,
+                width: 30,
                 height: 16,
-                mines: 40
+                mines: 99
             },
             {
                 id: "debug",
@@ -69,7 +69,7 @@ var games = [
 ];
 class App extends React.Component {
     render() {
-        return (React.createElement("div", {"className": "container"}, React.createElement(Header, null), this.props.children));
+        return (React.createElement("div", {"className": "container-fluid"}, React.createElement(Header, null), this.props.children));
     }
 }
 ReactDOM.render((React.createElement(ReactRouter.Router, {"history": ReactRouter.hashHistory}, React.createElement(ReactRouter.Route, {"path": "/", "component": App}, React.createElement(ReactRouter.IndexRoute, {"component": GameList}), React.createElement(ReactRouter.Route, {"path": "/games", "component": GameList}), React.createElement(ReactRouter.Route, {"path": "/lobby/:lobbyId", "component": LobbyComponent}), React.createElement(ReactRouter.Route, {"path": "*", "component": NoMatch})))), document.getElementById('content'));
