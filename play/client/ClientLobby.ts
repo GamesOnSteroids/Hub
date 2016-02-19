@@ -133,14 +133,14 @@ module Play.Client {
             console.log("ClientLobby.onGameStart");
 
 
-            this.game = new Minesweeper.Client.MinesweeperGame(this);
+            this.game = new this.configuration.gameClass(this);
 
             this.state = LobbyState.GAME_RUNNING;
             this.emitChange();
         }
 
         onJoin(message:PlayerJoinedMessage) {
-            console.log("ClientLobby.onJoin");
+            console.log("ClientLobby.onJoin", message);
 
             let player = new PlayerInfo();
             player.gameData = {};

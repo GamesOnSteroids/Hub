@@ -58,8 +58,8 @@ class LobbyComponent extends React.Component {
             return (React.createElement("div", null, React.createElement("div", {"className": "row"}, React.createElement("div", {"className": "col-md-8"}, React.createElement("div", {"className": "row"}, React.createElement("div", {"className": "col-md-12"}, React.createElement("div", {"className": "progress"}, React.createElement("div", {"className": "progress-bar progress-bar-striped active", "role": "progressbar", "style": { width: "100%" }}, React.createElement("span", null, "Waiting for other players"))))), React.createElement("div", null, React.createElement("div", {"className": "row"}, React.createElement("div", {"className": "col-md-12"}, React.createElement(PlayerList, {"players": this.state.players}))))), React.createElement("div", {"className": "col-md-4"}, React.createElement(Chat, null)))));
         }
         else if (this.state.state == LobbyState.GAME_RUNNING || this.state.state == LobbyState.GAME_OVER) {
-            var game = React.createElement(Minesweeper.Client.MinesweeperApp);
-            return (React.createElement("div", null, game, this.state.state == LobbyState.GAME_OVER ? React.createElement(GameOver, {"onBackToLobby": this.backToLobby}) : ""));
+            var app = React.createElement(ClientLobby.current.configuration.appClass);
+            return (React.createElement("div", null, app, this.state.state == LobbyState.GAME_OVER ? React.createElement(GameOver, {"onBackToLobby": this.backToLobby}) : ""));
         }
         else {
             throw "Unknown state";

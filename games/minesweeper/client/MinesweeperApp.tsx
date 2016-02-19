@@ -22,7 +22,6 @@ module Minesweeper.Client {
             console.log("MinesweeperApp.componentDidMount");
 
             let game = ClientLobby.current.game as MinesweeperGame;
-
             game.initialize();
 
             this.stateChangeToken = game.changeListener.register( (game:MinesweeperGame) => {

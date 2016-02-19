@@ -1,4 +1,5 @@
 "use strict";
+
 class GameDescription extends React.Component<any, any> {
 
     constructor() {
@@ -6,8 +7,33 @@ class GameDescription extends React.Component<any, any> {
         this.startGame = this.startGame.bind(this);
     }
 
+    static resolveClass(name: string) {
+        let result: any = window;
+        for (let part of name.split(".")) {
+            result = result[part];
+        }
+        if (result == null) {
+            throw `Class: ${name} not found`;
+        }
+        return result;
+    }
+
+
+    //TODO: DEBUG ONLY
+    componentDidMount() {
+        //if (this.props.game.id == "chess") {
+//            this.startGame(this.props.game.configurations[0]);
+//        }
+    }
+
     startGame(configuration:any) {
+        console.log("GameDescription.startGame", configuration);
+
         configuration.gameId = this.props.game.id;
+        configuration.appClass = GameDescription.resolveClass(this.props.game.appClass);
+        configuration.gameClass = GameDescription.resolveClass(this.props.game.gameClass);
+        configuration.serviceClass = GameDescription.resolveClass(this.props.game.serviceClass);
+
 
         let lobbyService:Play.ILobbyService = new Play.FirebaseLobbyService();
         lobbyService.findLobby(configuration).then((lobby) => {

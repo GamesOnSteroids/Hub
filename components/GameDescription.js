@@ -4,8 +4,24 @@ class GameDescription extends React.Component {
         super();
         this.startGame = this.startGame.bind(this);
     }
+    static resolveClass(name) {
+        let result = window;
+        for (let part of name.split(".")) {
+            result = result[part];
+        }
+        if (result == null) {
+            throw `Class: ${name} not found`;
+        }
+        return result;
+    }
+    componentDidMount() {
+    }
     startGame(configuration) {
+        console.log("GameDescription.startGame", configuration);
         configuration.gameId = this.props.game.id;
+        configuration.appClass = GameDescription.resolveClass(this.props.game.appClass);
+        configuration.gameClass = GameDescription.resolveClass(this.props.game.gameClass);
+        configuration.serviceClass = GameDescription.resolveClass(this.props.game.serviceClass);
         let lobbyService = new Play.FirebaseLobbyService();
         lobbyService.findLobby(configuration).then((lobby) => {
             Play.Client.ClientLobby.current = lobby;

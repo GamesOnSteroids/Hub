@@ -16,7 +16,7 @@ module Minesweeper.Client {
         private camera:Camera;
         private minefield:Minefield;
         private assets:any;
-        public changeListener = new EventDispatcher<MinesweeperGame>();
+
         public remainingMines:number;
 
         constructor(lobby:ClientLobby) {
@@ -162,9 +162,7 @@ module Minesweeper.Client {
             this.emitChange();
         }
 
-        emitChange() {
-            this.changeListener.dispatch(this);
-        }
+
 
         onReveal(msg:RevealMessage) {
             let field = this.minefield.get(msg.fieldId);

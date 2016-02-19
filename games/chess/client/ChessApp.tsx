@@ -1,40 +1,39 @@
-module Minesweeper.Client {
+module Chess.Client {
     "use strict";
 
     import ClientLobby = Play.Client.ClientLobby;
 
 
-    export class MinesweeperApp extends React.Component<any, {players: PlayerInfo[], remainingMines: number}> {
+    export class ChessApp extends React.Component<any, {players: PlayerInfo[]}> {
         private stateChangeToken:number;
 
         constructor() {
             super();
 
-            let game = ClientLobby.current.game as MinesweeperGame;
+            let game = ClientLobby.current.game as ChessGame;
 
             this.state = {
                 players: ClientLobby.current.players,
-                remainingMines: game.remainingMines
             }
         }
 
         componentDidMount() {
-            console.log("MinesweeperApp.componentDidMount");
+            console.log("ChessApp.componentDidMount");
 
-            let game = ClientLobby.current.game as MinesweeperGame;
+            let game = ClientLobby.current.game as ChessGame;
 
             game.initialize();
 
-            this.stateChangeToken = game.changeListener.register( (game:MinesweeperGame) => {
-                console.log("MinesweeperApp.changeListener");
+            this.stateChangeToken = game.changeListener.register( (game:ChessGame) => {
+                console.log("ChessApp.changeListener");
                 this.setState({
-                    players: ClientLobby.current.players,
-                    remainingMines: game.remainingMines
+                    players: ClientLobby.current.players
                 })
             });
         }
+
         componentWillUnmount() {
-            let game = ClientLobby.current.game as MinesweeperGame;
+            let game = ClientLobby.current.game as ChessGame;
             game.changeListener.unregister(this.stateChangeToken);
 
         }
@@ -47,8 +46,6 @@ module Minesweeper.Client {
                             <canvas id="game-canvas"/>
                         </div>
                         <div className="col-xs-12 col-md-4">
-                            <MinesweeperScore players={this.state.players}
-                                              remainingMines={this.state.remainingMines}/>
                         </div>
                         <div className="col-xs-12 col-md-4">
                             <Chat/>

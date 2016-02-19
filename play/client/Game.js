@@ -11,7 +11,11 @@ var Play;
         Client.Mouse = Mouse;
         class Game {
             constructor(lobby) {
+                this.changeListener = new Client.EventDispatcher();
                 this.lobby = lobby;
+            }
+            emitChange() {
+                this.changeListener.dispatch(this);
             }
             initialize() {
                 this.canvas = document.getElementById("game-canvas");

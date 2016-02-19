@@ -108,9 +108,9 @@ class LobbyComponent extends React.Component<any, {state: LobbyState, players: P
                 </div>
             )
         } else if (this.state.state == LobbyState.GAME_RUNNING || this.state.state == LobbyState.GAME_OVER) {
-            var game = React.createElement(Minesweeper.Client.MinesweeperApp);
+            var app = React.createElement(ClientLobby.current.configuration.appClass);
             return (<div>
-                {game}
+                {app}
                 {this.state.state == LobbyState.GAME_OVER?<GameOver onBackToLobby={this.backToLobby}/>:""}
             </div>)
         } else {

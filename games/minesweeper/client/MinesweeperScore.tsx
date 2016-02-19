@@ -34,7 +34,7 @@ module Minesweeper.Client {
                                     {this.props.players.sort((a,b)=>b.gameData.score - a.gameData.score).map( (p, index) =>{
                                         return (
                                         <tr key={p.id}>
-                                            <th scope="row">{index + 1}.</th>
+                                            <th scope="row"><img src={"/games/minesweeper/assets/images/flag-"+p.team+".png"} /></th>
                                             <td>{p.name}</td>
                                             <td>{p.gameData.score}</td>
                                             <td>{p.gameData.flags}</td>

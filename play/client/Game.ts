@@ -13,8 +13,13 @@ module Play.Client {
         protected lobby:ClientLobby;
         protected canvas:HTMLCanvasElement;
         protected context:CanvasRenderingContext2D;
-
+        public changeListener = new EventDispatcher<this>();
         private lastFrame: number;
+
+
+        emitChange() {
+            this.changeListener.dispatch(this);
+        }
 
         constructor(lobby:ClientLobby) {
             this.lobby = lobby;

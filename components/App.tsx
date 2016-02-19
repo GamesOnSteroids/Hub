@@ -13,11 +13,14 @@ window.RTCIceCandidate = window.mozRTCIceCandidate || window.RTCIceCandidate;
 var games = [
     {
         id: "minesweeper",
+        appClass: "Minesweeper.Client.MinesweeperApp",
+        gameClass: "Minesweeper.Client.MinesweeperGame",
+        serviceClass: "Minesweeper.Server.MinesweeperService",
         name: "Minesweeper on Steroids",
         configurations: [
             {
                 id: "default",
-                name: "Play 1v1 now!",
+                name: "2 Players",
                 maxPlayers: 2,
                 width: 16,
                 height: 16,
@@ -25,7 +28,7 @@ var games = [
             },
             {
                 id: "3players",
-                name: "Play 1v1v1 now!",
+                name: "3 Players",
                 maxPlayers: 3,
                 width: 16,
                 height: 16,
@@ -33,23 +36,23 @@ var games = [
             },
             {
                 id: "4players",
-                name: "Play with 4 players now!",
+                name: "4 Players",
                 maxPlayers: 4,
-                width: 16,
+                width: 30,
                 height: 16,
-                mines: 40
+                mines: 99
             },
-            {
-                id: "friend",
-                name: "Play with friend",
-                maxPlayers: 2,
-                width: 10,
-                height: 10,
-                mines: 1
-            },
+            //{
+            //    id: "friend",
+            //    name: "Play with friend",
+            //    maxPlayers: 2,
+            //    width: 10,
+            //    height: 10,
+            //    mines: 1
+            //},
             {
                 id: "solo",
-                name: "Play Solo!",
+                name: "1 Player",
                 maxPlayers: 1,
                 width: 16,
                 height: 16,
@@ -67,8 +70,17 @@ var games = [
     },
     {
         id: "chess",
+        appClass: "Chess.Client.ChessApp",
+        gameClass: "Chess.Client.ChessGame",
+        serviceClass: "Chess.Server.ChessService",
         name: "Chess on Steroids",
-        configurations: []
+        configurations: [
+            {
+                id: "debug",
+                name: "debug",
+                maxPlayers: 1
+            }
+        ]
     }
 ];
 

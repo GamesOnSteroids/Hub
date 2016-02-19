@@ -73,7 +73,7 @@ module Play.Server {
 
 
         startGame(): void {
-            this.gameService = new Minesweeper.Server.MinesweeperService(this);
+            this.gameService = new this.configuration.serviceClass(this);
             this.state = LobbyState.GAME_RUNNING;
             this.broadcast(<GameStartMessage>{
                 service: ServiceType.Lobby,
