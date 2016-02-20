@@ -159,7 +159,7 @@ var Chess;
                     }
                 }
                 else if (this.direction == Chess.Direction4.Down) {
-                    let forward = this.addIfValid(result, board, this.x, this.y = 1, true);
+                    let forward = this.addIfValid(result, board, this.x, this.y + 1, true);
                     if (forward && this.y == 1) {
                         this.addIfValid(result, board, this.x, this.y + 2);
                     }
