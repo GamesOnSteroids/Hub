@@ -79,6 +79,7 @@ module Play.Server {
                 service: ServiceType.Lobby,
                 id: LobbyMessageId.SMSG_GAME_START
             });
+            this.gameService.start();
         }
 
 

@@ -12,11 +12,13 @@ module Play {
         onClientJoined(lobby: ServerLobby, client:Client): void;
     }
 
+    var firebaseUri = "https://gos-dev.firebaseio.com/";
+
     export class FirebaseLobbyService implements ILobbyService {
 
         onClientJoined(lobby: ServerLobby, client:Client) {
 
-            let firebase = new Firebase("https://fiery-inferno-1131.firebaseio.com/");
+            let firebase = new Firebase(firebaseUri);
             let lobbyRef = firebase.child("lobby").child(lobby.lobbyId);
 
             lobbyRef.transaction( (data) => {
@@ -33,7 +35,7 @@ module Play {
 
         findLobby(configuration:LobbyConfiguration):Promise<ClientLobby> {
             return new Promise<ClientLobby>((resolve, reject) => {
-                let lobbiesRef = new Firebase("https://fiery-inferno-1131.firebaseio.com/").child("lobby");
+                let lobbiesRef = new Firebase(firebaseUri).child("lobby");
 
                 // no desired game
                 if (configuration.lobbyId == null) {
@@ -74,7 +76,7 @@ module Play {
                                 let serverLobby = new ServerLobby(lobbyId, configuration);
 
                                 let signalingService = new SignalingService();
-                                var ref = new Firebase("https://fiery-inferno-1131.firebaseio.com/").child("lobby").child(serverLobby.lobbyId).child("sdp");
+                                var ref = new Firebase(firebaseUri).child("lobby").child(serverLobby.lobbyId).child("sdp");
                                 signalingService.createSignalingServer(serverLobby, new FirebaseSignalingChannel(ref));
 
 
@@ -104,7 +106,7 @@ module Play {
                             lobby.clientGUID = guid();
 
                             let signalingService = new SignalingService();
-                            var ref = new Firebase("https://fiery-inferno-1131.firebaseio.com/").child("lobby").child(lobby.lobbyId).child("sdp");
+                            var ref = new Firebase(firebaseUri).child("lobby").child(lobby.lobbyId).child("sdp");
                             signalingService.createSignalingClient(lobby, new FirebaseSignalingChannel(ref));
 
                             resolve(lobby);

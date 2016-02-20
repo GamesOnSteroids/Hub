@@ -14,6 +14,15 @@ var Play;
                 this.changeListener = new Client.EventDispatcher();
                 this.lobby = lobby;
             }
+            get players() {
+                return this.lobby.players;
+            }
+            get localPlayer() {
+                return this.lobby.localPlayer;
+            }
+            get configuration() {
+                return this.lobby.configuration.gameConfiguration;
+            }
             emitChange() {
                 this.changeListener.dispatch(this);
             }

@@ -21,17 +21,17 @@ class GameDescription extends React.Component<any, any> {
 
     //TODO: DEBUG ONLY
     componentDidMount() {
-        //if (this.props.game.id == "chess") {
-//            this.startGame(this.props.game.configurations[0]);
-//        }
+        if (this.props.game.id == "chess") {
+       //    this.startGame(this.props.game.variants[0]);
+        }
     }
 
-    startGame(configuration: any) {
-        console.log("GameDescription.startGame", configuration);
+    startGame(variant: any) {
+        console.log("GameDescription.startGame", variant);
 
         let lobbyConfiguration = new Play.LobbyConfiguration();
-        lobbyConfiguration.maxPlayers = configuration.maxPlayers;
-        lobbyConfiguration.gameConfiguration = configuration;
+        lobbyConfiguration.maxPlayers = variant.maxPlayers;
+        lobbyConfiguration.gameConfiguration = variant;
         lobbyConfiguration.gameId = this.props.game.id;
         lobbyConfiguration.appClass = GameDescription.resolveClass(this.props.game.appClass);
         lobbyConfiguration.gameClass = GameDescription.resolveClass(this.props.game.gameClass);
@@ -55,11 +55,11 @@ class GameDescription extends React.Component<any, any> {
                     <span>Currently playing: ? games</span>
                 </div>
                 <div className="btn-group-vertical" role="group">
-                    { this.props.game.configurations.map( (configuration: any) => (
-                    <button key={configuration.id} type="button"
-                            className={configuration.id == "default" ? "btn btn-primary" : "btn btn-default"}
-                            onClick={this.startGame.bind(this, configuration)}>
-                        {configuration.name}
+                    { this.props.game.variants.map( (variant: any) => (
+                    <button key={variant.id} type="button"
+                            className={variant.id == "default" ? "btn btn-primary" : "btn btn-default"}
+                            onClick={this.startGame.bind(this, variant)}>
+                        {variant.name}
                     </button>)) }
                 </div>
             </div>

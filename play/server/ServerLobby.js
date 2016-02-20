@@ -53,6 +53,7 @@ var Play;
                     service: Play.ServiceType.Lobby,
                     id: Play.LobbyMessageId.SMSG_GAME_START
                 });
+                this.gameService.start();
             }
             onChat(client, msg) {
                 this.broadcast({

@@ -10,6 +10,12 @@ module Play.Server {
             super(lobby);
         }
 
+        get players(): Client[] {
+            return this.lobby.clients;
+        }
+
+        start(): void { }
+
         on<T extends GameMessage>(id:number, handler:(client:Client, msg:T) => void) {
             this.lobby.on(ServiceType.Game, id, <any>handler);
         }

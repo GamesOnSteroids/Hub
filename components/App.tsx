@@ -1,7 +1,6 @@
 "use strict";
 
 
-
 window.RTCPeerConnection = window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection;
 window.RTCSessionDescription = window.RTCSessionDescription || window.mozRTCSessionDescription || window.webkitRTCSessionDescription;
 window.RTCIceCandidate = window.mozRTCIceCandidate || window.RTCIceCandidate;
@@ -9,15 +8,15 @@ window.RTCIceCandidate = window.mozRTCIceCandidate || window.RTCIceCandidate;
 //navigator.getUserMedia = navigator.getUserMedia || navigator.mozGetUserMedia || navigator.webkitGetUserMedia || navigator.msGetUserMedia;
 
 
-
 var games = [
     {
         id: "minesweeper",
+        image: "https://upload.wikimedia.org/wikipedia/en/5/5c/Minesweeper_Icon.png",
         appClass: "Minesweeper.Client.MinesweeperApp",
         gameClass: "Minesweeper.Client.MinesweeperGame",
         serviceClass: "Minesweeper.Server.MinesweeperService",
         name: "Minesweeper on Steroids",
-        configurations: [
+        variants: [
             {
                 id: "default",
                 name: "2 Players",
@@ -74,11 +73,30 @@ var games = [
         gameClass: "Chess.Client.ChessGame",
         serviceClass: "Chess.Server.ChessService",
         name: "Chess on Steroids",
-        configurations: [
+        variants: [
             {
                 id: "debug",
                 name: "debug",
                 maxPlayers: 1
+            }
+        ]
+    },
+    {
+        id: "anagrams",
+        name: "Anagrams on Steroids",
+        variants: [
+            {
+                id: "debug",
+                name: "debug"
+            }
+        ]
+    }, {
+        id: "typing",
+        name: "Typing on Steroids",
+        variants: [
+            {
+                id: "debug",
+                name: "debug"
             }
         ]
     }

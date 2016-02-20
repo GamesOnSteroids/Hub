@@ -5,9 +5,10 @@ var Play;
     var ServerLobby = Play.Server.ServerLobby;
     var LocalServerConnection = Play.Server.LocalServerConnection;
     var LocalClientConnection = Play.Server.LocalClientConnection;
+    var firebaseUri = "https://gos-dev.firebaseio.com/";
     class FirebaseLobbyService {
         onClientJoined(lobby, client) {
-            let firebase = new Firebase("https://fiery-inferno-1131.firebaseio.com/");
+            let firebase = new Firebase(firebaseUri);
             let lobbyRef = firebase.child("lobby").child(lobby.lobbyId);
             lobbyRef.transaction((data) => {
                 if (data != null) {
@@ -22,7 +23,7 @@ var Play;
         }
         findLobby(configuration) {
             return new Promise((resolve, reject) => {
-                let lobbiesRef = new Firebase("https://fiery-inferno-1131.firebaseio.com/").child("lobby");
+                let lobbiesRef = new Firebase(firebaseUri).child("lobby");
                 if (configuration.lobbyId == null) {
                     lobbiesRef.once("value", (snapshot) => {
                         let lobbyRef = null;
@@ -51,7 +52,7 @@ var Play;
                                 localClient.team = 0;
                                 let serverLobby = new ServerLobby(lobbyId, configuration);
                                 let signalingService = new Play.SignalingService();
-                                var ref = new Firebase("https://fiery-inferno-1131.firebaseio.com/").child("lobby").child(serverLobby.lobbyId).child("sdp");
+                                var ref = new Firebase(firebaseUri).child("lobby").child(serverLobby.lobbyId).child("sdp");
                                 signalingService.createSignalingServer(serverLobby, new Play.FirebaseSignalingChannel(ref));
                                 let localServerConnection = new LocalServerConnection(localClient);
                                 localServerConnection.messageHandler = (client, msg) => {
@@ -73,7 +74,7 @@ var Play;
                             let lobby = new ClientLobby(lobbyId, configuration);
                             lobby.clientGUID = guid();
                             let signalingService = new Play.SignalingService();
-                            var ref = new Firebase("https://fiery-inferno-1131.firebaseio.com/").child("lobby").child(lobby.lobbyId).child("sdp");
+                            var ref = new Firebase(firebaseUri).child("lobby").child(lobby.lobbyId).child("sdp");
                             signalingService.createSignalingClient(lobby, new Play.FirebaseSignalingChannel(ref));
                             resolve(lobby);
                         }

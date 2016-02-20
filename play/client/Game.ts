@@ -10,14 +10,25 @@ module Play.Client {
 
 
     export class Game {
-        protected lobby:ClientLobby;
+        private lobby:ClientLobby;
         protected canvas:HTMLCanvasElement;
         protected context:CanvasRenderingContext2D;
         public changeListener = new EventDispatcher<this>();
         private lastFrame: number;
 
+        get players() {
+            return this.lobby.players;
+        }
 
-        emitChange() {
+        get localPlayer() {
+            return this.lobby.localPlayer;
+        }
+
+        get configuration() {
+            return this.lobby.configuration.gameConfiguration;
+        }
+
+        emitChange(): void {
             this.changeListener.dispatch(this);
         }
 
@@ -70,16 +81,16 @@ module Play.Client {
             window.requestAnimationFrame(this.tick);
         }
 
-        draw(delta:number) {
+        draw(delta:number): void {
         }
 
-        update(delta:number) {
+        update(delta:number): void {
         }
 
-        onMouseUp(e:MouseEvent) {
+        onMouseUp(e:MouseEvent): void {
         }
 
-        onMouseDown(e:MouseEvent) {
+        onMouseDown(e:MouseEvent): void {
         }
 
         on<T extends GameMessage>(id:number, handler:(message:T) => void):void {

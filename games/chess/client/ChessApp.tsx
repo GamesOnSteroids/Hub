@@ -21,7 +21,6 @@ module Chess.Client {
             console.log("ChessApp.componentDidMount");
 
             let game = ClientLobby.current.game as ChessGame;
-
             game.initialize();
 
             this.stateChangeToken = game.changeListener.register( (game:ChessGame) => {

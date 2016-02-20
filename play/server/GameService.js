@@ -7,6 +7,10 @@ var Play;
             constructor(lobby) {
                 super(lobby);
             }
+            get players() {
+                return this.lobby.clients;
+            }
+            start() { }
             on(id, handler) {
                 this.lobby.on(Play.ServiceType.Game, id, handler);
             }

@@ -19,39 +19,41 @@ module Minesweeper.Client {
 
         public remainingMines:number;
 
+        private sprites:Sprite[];
+
         constructor(lobby:ClientLobby) {
             super(lobby);
 
-            let configuration = this.lobby.configuration;
-            this.remainingMines = configuration.gameConfiguration.mines;
+            this.remainingMines = this.configuration.mines;
 
-            for (let player of this.lobby.players) {
+            for (let player of this.players) {
                 player.gameData = {
                     score: 0,
                     flags: 0,
                     mines: 0
                 };
             }
-            this.sprites = [];
-        }
 
-        initialize() {
-            super.initialize();
-
-            let configuration = this.lobby.configuration.gameConfiguration;
-
-            this.minefield = new Minefield(configuration.width, configuration.height);
-
-            this.canvas.width = this.minefield.width * TILE_SIZE + TILE_SIZE * 2;
-            this.canvas.height = this.minefield.height * TILE_SIZE + TILE_SIZE * 2;
-
-            (this.context as any).imageSmoothingEnabled = false;
+            this.minefield = new Minefield(this.configuration.width, this.configuration.height);
 
             this.load();
 
             this.on(MessageId.SMSG_REVEAL, this.onReveal.bind(this));
             this.on(MessageId.SMSG_FLAG, this.onFlag.bind(this));
             this.on(MessageId.SMSG_SCORE, this.onScore.bind(this));
+
+            this.sprites = [];
+        }
+
+        initialize() {
+            super.initialize();
+
+
+            this.canvas.width = this.minefield.width * TILE_SIZE + TILE_SIZE * 2;
+            this.canvas.height = this.minefield.height * TILE_SIZE + TILE_SIZE * 2;
+            (this.context as any).imageSmoothingEnabled = false;
+
+
 
             this.canvas.style.cursor = "pointer";
 
@@ -73,7 +75,7 @@ module Minesweeper.Client {
             }
 
             if (field.owner != null) {
-                if (field.owner.id == this.lobby.localPlayer.id) {
+                if (field.owner.id == this.localPlayer.id) {
                     this.send<FlagRequestMessage>({
                         id: MessageId.CMSG_FLAG_REQUEST,
                         fieldId: x + y * this.minefield.width,
@@ -125,7 +127,7 @@ module Minesweeper.Client {
             if (field.isRevealed) {
                 return;
             }
-            if (field.hasFlag && field.owner.team == this.lobby.localPlayer.team) {
+            if (field.hasFlag && field.owner.team == this.localPlayer.team) {
                 return;
             }
             let doubt = field.hasFlag;
@@ -139,14 +141,14 @@ module Minesweeper.Client {
         }
 
         onScore(msg:ScoreMessage) {
-            let player = this.lobby.players.find(p => p.id == msg.playerId);
+            let player = this.players.find(p => p.id == msg.playerId);
             player.gameData.score += msg.score;
             this.emitChange();
         }
 
         onFlag(msg:FlagMessage) {
             let field = this.minefield.get(msg.fieldId);
-            var player = this.lobby.players.find(p => p.id == msg.playerId);
+            var player = this.players.find(p => p.id == msg.playerId);
 
             if (msg.flag)
                 player.gameData.flags++;
@@ -168,7 +170,7 @@ module Minesweeper.Client {
 
         onReveal(msg:RevealMessage) {
             let field = this.minefield.get(msg.fieldId);
-            var player = this.lobby.players.find(p => p.id == msg.playerId);
+            var player = this.players.find(p => p.id == msg.playerId);
 
             field.isRevealed = true;
 
@@ -246,8 +248,6 @@ module Minesweeper.Client {
 
         }
 
-        private sprites:Sprite[];
-
         update(delta:number) {
             this.camera.update(delta);
 
@@ -296,7 +296,7 @@ module Minesweeper.Client {
 
                             if (x == ((mousePosition.x / TILE_SIZE) | 0) && y == ((mousePosition.y / TILE_SIZE) | 0)) {
                                 if (Mouse.button == 1) {
-                                    this.drawTile(ctx, this.assets.reveal[this.lobby.localPlayer.team], x, y);
+                                    this.drawTile(ctx, this.assets.reveal[this.localPlayer.team], x, y);
                                 } else {
                                     this.drawTile(ctx, this.assets.over, x, y);
                                 }

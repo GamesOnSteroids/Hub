@@ -15,12 +15,14 @@ class GameDescription extends React.Component {
         return result;
     }
     componentDidMount() {
+        if (this.props.game.id == "chess") {
+        }
     }
-    startGame(configuration) {
-        console.log("GameDescription.startGame", configuration);
+    startGame(variant) {
+        console.log("GameDescription.startGame", variant);
         let lobbyConfiguration = new Play.LobbyConfiguration();
-        lobbyConfiguration.maxPlayers = configuration.maxPlayers;
-        lobbyConfiguration.gameConfiguration = configuration;
+        lobbyConfiguration.maxPlayers = variant.maxPlayers;
+        lobbyConfiguration.gameConfiguration = variant;
         lobbyConfiguration.gameId = this.props.game.id;
         lobbyConfiguration.appClass = GameDescription.resolveClass(this.props.game.appClass);
         lobbyConfiguration.gameClass = GameDescription.resolveClass(this.props.game.gameClass);
@@ -32,7 +34,7 @@ class GameDescription extends React.Component {
         });
     }
     render() {
-        return (React.createElement("div", null, React.createElement("h3", null, this.props.game.name), React.createElement("div", null, React.createElement("p", null, this.props.game.description), React.createElement("span", null, "Currently playing: ? games")), React.createElement("div", {"className": "btn-group-vertical", "role": "group"}, this.props.game.configurations.map((configuration) => (React.createElement("button", {"key": configuration.id, "type": "button", "className": configuration.id == "default" ? "btn btn-primary" : "btn btn-default", "onClick": this.startGame.bind(this, configuration)}, configuration.name))))));
+        return (React.createElement("div", null, React.createElement("h3", null, this.props.game.name), React.createElement("div", null, React.createElement("p", null, this.props.game.description), React.createElement("span", null, "Currently playing: ? games")), React.createElement("div", {"className": "btn-group-vertical", "role": "group"}, this.props.game.variants.map((variant) => (React.createElement("button", {"key": variant.id, "type": "button", "className": variant.id == "default" ? "btn btn-primary" : "btn btn-default", "onClick": this.startGame.bind(this, variant)}, variant.name))))));
     }
 }
 //# sourceMappingURL=GameDescription.js.map
