@@ -39,6 +39,9 @@ module Play.Client {
         initialize() {
             this.canvas = <HTMLCanvasElement>document.getElementById("game-canvas");
             this.context = this.canvas.getContext("2d");
+            this.canvas.onkeypress = this.onKeyPress.bind(this);
+            this.canvas.onkeydown = this.onKeyDown.bind(this);
+            this.canvas.tabIndex = 1000;
             this.canvas.onmousemove = (e) => {
                 Mouse.x = e.offsetX;
                 Mouse.y = e.offsetY;
@@ -91,6 +94,14 @@ module Play.Client {
         }
 
         onMouseDown(e:MouseEvent): void {
+        }
+
+        onKeyDown(e: KeyboardEvent): void {
+
+        }
+
+        onKeyPress(e: KeyboardEvent): void {
+
         }
 
         on<T extends GameMessage>(id:number, handler:(message:T) => void):void {

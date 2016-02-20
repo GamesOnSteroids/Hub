@@ -13,133 +13,6 @@ module Chess.Client {
     const TILE_HEIGHT = 42;
 
 
-    abstract class ChessPiece {
-        public timer:number = 0;
-        public movementProgress:number = 0;
-        public drawX:number;
-        public drawY:number;
-        public goal:{x: number, y: number} = null;
-
-        constructor(public type:PieceType, public id:number, public x:number, public y:number, public owner:PlayerInfo) {
-            this.drawX = x;
-            this.drawY = y;
-        }
-
-        abstract getValidMoves(board:ChessBoard):IMove[];
-    }
-    //class Pawn extends ChessPiece {
-    //    constructor(public direction:Direction4, x:number, y:number, owner:PlayerInfo) {
-    //        super(PieceType.Pawn, x, y, owner);
-    //    }
-    //
-    //    getValidMoves():{x: number, y: number}[] {
-    //        return null;
-    //    }
-    //}
-
-    enum MoveConstraints {
-        Move,
-        Fly,
-        Attack,
-    }
-
-    interface IMove {
-        x: number;
-        y: number;
-        constraints: MoveConstraints
-    }
-    class Queen extends ChessPiece {
-        constructor(id:number, x:number, y:number, owner:PlayerInfo) {
-            super(PieceType.Queen, id, x, y, owner);
-        }
-
-        addIfValid(result:IMove[], board:ChessBoard, x:number, y:number):boolean {
-            if (!board.isValidPosition(x, y)) {
-                return false;
-            }
-            let anotherPiece = board.pieces.find(p=>p.x == x && p.y == y);
-            if (anotherPiece != null) {
-                if (anotherPiece.owner.team == this.owner.team) {
-                    return false;
-                } else {
-                    result.push({x: x, y: y, constraints: MoveConstraints.Attack});
-                    return false;
-                }
-            }
-            result.push({x: x, y: y, constraints: MoveConstraints.Move});
-            return true;
-        }
-
-        getValidMoves(board:ChessBoard):IMove[] {
-            let result:IMove[] = [];
-            for (let x = this.x + 1; x < board.width; x++) {
-                if (!this.addIfValid(result, board, x, this.y)) {
-                    break;
-                }
-            }
-            for (let y = this.y + 1; y < board.height; y++) {
-                if (!this.addIfValid(result, board, this.x, y)) {
-                    break;
-                }
-            }
-            for (let x = this.x - 1; x >= 0; x--) {
-                if (!this.addIfValid(result, board, x, this.y)) {
-                    break;
-                }
-            }
-            for (let y = this.y - 1; y >= 0; y--) {
-                if (!this.addIfValid(result, board, this.x, y)) {
-                    break;
-                }
-            }
-            for (let i = 1; i < board.width; i++) {
-                if (!this.addIfValid(result, board, this.x + i, this.y + i)) {
-                    break;
-                }
-            }
-            for (let i = 1; i < board.width; i++) {
-                if (!this.addIfValid(result, board, this.x + i, this.y - i)) {
-                    break;
-                }
-            }
-            for (let i = 1; i < board.width; i++) {
-                if (!this.addIfValid(result, board, this.x - i, this.y + i)) {
-                    break;
-                }
-            }
-            for (let i = 1; i < board.width; i++) {
-                if (!this.addIfValid(result, board, this.x - i, this.y - i)) {
-                    break;
-                }
-            }
-
-            return result;
-        }
-    }
-
-    class ChessBoard {
-        public pieces:ChessPiece[] = [];
-        public width:number = 8;
-        public height:number = 8;
-
-        isValidPosition(x:number, y:number):boolean {
-            if (x < 0 || y < 0 || x >= 8 || y >= 8) {
-                return false;
-            }
-
-            return true;
-        }
-
-        getValidMoves(piece:ChessPiece):IMove[] {
-            let validMoves = piece.getValidMoves(this);
-            return validMoves;
-        }
-
-        isMoveValid(piece:ChessPiece, x:number, y:number) {
-            //this.getValidMoves(piece);
-        }
-    }
-
     export class ChessGame extends Game {
 
         private camera:Camera;
@@ -147,6 +20,8 @@ module Chess.Client {
         private assets:any = {};
 
         private chessBoard:ChessBoard;
+        selectedPiece:ChessPiece = null;
+
 
         constructor(lobby:ClientLobby) {
             super(lobby);
@@ -159,13 +34,6 @@ module Chess.Client {
 
 
             this.chessBoard = new ChessBoard();
-            //this.chessBoard.pieces.push(new Queen(1, 1, this.localPlayer));
-            //let fakePlayer = new PlayerInfo();
-            //fakePlayer.id = "321321";
-            //fakePlayer.team = 1;
-            //this.chessBoard.pieces.push(new Queen(4, 3, fakePlayer));
-            //this.chessBoard.pieces.push(new Queen(6, 7, this.localPlayer));
-            //this.chessBoard.pieces.push(new Queen(6, 3, this.localPlayer));
         }
 
         initialize() {
@@ -187,11 +55,13 @@ module Chess.Client {
         load() {
             let root = "games/chess/assets/";
 
-            this.assets[PieceType.Queen] = [];
-            this.assets[PieceType.Queen][0] = new Image();
-            this.assets[PieceType.Queen][0].src = root + "images/queen-white.png";
-            this.assets[PieceType.Queen][1] = new Image();
-            this.assets[PieceType.Queen][1].src = root + "images/queen-black.png";
+            for (let pieceType = 1; pieceType <= 6; pieceType++) {
+                this.assets[pieceType] = [];
+                for (let team = 0; team < 2; team++) {
+                    this.assets[pieceType][team] = new Image();
+                    this.assets[pieceType][team].src = `${root}images/${pieceType}-${team}.png`;
+                }
+            }
         }
 
         onMovePiece(message:MovePieceMessage) {
@@ -203,52 +73,71 @@ module Chess.Client {
 
         onDestroyPiece(message:DestroyPieceMessage) {
             console.log("ChessGame.onDestroyPiece", message);
+            let piece = this.chessBoard.pieces.find(p=>p.id == message.pieceId);
+            if (this.selectedPiece == piece) {
+                this.selectedPiece = null;
+            }
+            this.chessBoard.pieces.splice(this.chessBoard.pieces.indexOf(piece),1);
         }
 
         onCreatePiece(message:CreatePieceMessage) {
+            console.log("ChessGame.onCreatePiece", message.pieceId, PieceType[message.type], message.x, message.y);
             let player = this.players.find(p=>p.id == message.playerId);
             if (message.type == PieceType.Queen) {
                 this.chessBoard.pieces.push(new Queen(message.pieceId, message.x, message.y, player));
-            } else {
-                throw "Unknown piece"; //TODO: debug only
+            } else if (message.type == PieceType.King) {
+                this.chessBoard.pieces.push(new King(message.pieceId, message.x, message.y, player));
+            } else if (message.type == PieceType.Knight) {
+                this.chessBoard.pieces.push(new Knight(message.pieceId, message.x, message.y, player));
+            } else if (message.type == PieceType.Bishop) {
+                this.chessBoard.pieces.push(new Bishop(message.pieceId, message.x, message.y, player));
+            } else if (message.type == PieceType.Rook) {
+                this.chessBoard.pieces.push(new Rook(message.pieceId, message.x, message.y, player));
+            } else if (message.type == PieceType.Pawn) {
+                let direction:Direction4;
+                if (player.team == 0)
+                    direction = Direction4.Up;
+                else if (player.team == 1)
+                    direction = Direction4.Down;
+                else if (player.team == 2)
+                    direction = Direction4.Right;
+                else if (player.team == 3)
+                    direction = Direction4.Left;
+                this.chessBoard.pieces.push(new Pawn(message.pieceId, message.x, message.y, direction, player));
             }
         }
 
-        lerp(v0:number, v1:number, t:number) {
-            return (1 - t) * v0 + t * v1;
-        }
-
-        length(x0:number, y0:number, x1:number, y1:number) {
-            return Math.sqrt(Math.pow(x1 - x0, 2) + Math.pow(y1 - y0, 2));
-        }
 
         update(delta:number) {
             this.camera.update(delta);
 
-            let speed = 1 / (1000 * 0.5);
-
             for (let piece of this.chessBoard.pieces) {
                 if (piece.goal != null) {
-                    let length = this.length(piece.x, piece.y, piece.goal.x, piece.goal.y);
-                    piece.movementProgress += (delta * speed) / length;
+                    let length = Math.length(piece.x, piece.y, piece.goal.x, piece.goal.y);
+                    piece.movementProgress += (delta * MOVEMENT_SPEED) / length;
                     if (piece.movementProgress > 1) {
                         piece.movementProgress = 1;
                     }
 
-                    piece.drawX = this.lerp(piece.x, piece.goal.x, piece.movementProgress);
-                    piece.drawY = this.lerp(piece.y, piece.goal.y, piece.movementProgress);
+                    piece.drawX = Math.lerp(piece.x, piece.goal.x, piece.movementProgress);
+                    piece.drawY = Math.lerp(piece.y, piece.goal.y, piece.movementProgress);
+
 
                     if (piece.movementProgress == 1) {
                         piece.x = piece.goal.x;
                         piece.y = piece.goal.y;
                         piece.goal = null;
                         piece.movementProgress = 0;
+                        piece.timer = LOCK_TIMER;
                     }
                 }
+                if (piece.timer > 0) {
+                    piece.timer -= delta * (1 / 1000);
+                }
             }
+
         }
 
-        selectedPiece:ChessPiece = null;
 
         movePiece(piece:ChessPiece, x:number, y:number) {
             console.log("ChessGame.movePiece", PieceType[piece.type], x, y);
@@ -267,21 +156,19 @@ module Chess.Client {
             let y = (position.y / TILE_HEIGHT) | 0;
 
             if (Mouse.button == 1) {
-                if (this.selectedPiece != null) {
+                let piece = this.chessBoard.pieces.find(p=>p.x == x && p.y == y);
+                if (piece != null && piece.timer <= 0 && piece.movementProgress == 0 && piece.owner.id == this.localPlayer.id) {
+
+                    console.log("Select", PieceType[piece.type], x, y);
+                    this.selectedPiece = piece;
+                } else if (this.selectedPiece != null) {
                     console.log("MoveTo", PieceType[this.selectedPiece.type], x, y);
-                    //if (this.chessBoard.isMoveValid(this.selectedPiece, x, y)) {
-                    this.movePiece(this.selectedPiece, x, y);
-                    this.selectedPiece = null;
-                    //}
-                }
-                if (Mouse.button == 1) {
-                    let piece = this.chessBoard.pieces.find(p=>p.x == x && p.y == y);
-                    if (piece != null) {
-                        if (piece.owner.id == this.localPlayer.id) {
-                            console.log("Select", PieceType[piece.type], x, y);
-                            this.selectedPiece = piece;
-                        }
+                    let validMoves = this.selectedPiece.getValidMoves(this.chessBoard);
+                    if (validMoves.find(m=>m.x == x && m.y == y) != null) {
+                        this.movePiece(this.selectedPiece, x, y);
+                        this.selectedPiece = null;
                     }
+
                 }
             } else if (Mouse.button == 2) {
                 console.log("Deselect");
@@ -321,9 +208,9 @@ module Chess.Client {
 
 
                 ctx.globalAlpha = 0.6;
-                let validMoves = this.chessBoard.getValidMoves(this.selectedPiece);
+                let validMoves = this.selectedPiece.getValidMoves(this.chessBoard);
                 for (let validMove of validMoves) {
-                    if (validMove.constraints == MoveConstraints.Attack) {
+                    if (validMove.constraints == MoveType.Capture) {
                         ctx.fillStyle = "#FF3B30";
                     } else {
                         ctx.fillStyle = "#4CD964";
@@ -332,24 +219,41 @@ module Chess.Client {
                 }
             }
 
-            ctx.globalAlpha = 1;
-            for (let piece of this.chessBoard.pieces.sort((a, b) => b.y - a.y)) {
+
+            for (let piece of this.chessBoard.pieces.sort((a, b) => a.drawY - b.drawY)) {
                 this.drawPiece(ctx, piece);
             }
         }
 
-        drawPiece(ctx:CanvasRenderingContext2D, piece: ChessPiece):void {
+        drawPiece(ctx:CanvasRenderingContext2D, piece:ChessPiece):void {
             let image = this.assets[piece.type][piece.owner.team];
 
-            let x = piece.drawX;
-            let y = piece.drawY;
+            let x = piece.drawX * TILE_WIDTH;
+            let y = piece.drawY * TILE_HEIGHT;
 
+            ctx.globalAlpha = 1;
             ctx.drawImage(image,
                 0, 0, image.width, image.height,
-                x * TILE_WIDTH - image.width / 2 + TILE_WIDTH / 2,
-                y * TILE_HEIGHT + TILE_HEIGHT - image.width - TILE_HEIGHT / 4,
+                x - image.width / 2 + TILE_WIDTH / 2,
+                y + TILE_HEIGHT - image.width - TILE_HEIGHT / 4,
                 image.width, image.height);
+
+            if (piece.timer > 0) {
+                ctx.globalAlpha = 0.9;
+                ctx.fillStyle = "#FF0000";
+                ctx.beginPath();
+                let progress = (piece.timer * Math.PI * 2) / LOCK_TIMER;
+                ctx.moveTo(x + TILE_WIDTH / 2, y + TILE_HEIGHT / 2);
+                ctx.arc(
+                    x + TILE_WIDTH / 2,
+                    y + TILE_HEIGHT / 2,
+                    TILE_WIDTH / 3,
+                    0, progress);
+                ctx.fill();
+
+
+                //ctx.closePath();
+            }
         }
     }
-
 }

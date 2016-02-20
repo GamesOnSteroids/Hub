@@ -3,11 +3,16 @@ module Chess {
 
     import GameMessage = Play.GameMessage;
 
+
+    export const LOCK_TIMER = 3;
+    export const MOVEMENT_SPEED = 1 / (1000 * 0.5);
+
+
     export enum PieceType {
         Pawn = 1,
         Rook = 2,
-        Bishop = 3,
-        Knight = 4,
+        Knight = 3,
+        Bishop = 4,
         Queen = 5,
         King = 6
     }
@@ -48,7 +53,6 @@ module Chess {
 
     export interface DestroyPieceMessage extends GameMessage {
         pieceId: number;
-        playerId: string;
     }
 
 

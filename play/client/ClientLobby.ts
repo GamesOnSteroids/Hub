@@ -97,7 +97,6 @@ module Play.Client {
         }
 
         join(): void {
-
             this.sendToServer<JoinRequestMessage>({
                 service: ServiceType.Lobby,
                 id: <number>LobbyMessageId.CMSG_JOIN_REQUEST,

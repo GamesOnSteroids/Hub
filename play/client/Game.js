@@ -29,6 +29,9 @@ var Play;
             initialize() {
                 this.canvas = document.getElementById("game-canvas");
                 this.context = this.canvas.getContext("2d");
+                this.canvas.onkeypress = this.onKeyPress.bind(this);
+                this.canvas.onkeydown = this.onKeyDown.bind(this);
+                this.canvas.tabIndex = 1000;
                 this.canvas.onmousemove = (e) => {
                     Mouse.x = e.offsetX;
                     Mouse.y = e.offsetY;
@@ -73,6 +76,10 @@ var Play;
             onMouseUp(e) {
             }
             onMouseDown(e) {
+            }
+            onKeyDown(e) {
+            }
+            onKeyPress(e) {
             }
             on(id, handler) {
                 this.lobby.on(Play.ServiceType.Game, id, (message) => {

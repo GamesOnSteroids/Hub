@@ -63,17 +63,21 @@ var games = [
             {
                 id: "debug",
                 name: "debug",
-                maxPlayers: 1
+                maxPlayers: 2
             }
         ]
     },
     {
         id: "anagrams",
         name: "Anagrams on Steroids",
+        appClass: "Anagrams.Client.AnagramsApp",
+        gameClass: "Anagrams.Client.AnagramsGame",
+        serviceClass: "Anagrams.Server.AnagramsService",
         variants: [
             {
                 id: "debug",
-                name: "debug"
+                name: "debug",
+                maxPlayers: 1
             }
         ]
     }, {
@@ -82,7 +86,8 @@ var games = [
         variants: [
             {
                 id: "debug",
-                name: "debug"
+                name: "debug",
+                maxPlayers: 1
             }
         ]
     }
@@ -92,5 +97,28 @@ class App extends React.Component {
         return (React.createElement("div", {"className": "container-fluid"}, React.createElement(Header, null), this.props.children));
     }
 }
+document.onkeydown = function (event) {
+    var doPrevent = false;
+    if (event.keyCode === 8) {
+        let d = event.srcElement || event.target;
+        if ((d.tagName.toUpperCase() === 'INPUT' &&
+            (d.type.toUpperCase() === 'TEXT' ||
+                d.type.toUpperCase() === 'PASSWORD' ||
+                d.type.toUpperCase() === 'FILE' ||
+                d.type.toUpperCase() === 'SEARCH' ||
+                d.type.toUpperCase() === 'EMAIL' ||
+                d.type.toUpperCase() === 'NUMBER' ||
+                d.type.toUpperCase() === 'DATE')) ||
+            d.tagName.toUpperCase() === 'TEXTAREA') {
+            doPrevent = d.readOnly || d.disabled;
+        }
+        else {
+            doPrevent = true;
+        }
+    }
+    if (doPrevent) {
+        event.preventDefault();
+    }
+};
 ReactDOM.render((React.createElement(ReactRouter.Router, {"history": ReactRouter.hashHistory}, React.createElement(ReactRouter.Route, {"path": "/", "component": App}, React.createElement(ReactRouter.IndexRoute, {"component": GameList}), React.createElement(ReactRouter.Route, {"path": "/games", "component": GameList}), React.createElement(ReactRouter.Route, {"path": "/lobby/:lobbyId", "component": LobbyComponent}), React.createElement(ReactRouter.Route, {"path": "*", "component": NoMatch})))), document.getElementById('content'));
 //# sourceMappingURL=App.js.map

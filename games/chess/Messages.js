@@ -1,11 +1,13 @@
 var Chess;
 (function (Chess) {
     "use strict";
+    Chess.LOCK_TIMER = 3;
+    Chess.MOVEMENT_SPEED = 1 / (1000 * 0.5);
     (function (PieceType) {
         PieceType[PieceType["Pawn"] = 1] = "Pawn";
         PieceType[PieceType["Rook"] = 2] = "Rook";
-        PieceType[PieceType["Bishop"] = 3] = "Bishop";
-        PieceType[PieceType["Knight"] = 4] = "Knight";
+        PieceType[PieceType["Knight"] = 3] = "Knight";
+        PieceType[PieceType["Bishop"] = 4] = "Bishop";
         PieceType[PieceType["Queen"] = 5] = "Queen";
         PieceType[PieceType["King"] = 6] = "King";
     })(Chess.PieceType || (Chess.PieceType = {}));

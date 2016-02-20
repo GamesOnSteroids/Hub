@@ -6,11 +6,20 @@ var Play;
         class GameService extends Server.Service {
             constructor(lobby) {
                 super(lobby);
+                this.tick = this.tick.bind(this);
+                this.lastFrame = performance.now();
+            }
+            tick(time) {
+                let delta = time - this.lastFrame;
+                this.update(delta);
+                this.lastFrame = time;
+                window.requestAnimationFrame(this.tick);
             }
             get players() {
                 return this.lobby.clients;
             }
             start() { }
+            update(delta) { }
             on(id, handler) {
                 this.lobby.on(Play.ServiceType.Game, id, handler);
             }
