@@ -110,13 +110,11 @@ var games = [
 class App extends React.Component<any, any> {
     render() {
         return (
-            <div className="container-fluid">
-
-                <Header />
-
-                {this.props.children}
-
-
+            <div>
+                <Header />,
+                <div className="container">
+                    {this.props.children}
+                </div>
             </div>
         );
     }
@@ -128,7 +126,7 @@ class App extends React.Component<any, any> {
 document.onkeydown = function (event) {
     var doPrevent = false;
     if (event.keyCode === 8) {
-        let d: any = event.srcElement || event.target;
+        let d:any = event.srcElement || event.target;
         if ((d.tagName.toUpperCase() === 'INPUT' &&
                 (
                 d.type.toUpperCase() === 'TEXT' ||

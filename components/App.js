@@ -94,7 +94,7 @@ var games = [
 ];
 class App extends React.Component {
     render() {
-        return (React.createElement("div", {"className": "container-fluid"}, React.createElement(Header, null), this.props.children));
+        return (React.createElement("div", null, React.createElement(Header, null), ",", React.createElement("div", {"className": "container"}, this.props.children)));
     }
 }
 document.onkeydown = function (event) {
