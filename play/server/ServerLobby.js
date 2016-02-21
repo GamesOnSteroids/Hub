@@ -80,7 +80,7 @@ var Play;
                 }
             }
             onJoinRequest(client, msg) {
-                console.log("ServerLobby.onJoinRequest");
+                console.log("ServerLobby.onJoinRequest", msg);
                 client.name = msg.name;
                 client.team = this.clients.indexOf(client);
                 client.isConnected = true;

@@ -113,7 +113,7 @@ module Play.Server {
         }
 
         onJoinRequest(client:Client, msg:JoinRequestMessage) {
-            console.log("ServerLobby.onJoinRequest");
+            console.log("ServerLobby.onJoinRequest", msg);
 //TODO: if the game is already running, disconnect client
 
             client.name = msg.name;
