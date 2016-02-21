@@ -22,11 +22,11 @@ interface IApplicationConfiguration {
     firebaseURL: string;
 }
 var config = new Map<EnvironmentType, IApplicationConfiguration>();
-config.set("development",
+config.set(EnvironemtnType.Development,
     {
         firebaseURL: "https://gos-dev.firebaseio.com/"
     });
-config.set("production",
+config.set(EnvironemtnType.Production,
     {
         firebaseURL: "https://games-on-steroids.firebaseio.com/"
     });

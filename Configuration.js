@@ -15,10 +15,10 @@ var EnvironmentType;
     EnvironmentType[EnvironmentType["Development"] = 1] = "Development";
 })(EnvironmentType || (EnvironmentType = {}));
 var config = new Map();
-config.set("development", {
+config.set(EnvironemtnType.Development, {
     firebaseURL: "https://gos-dev.firebaseio.com/"
 });
-config.set("production", {
+config.set(EnvironemtnType.Production, {
     firebaseURL: "https://games-on-steroids.firebaseio.com/"
 });
 var games = [
