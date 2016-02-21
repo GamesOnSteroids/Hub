@@ -119,6 +119,8 @@ module Play.Server {
             client.name = msg.name;
             client.team = this.clients.indexOf(client);
 
+            client.isConnected = true;
+
             for (let other of this.clients) {
                 if (other.id == client.id) {
                     client.connection.send(<PlayerJoinedMessage>{
@@ -131,22 +133,24 @@ module Play.Server {
                         configuration: this.configuration.gameConfiguration
                     });
                 } else {
-                    client.connection.send(<PlayerJoinedMessage>{
-                        service: ServiceType.Lobby,
-                        id: LobbyMessageId.SMSG_PLAYER_JOINED,
-                        name: other.name,
-                        playerId: other.id,
-                        team: other.team,
-                        isReady: other.isReady
-                    }); // send other players to connecting player
+                    if (other.isConnected) {
+                        client.connection.send(<PlayerJoinedMessage>{
+                            service: ServiceType.Lobby,
+                            id: LobbyMessageId.SMSG_PLAYER_JOINED,
+                            name: other.name,
+                            playerId: other.id,
+                            team: other.team,
+                            isReady: other.isReady
+                        }); // send other players to connecting player
 
-                    other.connection.send(<PlayerJoinedMessage> {
-                        service: ServiceType.Lobby,
-                        id: LobbyMessageId.SMSG_PLAYER_JOINED,
-                        name: client.name,
-                        playerId: client.id,
-                        team: client.team
-                    }); // send connecting player to other players
+                        other.connection.send(<PlayerJoinedMessage> {
+                            service: ServiceType.Lobby,
+                            id: LobbyMessageId.SMSG_PLAYER_JOINED,
+                            name: client.name,
+                            playerId: client.id,
+                            team: client.team
+                        }); // send connecting player to other players
+                    }
                 }
             }
 

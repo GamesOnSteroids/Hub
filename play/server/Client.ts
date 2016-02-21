@@ -41,12 +41,14 @@ module Play.Server {
 
 
 
-    export class Client {
+    export class Client implements IPlayerInfo {
         public id:string;
         public name:string;
         public team:number;
         public isReady:boolean;
         public connection:IConnection;
+        public gameData: any;
+        public isConnected: boolean = false;
 
 
         send(msg:any):void {

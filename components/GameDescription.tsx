@@ -22,7 +22,7 @@ class GameDescription extends React.Component<any, any> {
     //TODO: DEBUG ONLY
     componentDidMount() {
         if (this.props.game.id == "chess") {
-          // this.startGame(this.props.game.variants[0]);
+        //   this.startGame(this.props.game.variants[1]);
         }
     }
 

@@ -1,22 +1,22 @@
-module Minesweeper.Client {
-
+module Minesweeper.Server {
     "use strict";
     import IPlayerInfo = Play.IPlayerInfo;
 
     export class Field {
         public isRevealed:boolean;
-        public owner:IPlayerInfo;
         public hasFlag:boolean;
         public hasMine:boolean;
+        public owner:IPlayerInfo;
         public adjacentMines:number;
     }
 
     export class Minefield {
         public width:number;
         public height:number;
-        private fields:Field[];
+        public generated:boolean;
+        public fields:Field[];
 
-        forAdjacent(fieldId: number, callback: (fieldId: number)=>void) {
+        forAdjacent(fieldId:number, callback:(fieldId:number) => void) {
             let x = (fieldId % this.width) | 0;
             let y = (fieldId / this.width) | 0;
 
@@ -31,12 +31,16 @@ module Minesweeper.Client {
         constructor(width:number, height:number) {
             this.width = width;
             this.height = height;
+            this.generated = false;
+
             this.fields = [];
-            for (let x = 0; x < this.width; x++) {
-                for (let y = 0; y < this.height; y++) {
-                    let field = this.fields[x + y * this.width] = new Field();
-                    field.isRevealed = false;
-                }
+
+            for (let i = 0; i < width * height; i++) {
+                let field:Field = new Field();
+                field.hasMine = false;
+                field.owner = null;
+
+                this.fields.push(field);
             }
         }
 

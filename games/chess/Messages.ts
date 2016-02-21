@@ -36,19 +36,22 @@ module Chess {
         x: number;
         y: number;
         pieceId: number;
-        type: PieceType;
+        pieceType: PieceType;
         playerId: string;
+        direction: number;
     }
 
 
     export interface MovePieceRequestMessage extends GameMessage {
         pieceId: number;
-        to: {x: number, y: number};
+        x: number;
+        y: number;
     }
 
     export interface MovePieceMessage extends GameMessage {
         pieceId: number;
-        to: {x: number, y: number};
+        x: number;
+        y: number;
     }
 
     export interface DestroyPieceMessage extends GameMessage {

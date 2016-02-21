@@ -12,13 +12,11 @@ module Play {
         onClientJoined(lobby: ServerLobby, client:Client): void;
     }
 
-    var firebaseUri = "https://gos-dev.firebaseio.com/";
-
     export class FirebaseLobbyService implements ILobbyService {
 
         onClientJoined(lobby: ServerLobby, client:Client) {
 
-            let firebase = new Firebase(firebaseUri);
+            let firebase = new Firebase(config.get(environment).firebaseURL);
             let lobbyRef = firebase.child("lobby").child(lobby.lobbyId);
 
             lobbyRef.transaction( (data) => {
@@ -35,7 +33,7 @@ module Play {
 
         findLobby(configuration:LobbyConfiguration):Promise<ClientLobby> {
             return new Promise<ClientLobby>((resolve, reject) => {
-                let lobbiesRef = new Firebase(firebaseUri).child("lobby");
+                let lobbiesRef = new Firebase(config.get(environment).firebaseURL).child("lobby");
 
                 // no desired game
                 if (configuration.lobbyId == null) {
@@ -45,7 +43,7 @@ module Play {
                         let lobbyRef:Firebase = null;
                         let found = snapshot.forEach((snapshot) => {
                             let value = snapshot.val();
-                            if (value.playerCount < value.maxPlayers && value.gameId == configuration.gameId) {
+                            if (value.playerCount < value.maxPlayers && value.gameId == configuration.gameId && value.gameVariant == configuration.gameConfiguration.id) {
                                 lobbyRef = snapshot.ref();
                                 return true;
                             }
@@ -57,6 +55,7 @@ module Play {
                                 maxPlayers: configuration.maxPlayers,
                                 gameId: configuration.gameId,
                                 createdAt: new Date(),
+                                gameVariant: configuration.gameConfiguration.id
                             };
 
                             let lobbyRef = lobbiesRef.push();
@@ -76,7 +75,7 @@ module Play {
                                 let serverLobby = new ServerLobby(lobbyId, configuration);
 
                                 let signalingService = new SignalingService();
-                                var ref = new Firebase(firebaseUri).child("lobby").child(serverLobby.lobbyId).child("sdp");
+                                var ref = new Firebase(config.get(environment).firebaseURL).child("lobby").child(serverLobby.lobbyId).child("sdp");
                                 signalingService.createSignalingServer(serverLobby, new FirebaseSignalingChannel(ref));
 
 
@@ -106,7 +105,7 @@ module Play {
                             lobby.clientGUID = guid();
 
                             let signalingService = new SignalingService();
-                            var ref = new Firebase(firebaseUri).child("lobby").child(lobby.lobbyId).child("sdp");
+                            var ref = new Firebase(config.get(environment).firebaseURL).child("lobby").child(lobby.lobbyId).child("sdp");
                             signalingService.createSignalingClient(lobby, new FirebaseSignalingChannel(ref));
 
                             resolve(lobby);

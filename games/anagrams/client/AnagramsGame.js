@@ -30,7 +30,6 @@ var Anagrams;
             }
             onLetters(message) {
                 console.log(message.letters);
-                this.remainingLetters = this.letters = message.letters;
             }
             onWord(message) {
             }

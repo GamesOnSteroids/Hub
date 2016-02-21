@@ -33,14 +33,18 @@ module Chess.Client {
             this.on(MessageId.SMSG_DESTROY_PIECE, this.onDestroyPiece.bind(this));
 
 
-            this.chessBoard = new ChessBoard();
+            if (lobby.configuration.gameConfiguration.boardType == "4player") {
+                this.chessBoard = new FourPlayerChessBoard();
+            } else {
+                this.chessBoard = new TwoPlayerChessBoard();
+            }
         }
 
         initialize() {
             super.initialize();
 
-            this.canvas.width = 8 * TILE_WIDTH + TILE_WIDTH * 2;
-            this.canvas.height = 8 * TILE_HEIGHT + TILE_HEIGHT * 2;
+            this.canvas.width = this.chessBoard.size * TILE_WIDTH + TILE_WIDTH * 2;
+            this.canvas.height = this.chessBoard.size * TILE_HEIGHT + TILE_HEIGHT * 2;
 
             this.canvas.style.cursor = "pointer";
 
@@ -57,7 +61,7 @@ module Chess.Client {
 
             for (let pieceType = 1; pieceType <= 6; pieceType++) {
                 this.assets[pieceType] = [];
-                for (let team = 0; team < 2; team++) {
+                for (let team = 0; team < 4; team++) {
                     this.assets[pieceType][team] = new Image();
                     this.assets[pieceType][team].src = `${root}images/${pieceType}-${team}.png`;
                 }
@@ -67,7 +71,7 @@ module Chess.Client {
         onMovePiece(message:MovePieceMessage) {
             console.log("ChessGame.onMovePiece", message);
             let piece = this.chessBoard.pieces.find(p=>p.id == message.pieceId);
-            piece.goal = {x: message.to.x, y: message.to.y};
+            piece.goTo(message.x, message.y);
 
         }
 
@@ -81,29 +85,20 @@ module Chess.Client {
         }
 
         onCreatePiece(message:CreatePieceMessage) {
-            console.log("ChessGame.onCreatePiece", message.pieceId, PieceType[message.type], message.x, message.y);
+            console.log("ChessGame.onCreatePiece", message.pieceId, PieceType[message.pieceType], message.x, message.y);
             let player = this.players.find(p=>p.id == message.playerId);
-            if (message.type == PieceType.Queen) {
+            if (message.pieceType == PieceType.Queen) {
                 this.chessBoard.pieces.push(new Queen(message.pieceId, message.x, message.y, player));
-            } else if (message.type == PieceType.King) {
+            } else if (message.pieceType == PieceType.King) {
                 this.chessBoard.pieces.push(new King(message.pieceId, message.x, message.y, player));
-            } else if (message.type == PieceType.Knight) {
+            } else if (message.pieceType == PieceType.Knight) {
                 this.chessBoard.pieces.push(new Knight(message.pieceId, message.x, message.y, player));
-            } else if (message.type == PieceType.Bishop) {
+            } else if (message.pieceType == PieceType.Bishop) {
                 this.chessBoard.pieces.push(new Bishop(message.pieceId, message.x, message.y, player));
-            } else if (message.type == PieceType.Rook) {
+            } else if (message.pieceType == PieceType.Rook) {
                 this.chessBoard.pieces.push(new Rook(message.pieceId, message.x, message.y, player));
-            } else if (message.type == PieceType.Pawn) {
-                let direction:Direction4;
-                if (player.team == 0)
-                    direction = Direction4.Up;
-                else if (player.team == 1)
-                    direction = Direction4.Down;
-                else if (player.team == 2)
-                    direction = Direction4.Right;
-                else if (player.team == 3)
-                    direction = Direction4.Left;
-                this.chessBoard.pieces.push(new Pawn(message.pieceId, message.x, message.y, direction, player));
+            } else if (message.pieceType == PieceType.Pawn) {
+                this.chessBoard.pieces.push(new Pawn(message.pieceId, message.x, message.y, message.direction, player));
             }
         }
 
@@ -113,20 +108,19 @@ module Chess.Client {
 
             for (let piece of this.chessBoard.pieces) {
                 if (piece.goal != null) {
-                    let length = Math.length(piece.x, piece.y, piece.goal.x, piece.goal.y);
+                    let length = Math.length(piece.start.x, piece.start.y, piece.goal.x, piece.goal.y);
                     piece.movementProgress += (delta * MOVEMENT_SPEED) / length;
                     if (piece.movementProgress > 1) {
                         piece.movementProgress = 1;
                     }
-
-                    piece.drawX = Math.lerp(piece.x, piece.goal.x, piece.movementProgress);
-                    piece.drawY = Math.lerp(piece.y, piece.goal.y, piece.movementProgress);
-
+                    piece.x = Math.round(Math.lerp(piece.start.x, piece.goal.x, piece.movementProgress));
+                    piece.y = Math.round(Math.lerp(piece.start.y, piece.goal.y, piece.movementProgress));
 
                     if (piece.movementProgress == 1) {
                         piece.x = piece.goal.x;
                         piece.y = piece.goal.y;
                         piece.goal = null;
+                        piece.start = null;
                         piece.movementProgress = 0;
                         piece.timer = LOCK_TIMER;
                     }
@@ -145,7 +139,8 @@ module Chess.Client {
             this.send<MovePieceRequestMessage>({
                 id: MessageId.CMSG_MOVE_PIECE_REQUEST,
                 pieceId: piece.id,
-                to: {x: x, y: y}
+                x: x,
+                y: y
             })
         }
 
@@ -188,18 +183,19 @@ module Chess.Client {
             ctx.globalAlpha = 1;
             ctx.strokeStyle = "#000000";
             ctx.lineWidth = 1;
-            ctx.strokeRect(0, 0, 8 * TILE_WIDTH, 8 * TILE_HEIGHT);
+            ctx.strokeRect(0, 0, this.chessBoard.size * TILE_WIDTH, this.chessBoard.size * TILE_HEIGHT);
 
-            for (let y = 0; y < 8; y++) {
-                for (let x = 0; x < 8; x++) {
-                    if ((x % 2) == (y % 2)) {
-                        ctx.fillStyle = "#000000";
-                        ctx.fillRect(x * TILE_WIDTH, y * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT);
-                    } else {
-                        ctx.fillStyle = "#FFFFFF";
-                        ctx.fillRect(x * TILE_WIDTH, y * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT);
+            for (let y = 0; y < this.chessBoard.size; y++) {
+                for (let x = 0; x < this.chessBoard.size; x++) {
+                    if (this.chessBoard.isValidPosition(x, y)) {
+                        if ((x % 2) == (y % 2)) {
+                            ctx.fillStyle = "#000000";
+                            ctx.fillRect(x * TILE_WIDTH, y * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT);
+                        } else {
+                            ctx.fillStyle = "#FFFFFF";
+                            ctx.fillRect(x * TILE_WIDTH, y * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT);
+                        }
                     }
-
                 }
             }
             if (this.selectedPiece != null) {
@@ -220,16 +216,24 @@ module Chess.Client {
             }
 
 
-            for (let piece of this.chessBoard.pieces.sort((a, b) => a.drawY - b.drawY)) {
+            for (let piece of this.chessBoard.pieces.sort((a, b) => a.y - b.y)) {
                 this.drawPiece(ctx, piece);
             }
         }
 
+
         drawPiece(ctx:CanvasRenderingContext2D, piece:ChessPiece):void {
             let image = this.assets[piece.type][piece.owner.team];
 
-            let x = piece.drawX * TILE_WIDTH;
-            let y = piece.drawY * TILE_HEIGHT;
+            let x: number;
+            let y: number;
+            if (piece.goal != null) {
+                x = Math.lerp(piece.start.x, piece.goal.x, piece.movementProgress) * TILE_WIDTH;
+                y = Math.lerp(piece.start.y, piece.goal.y, piece.movementProgress) * TILE_HEIGHT;
+            } else {
+                x = piece.x * TILE_WIDTH;
+                y = piece.y * TILE_HEIGHT;
+            }
 
             ctx.globalAlpha = 1;
             ctx.drawImage(image,

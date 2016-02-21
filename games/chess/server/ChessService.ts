@@ -8,96 +8,6 @@ module Chess.Server {
     import Client = Play.Server.Client;
 
 
-    abstract class ChessPiece {
-        public goal:{x: number, y: number};
-        public start:{x: number, y: number};
-        public movementProgress:number = 0;
-        public timer:number = 0;
-
-        constructor(public type:PieceType, public id:number, public x:number, public y:number, public owner:Client) {
-
-        }
-    }
-
-    class Queen extends ChessPiece {
-        constructor(id:number, x:number, y:number, owner:Client) {
-            super(PieceType.Queen, id, x, y, owner);
-        }
-    }
-
-    class King extends ChessPiece {
-        constructor(id:number, x:number, y:number, owner:Client) {
-            super(PieceType.King, id, x, y, owner);
-        }
-    }
-
-    export class Knight extends ChessPiece {
-        constructor(id:number, x:number, y:number, owner:Client) {
-            super(PieceType.Knight, id, x, y, owner);
-        }
-    }
-
-    export class Bishop extends ChessPiece {
-        constructor(id:number, x:number, y:number, owner:Client) {
-            super(PieceType.Bishop, id, x, y, owner);
-        }
-    }
-    export class Rook extends ChessPiece {
-        constructor(id:number, x:number, y:number, owner:Client) {
-            super(PieceType.Rook, id, x, y, owner);
-        }
-    }
-
-    export class Pawn extends ChessPiece {
-        constructor(id:number, x:number, y:number, public direction:Direction4, owner:Client) {
-            super(PieceType.Pawn, id, x, y, owner);
-        }
-    }
-
-    class ChessBoard {
-        pieces:ChessPiece[] = [];
-
-        //TODO: make abstract
-        initialize(service:ChessService) {
-        }
-    }
-
-    class TwoPlayerChessBoard extends ChessBoard {
-        constructor() {
-            super();
-            //this.size = 8;
-        }
-
-        initialize(service:ChessService) {
-            for (let i = 0; i < 8; i++) {
-                this.pieces.push(new Pawn(this.pieces.length, i, 6, Direction4.Up, service.players[0]));
-                this.pieces.push(new Pawn(this.pieces.length, i, 1, Direction4.Up, service.players[1]));
-            }
-            for (let i = 0; i < 2; i++) {
-                let row: number;
-                if (i == 0) {
-                    row = 7;
-                } else {
-                    row = 0;
-                }
-                this.pieces.push(new Rook(this.pieces.length, 0, row, service.players[i]));
-                this.pieces.push(new Knight(this.pieces.length, 1, row, service.players[i]));
-                this.pieces.push(new Bishop(this.pieces.length, 2, row, service.players[i]));
-                this.pieces.push(new King(this.pieces.length, 3, row, service.players[i]));
-                this.pieces.push(new Queen(this.pieces.length, 4, row, service.players[i]));
-                this.pieces.push(new Bishop(this.pieces.length, 5, row, service.players[i]));
-                this.pieces.push(new Knight(this.pieces.length, 6, row, service.players[i]));
-                this.pieces.push(new Rook(this.pieces.length, 7, row, service.players[i]));
-            }
-        }
-    }
-
-    class FourPlayerChessBoard extends ChessBoard {
-        constructor() {
-            super();
-            //this.size = 14;
-        }
-    }
 
     export class ChessService extends GameService {
         private chessBoard:ChessBoard;
@@ -105,7 +15,11 @@ module Chess.Server {
         constructor(lobby:ServerLobby) {
             super(lobby);
 
-            this.chessBoard = new TwoPlayerChessBoard();
+            if (lobby.configuration.gameConfiguration.boardType == "4player") {
+                this.chessBoard = new FourPlayerChessBoard();
+            } else {
+                this.chessBoard = new TwoPlayerChessBoard();
+            }
 
             this.on(MessageId.CMSG_MOVE_PIECE_REQUEST, this.onMovePieceRequest.bind(this));
 
@@ -130,9 +44,7 @@ module Chess.Server {
         update(delta:number) {
             for (let piece of this.chessBoard.pieces) {
                 if (piece.goal != null) {
-                    if (piece.start == null) {
-                        piece.start = {x: piece.x, y: piece.y};
-                    }
+
                     let length = Math.length(piece.start.x, piece.start.y, piece.goal.x, piece.goal.y);
                     piece.movementProgress += (delta * MOVEMENT_SPEED) / length;
                     if (piece.movementProgress > 1) {
@@ -144,6 +56,7 @@ module Chess.Server {
 
                     if (piece.type != PieceType.Knight || piece.movementProgress == 1) {
                         let collision = this.chessBoard.pieces.find(p=> p.x == piece.x && p.y == piece.y && p.id != piece.id);
+
                         if (collision != null) {
                             this.destroyPiece(collision);
                         }
@@ -166,11 +79,12 @@ module Chess.Server {
             let piece = this.chessBoard.pieces.find(p=>p.id == message.pieceId);
             if (piece != null) {
                 //TODO: check if move is valid
-                piece.goal = {x: message.to.x, y: message.to.y};
+                piece.goTo(message.x,  message.y);
                 this.broadcast<MovePieceMessage>({
                     id: MessageId.SMSG_MOVE_PIECE,
                     pieceId: piece.id,
-                    to: {x: message.to.x, y: message.to.y}
+                    x: message.x,
+                    y: message.y
                 });
             }
         }
@@ -180,14 +94,15 @@ module Chess.Server {
                 id: MessageId.SMSG_CREATE_PIECE,
                 x: piece.x,
                 y: piece.y,
+                direction: (piece as Pawn).direction,
                 pieceId: piece.id,
-                type: piece.type,
+                pieceType: piece.type,
                 playerId: piece.owner.id
             });
         }
 
         start():void {
-            this.chessBoard.initialize(this);
+            this.chessBoard.initialize(this.players);
             for (let piece of this.chessBoard.pieces) {
                 this.createPiece(piece);
             }

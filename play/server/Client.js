@@ -25,6 +25,9 @@ var Play;
         }
         Server.Peer2PeerConnection = Peer2PeerConnection;
         class Client {
+            constructor() {
+                this.isConnected = false;
+            }
             send(msg) {
                 this.connection.send(msg);
             }

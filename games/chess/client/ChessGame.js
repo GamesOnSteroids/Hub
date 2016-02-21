@@ -17,12 +17,17 @@ var Chess;
                 this.on(Chess.MessageId.SMSG_CREATE_PIECE, this.onCreatePiece.bind(this));
                 this.on(Chess.MessageId.SMSG_MOVE_PIECE, this.onMovePiece.bind(this));
                 this.on(Chess.MessageId.SMSG_DESTROY_PIECE, this.onDestroyPiece.bind(this));
-                this.chessBoard = new Client.ChessBoard();
+                if (lobby.configuration.gameConfiguration.boardType == "4player") {
+                    this.chessBoard = new Chess.FourPlayerChessBoard();
+                }
+                else {
+                    this.chessBoard = new Chess.TwoPlayerChessBoard();
+                }
             }
             initialize() {
                 super.initialize();
-                this.canvas.width = 8 * TILE_WIDTH + TILE_WIDTH * 2;
-                this.canvas.height = 8 * TILE_HEIGHT + TILE_HEIGHT * 2;
+                this.canvas.width = this.chessBoard.size * TILE_WIDTH + TILE_WIDTH * 2;
+                this.canvas.height = this.chessBoard.size * TILE_HEIGHT + TILE_HEIGHT * 2;
                 this.canvas.style.cursor = "pointer";
                 this.camera = new Camera(this.canvas);
                 this.camera.translateX = TILE_WIDTH;
@@ -33,7 +38,7 @@ var Chess;
                 let root = "games/chess/assets/";
                 for (let pieceType = 1; pieceType <= 6; pieceType++) {
                     this.assets[pieceType] = [];
-                    for (let team = 0; team < 2; team++) {
+                    for (let team = 0; team < 4; team++) {
                         this.assets[pieceType][team] = new Image();
                         this.assets[pieceType][team].src = `${root}images/${pieceType}-${team}.png`;
                     }
@@ -42,7 +47,7 @@ var Chess;
             onMovePiece(message) {
                 console.log("ChessGame.onMovePiece", message);
                 let piece = this.chessBoard.pieces.find(p => p.id == message.pieceId);
-                piece.goal = { x: message.to.x, y: message.to.y };
+                piece.goTo(message.x, message.y);
             }
             onDestroyPiece(message) {
                 console.log("ChessGame.onDestroyPiece", message);
@@ -53,51 +58,43 @@ var Chess;
                 this.chessBoard.pieces.splice(this.chessBoard.pieces.indexOf(piece), 1);
             }
             onCreatePiece(message) {
-                console.log("ChessGame.onCreatePiece", message.pieceId, Chess.PieceType[message.type], message.x, message.y);
+                console.log("ChessGame.onCreatePiece", message.pieceId, Chess.PieceType[message.pieceType], message.x, message.y);
                 let player = this.players.find(p => p.id == message.playerId);
-                if (message.type == Chess.PieceType.Queen) {
-                    this.chessBoard.pieces.push(new Client.Queen(message.pieceId, message.x, message.y, player));
+                if (message.pieceType == Chess.PieceType.Queen) {
+                    this.chessBoard.pieces.push(new Chess.Queen(message.pieceId, message.x, message.y, player));
                 }
-                else if (message.type == Chess.PieceType.King) {
-                    this.chessBoard.pieces.push(new Client.King(message.pieceId, message.x, message.y, player));
+                else if (message.pieceType == Chess.PieceType.King) {
+                    this.chessBoard.pieces.push(new Chess.King(message.pieceId, message.x, message.y, player));
                 }
-                else if (message.type == Chess.PieceType.Knight) {
-                    this.chessBoard.pieces.push(new Client.Knight(message.pieceId, message.x, message.y, player));
+                else if (message.pieceType == Chess.PieceType.Knight) {
+                    this.chessBoard.pieces.push(new Chess.Knight(message.pieceId, message.x, message.y, player));
                 }
-                else if (message.type == Chess.PieceType.Bishop) {
-                    this.chessBoard.pieces.push(new Client.Bishop(message.pieceId, message.x, message.y, player));
+                else if (message.pieceType == Chess.PieceType.Bishop) {
+                    this.chessBoard.pieces.push(new Chess.Bishop(message.pieceId, message.x, message.y, player));
                 }
-                else if (message.type == Chess.PieceType.Rook) {
-                    this.chessBoard.pieces.push(new Client.Rook(message.pieceId, message.x, message.y, player));
+                else if (message.pieceType == Chess.PieceType.Rook) {
+                    this.chessBoard.pieces.push(new Chess.Rook(message.pieceId, message.x, message.y, player));
                 }
-                else if (message.type == Chess.PieceType.Pawn) {
-                    let direction;
-                    if (player.team == 0)
-                        direction = Chess.Direction4.Up;
-                    else if (player.team == 1)
-                        direction = Chess.Direction4.Down;
-                    else if (player.team == 2)
-                        direction = Chess.Direction4.Right;
-                    else if (player.team == 3)
-                        direction = Chess.Direction4.Left;
-                    this.chessBoard.pieces.push(new Client.Pawn(message.pieceId, message.x, message.y, direction, player));
+                else if (message.pieceType == Chess.PieceType.Pawn) {
+                    this.chessBoard.pieces.push(new Chess.Pawn(message.pieceId, message.x, message.y, message.direction, player));
                 }
             }
             update(delta) {
                 this.camera.update(delta);
                 for (let piece of this.chessBoard.pieces) {
                     if (piece.goal != null) {
-                        let length = Math.length(piece.x, piece.y, piece.goal.x, piece.goal.y);
+                        let length = Math.length(piece.start.x, piece.start.y, piece.goal.x, piece.goal.y);
                         piece.movementProgress += (delta * Chess.MOVEMENT_SPEED) / length;
                         if (piece.movementProgress > 1) {
                             piece.movementProgress = 1;
                         }
-                        piece.drawX = Math.lerp(piece.x, piece.goal.x, piece.movementProgress);
-                        piece.drawY = Math.lerp(piece.y, piece.goal.y, piece.movementProgress);
+                        piece.x = Math.round(Math.lerp(piece.start.x, piece.goal.x, piece.movementProgress));
+                        piece.y = Math.round(Math.lerp(piece.start.y, piece.goal.y, piece.movementProgress));
                         if (piece.movementProgress == 1) {
                             piece.x = piece.goal.x;
                             piece.y = piece.goal.y;
                             piece.goal = null;
+                            piece.start = null;
                             piece.movementProgress = 0;
                             piece.timer = Chess.LOCK_TIMER;
                         }
@@ -112,7 +109,8 @@ var Chess;
                 this.send({
                     id: Chess.MessageId.CMSG_MOVE_PIECE_REQUEST,
                     pieceId: piece.id,
-                    to: { x: x, y: y }
+                    x: x,
+                    y: y
                 });
             }
             onMouseDown(e) {
@@ -147,16 +145,18 @@ var Chess;
                 ctx.globalAlpha = 1;
                 ctx.strokeStyle = "#000000";
                 ctx.lineWidth = 1;
-                ctx.strokeRect(0, 0, 8 * TILE_WIDTH, 8 * TILE_HEIGHT);
-                for (let y = 0; y < 8; y++) {
-                    for (let x = 0; x < 8; x++) {
-                        if ((x % 2) == (y % 2)) {
-                            ctx.fillStyle = "#000000";
-                            ctx.fillRect(x * TILE_WIDTH, y * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT);
-                        }
-                        else {
-                            ctx.fillStyle = "#FFFFFF";
-                            ctx.fillRect(x * TILE_WIDTH, y * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT);
+                ctx.strokeRect(0, 0, this.chessBoard.size * TILE_WIDTH, this.chessBoard.size * TILE_HEIGHT);
+                for (let y = 0; y < this.chessBoard.size; y++) {
+                    for (let x = 0; x < this.chessBoard.size; x++) {
+                        if (this.chessBoard.isValidPosition(x, y)) {
+                            if ((x % 2) == (y % 2)) {
+                                ctx.fillStyle = "#000000";
+                                ctx.fillRect(x * TILE_WIDTH, y * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT);
+                            }
+                            else {
+                                ctx.fillStyle = "#FFFFFF";
+                                ctx.fillRect(x * TILE_WIDTH, y * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT);
+                            }
                         }
                     }
                 }
@@ -166,7 +166,7 @@ var Chess;
                     ctx.globalAlpha = 0.6;
                     let validMoves = this.selectedPiece.getValidMoves(this.chessBoard);
                     for (let validMove of validMoves) {
-                        if (validMove.constraints == Client.MoveType.Capture) {
+                        if (validMove.constraints == Chess.MoveType.Capture) {
                             ctx.fillStyle = "#FF3B30";
                         }
                         else {
@@ -175,14 +175,22 @@ var Chess;
                         ctx.fillRect(validMove.x * TILE_WIDTH, validMove.y * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT);
                     }
                 }
-                for (let piece of this.chessBoard.pieces.sort((a, b) => a.drawY - b.drawY)) {
+                for (let piece of this.chessBoard.pieces.sort((a, b) => a.y - b.y)) {
                     this.drawPiece(ctx, piece);
                 }
             }
             drawPiece(ctx, piece) {
                 let image = this.assets[piece.type][piece.owner.team];
-                let x = piece.drawX * TILE_WIDTH;
-                let y = piece.drawY * TILE_HEIGHT;
+                let x;
+                let y;
+                if (piece.goal != null) {
+                    x = Math.lerp(piece.start.x, piece.goal.x, piece.movementProgress) * TILE_WIDTH;
+                    y = Math.lerp(piece.start.y, piece.goal.y, piece.movementProgress) * TILE_HEIGHT;
+                }
+                else {
+                    x = piece.x * TILE_WIDTH;
+                    y = piece.y * TILE_HEIGHT;
+                }
                 ctx.globalAlpha = 1;
                 ctx.drawImage(image, 0, 0, image.width, image.height, x - image.width / 2 + TILE_WIDTH / 2, y + TILE_HEIGHT - image.width - TILE_HEIGHT / 4, image.width, image.height);
                 if (piece.timer > 0) {

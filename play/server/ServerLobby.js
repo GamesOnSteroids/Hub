@@ -83,6 +83,7 @@ var Play;
                 console.log("ServerLobby.onJoinRequest");
                 client.name = msg.name;
                 client.team = this.clients.indexOf(client);
+                client.isConnected = true;
                 for (let other of this.clients) {
                     if (other.id == client.id) {
                         client.connection.send({
@@ -96,21 +97,23 @@ var Play;
                         });
                     }
                     else {
-                        client.connection.send({
-                            service: Play.ServiceType.Lobby,
-                            id: Play.LobbyMessageId.SMSG_PLAYER_JOINED,
-                            name: other.name,
-                            playerId: other.id,
-                            team: other.team,
-                            isReady: other.isReady
-                        });
-                        other.connection.send({
-                            service: Play.ServiceType.Lobby,
-                            id: Play.LobbyMessageId.SMSG_PLAYER_JOINED,
-                            name: client.name,
-                            playerId: client.id,
-                            team: client.team
-                        });
+                        if (other.isConnected) {
+                            client.connection.send({
+                                service: Play.ServiceType.Lobby,
+                                id: Play.LobbyMessageId.SMSG_PLAYER_JOINED,
+                                name: other.name,
+                                playerId: other.id,
+                                team: other.team,
+                                isReady: other.isReady
+                            });
+                            other.connection.send({
+                                service: Play.ServiceType.Lobby,
+                                id: Play.LobbyMessageId.SMSG_PLAYER_JOINED,
+                                name: client.name,
+                                playerId: client.id,
+                                team: client.team
+                            });
+                        }
                     }
                 }
                 new Play.FirebaseLobbyService().onClientJoined(this, client);

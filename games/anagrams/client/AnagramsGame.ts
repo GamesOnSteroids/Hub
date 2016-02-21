@@ -48,7 +48,7 @@ module Anagrams.Client {
 
         onLetters(message: LettersMessage) {
             console.log(message.letters);
-            this.remainingLetters = this.letters = message.letters;
+            //this.remainingLetters = this.letters = message.letters;
         }
 
         onWord(message:WordMessage) {

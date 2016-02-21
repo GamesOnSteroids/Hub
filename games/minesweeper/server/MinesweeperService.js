@@ -4,35 +4,6 @@ var Minesweeper;
     (function (Server) {
         "use strict";
         var GameService = Play.Server.GameService;
-        class Field {
-        }
-        class Minefield {
-            constructor(width, height) {
-                this.width = width;
-                this.height = height;
-                this.generated = false;
-                this.fields = [];
-                for (let i = 0; i < width * height; i++) {
-                    let field = new Field();
-                    field.hasMine = false;
-                    field.owner = null;
-                    this.fields.push(field);
-                }
-            }
-            forAdjacent(fieldId, callback) {
-                let x = (fieldId % this.width) | 0;
-                let y = (fieldId / this.width) | 0;
-                for (let _y = Math.max(0, y - 1); _y <= Math.min(y + 1, this.height - 1); _y++) {
-                    for (let _x = Math.max(0, x - 1); _x <= Math.min(x + 1, this.width - 1); _x++) {
-                        let _fieldId = _x + _y * this.width;
-                        callback(_fieldId);
-                    }
-                }
-            }
-            get(fieldId) {
-                return this.fields[fieldId];
-            }
-        }
         class MinesweeperService extends GameService {
             constructor(lobby) {
                 super(lobby);
@@ -40,7 +11,7 @@ var Minesweeper;
                 this.on(Minesweeper.MessageId.CMSG_FLAG_REQUEST, this.onFlagRequest.bind(this));
                 this.on(Minesweeper.MessageId.CMSG_MASS_REVEAL_REQUEST, this.onMassRevealRequest.bind(this));
                 let configuration = this.lobby.configuration.gameConfiguration;
-                this.minefield = new Minefield(configuration.width, configuration.height);
+                this.minefield = new Server.Minefield(configuration.width, configuration.height);
                 this.mines = configuration.mines;
                 this.flaggedMines = 0;
             }
