@@ -37,16 +37,11 @@ module Chess.Server {
             window.requestAnimationFrame(this.tick);
         }
 
-        destroyPiece(killer: IPlayerInfo, piece:ChessPiece):void {
+        destroyPiece(piece:ChessPiece):void {
             this.chessBoard.pieces.splice(this.chessBoard.pieces.indexOf(piece), 1);
             this.broadcast<DestroyPieceMessage>({
                 id: MessageId.SMSG_DESTROY_PIECE,
                 pieceId: piece.id
-            });
-            this.broadcast<ScoreMessage>({
-                id: MessageId.SMSG_SCORE,
-                playerId: killer.id,
-                score: scores.get(piece.type)
             });
             if (piece.type == PieceType.King) {
                 this.gameOver();
@@ -74,7 +69,13 @@ module Chess.Server {
                         let collision = this.chessBoard.pieces.find(p=> p.x == piece.x && p.y == piece.y && p.id != piece.id);
 
                         if (collision != null) {
-                            this.destroyPiece(piece.owner, collision);
+                            this.destroyPiece(collision);
+
+                            this.broadcast<ScoreMessage>({
+                                id: MessageId.SMSG_SCORE,
+                                playerId: piece.owner.id,
+                                score: scores.get(piece.type)
+                            });
                         }
                     }
 
@@ -83,6 +84,8 @@ module Chess.Server {
                         piece.start = null;
                         piece.movementProgress = 0;
                         piece.timer = LOCK_TIMER;
+
+                        //TODO: if this is last row, change to queen
                     }
                 }
                 if (piece.timer > 0) {

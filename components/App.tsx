@@ -14,7 +14,7 @@ class App extends React.Component<any, any> {
         return (
             <div>
                 <Header />,
-                <div className="container">
+                <div className="container-fluid">
                     {this.props.children}
                 </div>
             </div>

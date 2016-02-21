@@ -4,7 +4,7 @@ window.RTCSessionDescription = window.RTCSessionDescription || window.mozRTCSess
 window.RTCIceCandidate = window.mozRTCIceCandidate || window.RTCIceCandidate;
 class App extends React.Component {
     render() {
-        return (React.createElement("div", null, React.createElement(Header, null), ",", React.createElement("div", {"className": "container"}, this.props.children)));
+        return (React.createElement("div", null, React.createElement(Header, null), ",", React.createElement("div", {"className": "container-fluid"}, this.props.children)));
     }
 }
 document.onkeydown = function (event) {

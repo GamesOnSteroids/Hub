@@ -25,16 +25,11 @@ var Chess;
                 this.on(MessageId.CMSG_MOVE_PIECE_REQUEST, this.onMovePieceRequest.bind(this));
                 window.requestAnimationFrame(this.tick);
             }
-            destroyPiece(killer, piece) {
+            destroyPiece(piece) {
                 this.chessBoard.pieces.splice(this.chessBoard.pieces.indexOf(piece), 1);
                 this.broadcast({
                     id: MessageId.SMSG_DESTROY_PIECE,
                     pieceId: piece.id
-                });
-                this.broadcast({
-                    id: MessageId.SMSG_SCORE,
-                    playerId: killer.id,
-                    score: scores.get(piece.type)
                 });
                 if (piece.type == Chess.PieceType.King) {
                     this.gameOver();
@@ -56,7 +51,12 @@ var Chess;
                         if (piece.type != Chess.PieceType.Knight || piece.movementProgress == 1) {
                             let collision = this.chessBoard.pieces.find(p => p.x == piece.x && p.y == piece.y && p.id != piece.id);
                             if (collision != null) {
-                                this.destroyPiece(piece.owner, collision);
+                                this.destroyPiece(collision);
+                                this.broadcast({
+                                    id: MessageId.SMSG_SCORE,
+                                    playerId: piece.owner.id,
+                                    score: scores.get(piece.type)
+                                });
                             }
                         }
                         if (piece.movementProgress == 1) {
