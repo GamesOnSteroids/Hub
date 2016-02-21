@@ -1,6 +1,11 @@
 "use strict";
 
-var environment: EnvironmentType = EnvironmentType.Production;
+enum EnvironmentType {
+    Production,
+    Development
+}
+
+var environment:EnvironmentType = EnvironmentType.Production;
 
 
 {
@@ -12,21 +17,16 @@ var environment: EnvironmentType = EnvironmentType.Production;
     }
 }
 
-enum EnvironmentType {
-    Production,
-    Development
-}
-
 
 interface IApplicationConfiguration {
     firebaseURL: string;
 }
 var config = new Map<EnvironmentType, IApplicationConfiguration>();
-config.set(EnvironemtnType.Development,
+config.set(EnvironmentType.Development,
     {
         firebaseURL: "https://gos-dev.firebaseio.com/"
     });
-config.set(EnvironemtnType.Production,
+config.set(EnvironmentType.Production,
     {
         firebaseURL: "https://games-on-steroids.firebaseio.com/"
     });

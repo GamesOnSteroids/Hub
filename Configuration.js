@@ -1,4 +1,9 @@
 "use strict";
+var EnvironmentType;
+(function (EnvironmentType) {
+    EnvironmentType[EnvironmentType["Production"] = 0] = "Production";
+    EnvironmentType[EnvironmentType["Development"] = 1] = "Development";
+})(EnvironmentType || (EnvironmentType = {}));
 var environment = EnvironmentType.Production;
 {
     let host = window.location.hostname;
@@ -9,16 +14,11 @@ var environment = EnvironmentType.Production;
         environment = EnvironmentType.Development;
     }
 }
-var EnvironmentType;
-(function (EnvironmentType) {
-    EnvironmentType[EnvironmentType["Production"] = 0] = "Production";
-    EnvironmentType[EnvironmentType["Development"] = 1] = "Development";
-})(EnvironmentType || (EnvironmentType = {}));
 var config = new Map();
-config.set(EnvironemtnType.Development, {
+config.set(EnvironmentType.Development, {
     firebaseURL: "https://gos-dev.firebaseio.com/"
 });
-config.set(EnvironemtnType.Production, {
+config.set(EnvironmentType.Production, {
     firebaseURL: "https://games-on-steroids.firebaseio.com/"
 });
 var games = [
