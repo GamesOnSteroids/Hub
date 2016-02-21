@@ -14,13 +14,20 @@ var environment = EnvironmentType.Production;
         environment = EnvironmentType.Development;
     }
 }
-var config = new Map();
-config.set(EnvironmentType.Development, {
-    firebaseURL: "https://gos-dev.firebaseio.com/"
-});
-config.set(EnvironmentType.Production, {
-    firebaseURL: "https://games-on-steroids.firebaseio.com/"
-});
+var config = new Map([
+    [
+        EnvironmentType.Development,
+        {
+            firebaseURL: "https://gos-dev.firebaseio.com/"
+        }
+    ],
+    [
+        EnvironmentType.Production,
+        {
+            firebaseURL: "https://games-on-steroids.firebaseio.com/"
+        }
+    ]
+]);
 var games = [
     {
         id: "minesweeper",
@@ -93,8 +100,7 @@ var games = [
             {
                 id: "debug",
                 name: "debug",
-                boardType: "4player",
-                maxPlayers: 1
+                maxPlayers: 2
             }
         ]
     },

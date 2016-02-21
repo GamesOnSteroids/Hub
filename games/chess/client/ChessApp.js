@@ -28,7 +28,7 @@ var Chess;
                 game.changeListener.unregister(this.stateChangeToken);
             }
             render() {
-                return (React.createElement("div", {"style": { position: "relative", textAlign: "center" }}, React.createElement("div", {"className": "row"}, React.createElement("div", {"className": "col-xs-12 col-md-8"}, React.createElement("canvas", {"id": "game-canvas"})), React.createElement("div", {"className": "col-xs-12 col-md-4"}), React.createElement("div", {"className": "col-xs-12 col-md-4"}, React.createElement(Chat, null)))));
+                return (React.createElement("div", {"style": { position: "relative", textAlign: "center" }}, React.createElement("div", {"className": "row"}, React.createElement("div", {"className": "col-xs-12 col-md-8"}, React.createElement("canvas", {"id": "game-canvas"})), React.createElement("div", {"className": "col-xs-12 col-md-4"}, React.createElement(Chess.Client.ChessScore, {"players": this.state.players})), React.createElement("div", {"className": "col-xs-12 col-md-4"}, React.createElement(Chat, null)))));
             }
         }
         Client.ChessApp = ChessApp;

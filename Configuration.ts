@@ -21,15 +21,21 @@ var environment:EnvironmentType = EnvironmentType.Production;
 interface IApplicationConfiguration {
     firebaseURL: string;
 }
-var config = new Map<EnvironmentType, IApplicationConfiguration>();
-config.set(EnvironmentType.Development,
-    {
-        firebaseURL: "https://gos-dev.firebaseio.com/"
-    });
-config.set(EnvironmentType.Production,
-    {
-        firebaseURL: "https://games-on-steroids.firebaseio.com/"
-    });
+
+var config = new Map<EnvironmentType, IApplicationConfiguration>([
+    [
+        EnvironmentType.Development,
+        {
+            firebaseURL: "https://gos-dev.firebaseio.com/"
+        }
+    ],
+    [
+        EnvironmentType.Production,
+        {
+            firebaseURL: "https://games-on-steroids.firebaseio.com/"
+        }
+    ]
+]);
 
 
 var games = [
@@ -112,8 +118,7 @@ var games = [
             {
                 id: "debug",
                 name: "debug",
-                boardType: "4player",
-                maxPlayers: 1
+                maxPlayers: 2
             }
         ]
     },

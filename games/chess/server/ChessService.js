@@ -5,6 +5,14 @@ var Chess;
         "use strict";
         var GameService = Play.Server.GameService;
         var MessageId = Chess.MessageId;
+        var scores = new Map([
+            [Chess.PieceType.Pawn, 100],
+            [Chess.PieceType.Rook, 500],
+            [Chess.PieceType.Bishop, 300],
+            [Chess.PieceType.Knight, 300],
+            [Chess.PieceType.Queen, 900],
+            [Chess.PieceType.King, 1000]
+        ]);
         class ChessService extends GameService {
             constructor(lobby) {
                 super(lobby);
@@ -17,11 +25,16 @@ var Chess;
                 this.on(MessageId.CMSG_MOVE_PIECE_REQUEST, this.onMovePieceRequest.bind(this));
                 window.requestAnimationFrame(this.tick);
             }
-            destroyPiece(piece) {
+            destroyPiece(killer, piece) {
                 this.chessBoard.pieces.splice(this.chessBoard.pieces.indexOf(piece), 1);
                 this.broadcast({
                     id: MessageId.SMSG_DESTROY_PIECE,
                     pieceId: piece.id
+                });
+                this.broadcast({
+                    id: MessageId.SMSG_SCORE,
+                    playerId: killer.id,
+                    score: scores.get(piece.type)
                 });
                 if (piece.type == Chess.PieceType.King) {
                     this.gameOver();
@@ -43,7 +56,7 @@ var Chess;
                         if (piece.type != Chess.PieceType.Knight || piece.movementProgress == 1) {
                             let collision = this.chessBoard.pieces.find(p => p.x == piece.x && p.y == piece.y && p.id != piece.id);
                             if (collision != null) {
-                                this.destroyPiece(collision);
+                                this.destroyPiece(piece.owner, collision);
                             }
                         }
                         if (piece.movementProgress == 1) {

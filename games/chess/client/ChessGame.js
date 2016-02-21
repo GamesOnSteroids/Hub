@@ -17,12 +17,24 @@ var Chess;
                 this.on(Chess.MessageId.SMSG_CREATE_PIECE, this.onCreatePiece.bind(this));
                 this.on(Chess.MessageId.SMSG_MOVE_PIECE, this.onMovePiece.bind(this));
                 this.on(Chess.MessageId.SMSG_DESTROY_PIECE, this.onDestroyPiece.bind(this));
+                this.on(Chess.MessageId.SMSG_SCORE, this.onScore.bind(this));
+                for (let player of this.players) {
+                    player.gameData = {
+                        score: 0,
+                        pieces: 0
+                    };
+                }
                 if (lobby.configuration.gameConfiguration.boardType == "4player") {
                     this.chessBoard = new Chess.FourPlayerChessBoard();
                 }
                 else {
                     this.chessBoard = new Chess.TwoPlayerChessBoard();
                 }
+            }
+            onScore(msg) {
+                let player = this.players.find(p => p.id == msg.playerId);
+                player.gameData.score += msg.score;
+                this.emitChange();
             }
             initialize() {
                 super.initialize();
@@ -56,10 +68,13 @@ var Chess;
                     this.selectedPiece = null;
                 }
                 this.chessBoard.pieces.splice(this.chessBoard.pieces.indexOf(piece), 1);
+                piece.owner.gameData.pieces--;
+                this.emitChange();
             }
             onCreatePiece(message) {
                 console.log("ChessGame.onCreatePiece", message.pieceId, Chess.PieceType[message.pieceType], message.x, message.y);
                 let player = this.players.find(p => p.id == message.playerId);
+                player.gameData.pieces++;
                 if (message.pieceType == Chess.PieceType.Queen) {
                     this.chessBoard.pieces.push(new Chess.Queen(message.pieceId, message.x, message.y, player));
                 }
@@ -78,6 +93,7 @@ var Chess;
                 else if (message.pieceType == Chess.PieceType.Pawn) {
                     this.chessBoard.pieces.push(new Chess.Pawn(message.pieceId, message.x, message.y, message.direction, player));
                 }
+                this.emitChange();
             }
             update(delta) {
                 this.camera.update(delta);

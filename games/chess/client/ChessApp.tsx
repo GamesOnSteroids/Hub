@@ -45,6 +45,7 @@ module Chess.Client {
                             <canvas id="game-canvas"/>
                         </div>
                         <div className="col-xs-12 col-md-4">
+                            <Chess.Client.ChessScore players={this.state.players} />
                         </div>
                         <div className="col-xs-12 col-md-4">
                             <Chat/>

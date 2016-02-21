@@ -29,7 +29,13 @@ module Chess {
         SMSG_CREATE_PIECE = 1,
         CMSG_MOVE_PIECE_REQUEST = 2,
         SMSG_MOVE_PIECE = 3,
-        SMSG_DESTROY_PIECE = 4
+        SMSG_DESTROY_PIECE = 4,
+        SMSG_SCORE = 5,
+    }
+
+    export interface ScoreMessage extends GameMessage {
+        playerId: string;
+        score: number;
     }
 
     export interface CreatePieceMessage extends GameMessage {

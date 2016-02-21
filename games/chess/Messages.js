@@ -24,6 +24,7 @@ var Chess;
         MessageId[MessageId["CMSG_MOVE_PIECE_REQUEST"] = 2] = "CMSG_MOVE_PIECE_REQUEST";
         MessageId[MessageId["SMSG_MOVE_PIECE"] = 3] = "SMSG_MOVE_PIECE";
         MessageId[MessageId["SMSG_DESTROY_PIECE"] = 4] = "SMSG_DESTROY_PIECE";
+        MessageId[MessageId["SMSG_SCORE"] = 5] = "SMSG_SCORE";
     })(Chess.MessageId || (Chess.MessageId = {}));
     var MessageId = Chess.MessageId;
 })(Chess || (Chess = {}));

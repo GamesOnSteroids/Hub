@@ -46,7 +46,7 @@ module Minesweeper.Client {
                             <canvas id="game-canvas"/>
                         </div>
                         <div className="col-xs-12 col-md-4">
-                            <MinesweeperScore players={this.state.players}
+                            <Minesweeper.Client.MinesweeperScore players={this.state.players}
                                               remainingMines={this.state.remainingMines}/>
                         </div>
                         <div className="col-xs-12 col-md-4">

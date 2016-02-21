@@ -6,8 +6,19 @@ module Chess.Server {
     import MessageId = Chess.MessageId;
     import CreatePieceMessage = Chess.CreatePieceMessage;
     import Client = Play.Server.Client;
+    import IPlayerInfo = Play.IPlayerInfo;
 
 
+    var scores = new Map<PieceType, number>(
+        [
+            [PieceType.Pawn, 100],
+            [PieceType.Rook, 500],
+            [PieceType.Bishop, 300],
+            [PieceType.Knight, 300],
+            [PieceType.Queen, 900],
+            [PieceType.King, 1000]
+        ]
+    );
 
     export class ChessService extends GameService {
         private chessBoard:ChessBoard;
@@ -26,11 +37,16 @@ module Chess.Server {
             window.requestAnimationFrame(this.tick);
         }
 
-        destroyPiece(piece:ChessPiece):void {
+        destroyPiece(killer: IPlayerInfo, piece:ChessPiece):void {
             this.chessBoard.pieces.splice(this.chessBoard.pieces.indexOf(piece), 1);
             this.broadcast<DestroyPieceMessage>({
                 id: MessageId.SMSG_DESTROY_PIECE,
                 pieceId: piece.id
+            });
+            this.broadcast<ScoreMessage>({
+                id: MessageId.SMSG_SCORE,
+                playerId: killer.id,
+                score: scores.get(piece.type)
             });
             if (piece.type == PieceType.King) {
                 this.gameOver();
@@ -58,7 +74,7 @@ module Chess.Server {
                         let collision = this.chessBoard.pieces.find(p=> p.x == piece.x && p.y == piece.y && p.id != piece.id);
 
                         if (collision != null) {
-                            this.destroyPiece(collision);
+                            this.destroyPiece(piece.owner, collision);
                         }
                     }
 
