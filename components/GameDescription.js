@@ -15,7 +15,10 @@ class GameDescription extends React.Component {
         return result;
     }
     componentDidMount() {
-        if (this.props.game.id == "chess") {
+        if (environment == EnvironmentType.Development) {
+            if (this.props.game.id == "mahjong") {
+                this.startGame(this.props.game.variants[0]);
+            }
         }
     }
     startGame(variant) {
@@ -34,7 +37,9 @@ class GameDescription extends React.Component {
         });
     }
     render() {
-        return (React.createElement("div", null, React.createElement("h3", null, this.props.game.name), React.createElement("div", null, React.createElement("p", null, this.props.game.description), React.createElement("span", null, "Currently playing: ? games")), React.createElement("div", {"className": "btn-group-vertical", "role": "group"}, this.props.game.variants.map((variant) => (React.createElement("button", {"key": variant.id, "type": "button", "className": variant.id == "default" ? "btn btn-primary" : "btn btn-default", "onClick": this.startGame.bind(this, variant)}, variant.name))))));
+        return (React.createElement("div", null, React.createElement("h3", null, this.props.game.name), React.createElement("div", null, React.createElement("p", null, this.props.game.description), React.createElement("span", null, "Currently playing: ? games")), React.createElement("div", {"className": "btn-group-vertical", "role": "group"}, this.props.game.variants
+            .filter((v) => v.development == false || environment == EnvironmentType.Development)
+            .map((variant) => (React.createElement("button", {"key": variant.id, "type": "button", "className": variant.id == "default" ? "btn btn-primary" : "btn btn-default", "onClick": this.startGame.bind(this, variant)}, variant.name))))));
     }
 }
 //# sourceMappingURL=GameDescription.js.map

@@ -1,5 +1,6 @@
-import ReactElement = __React.ReactElement;
 "use strict";
+import ReactElement = __React.ReactElement;
+
 class GameList extends React.Component<any, any> {
 
     constructor() {
@@ -10,7 +11,9 @@ class GameList extends React.Component<any, any> {
 
         return (
             <div className="row">
-                {games.map( (game, index) => {
+                {games
+                    .filter(g=>g.development == false || environment == EnvironmentType.Development)
+                    .map( (game, index) => {
                     let result:JSX.Element[] = [];
                     index++;
 

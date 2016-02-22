@@ -7,8 +7,8 @@ class GameDescription extends React.Component<any, any> {
         this.startGame = this.startGame.bind(this);
     }
 
-    static resolveClass(name: string) {
-        let result: any = window;
+    static resolveClass(name:string) {
+        let result:any = window;
         for (let part of name.split(".")) {
             result = result[part];
         }
@@ -21,12 +21,14 @@ class GameDescription extends React.Component<any, any> {
 
     //TODO: DEBUG ONLY
     componentDidMount() {
-        if (this.props.game.id == "chess") {
-        //   this.startGame(this.props.game.variants[1]);
+        if (environment == EnvironmentType.Development) {
+            if (this.props.game.id == "mahjong") {
+                this.startGame(this.props.game.variants[0]);
+            }
         }
     }
 
-    startGame(variant: any) {
+    startGame(variant:any) {
         console.log("GameDescription.startGame", variant);
 
         let lobbyConfiguration = new Play.LobbyConfiguration();
@@ -55,7 +57,9 @@ class GameDescription extends React.Component<any, any> {
                     <span>Currently playing: ? games</span>
                 </div>
                 <div className="btn-group-vertical" role="group">
-                    { this.props.game.variants.map( (variant: any) => (
+                    { this.props.game.variants
+                        .filter((v: any)=>v.development == false || environment == EnvironmentType.Development)
+                        .map( (variant: any) => (
                     <button key={variant.id} type="button"
                             className={variant.id == "default" ? "btn btn-primary" : "btn btn-default"}
                             onClick={this.startGame.bind(this, variant)}>

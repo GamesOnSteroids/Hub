@@ -4,7 +4,9 @@ class GameList extends React.Component {
         super();
     }
     render() {
-        return (React.createElement("div", {"className": "row"}, games.map((game, index) => {
+        return (React.createElement("div", {"className": "row"}, games
+            .filter(g => g.development == false || environment == EnvironmentType.Development)
+            .map((game, index) => {
             let result = [];
             index++;
             result.push(React.createElement("div", {"className": "col-lg-3 col-md-4 col-sm-6 col-xs-12"}, React.createElement(GameDescription, {"game": game})));

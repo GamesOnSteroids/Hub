@@ -10,7 +10,7 @@ var environment:EnvironmentType = EnvironmentType.Production;
 
 {
     let host = window.location.hostname;
-    if (host == "http://gamesonsteroids.com/") {
+    if (host == "gamesonsteroids.com") {
         environment = EnvironmentType.Production;
     } else {
         environment = EnvironmentType.Development;
@@ -37,15 +37,25 @@ var config = new Map<EnvironmentType, IApplicationConfiguration>([
     ]
 ]);
 
+interface IGameConfiguration {
+    id: string;
+    image?: string;
+    appClass?: string;
+    gameClass?: string;
+    serviceClass?: string;
+    name: string;
+    variants: any[];
+    development?: boolean;
+}
 
-var games = [
+var games: IGameConfiguration[] = [
     {
         id: "minesweeper",
         image: "https://upload.wikimedia.org/wikipedia/en/5/5c/Minesweeper_Icon.png",
         appClass: "Minesweeper.Client.MinesweeperApp",
         gameClass: "Minesweeper.Client.MinesweeperGame",
         serviceClass: "Minesweeper.Server.MinesweeperService",
-        name: "Minesweeper on Steroids",
+        name: "Minesweeper",
         variants: [
             {
                 id: "default",
@@ -90,6 +100,7 @@ var games = [
             {
                 id: "debug",
                 name: "debug",
+                development: true,
                 maxPlayers: 1,
                 width: 10,
                 height: 10,
@@ -102,7 +113,7 @@ var games = [
         appClass: "Chess.Client.ChessApp",
         gameClass: "Chess.Client.ChessGame",
         serviceClass: "Chess.Server.ChessService",
-        name: "Chess on Steroids",
+        name: "Chess",
         variants: [
             {
                 id: "2players",
@@ -118,32 +129,63 @@ var games = [
             {
                 id: "debug",
                 name: "debug",
+                development: true,
                 maxPlayers: 2
             }
         ]
     },
     {
         id: "anagrams",
-        name: "Anagrams on Steroids",
+        name: "Anagrams",
         appClass: "Anagrams.Client.AnagramsApp",
         gameClass: "Anagrams.Client.AnagramsGame",
         serviceClass: "Anagrams.Server.AnagramsService",
+        development: true,
         variants: [
             {
                 id: "debug",
                 name: "debug",
-                maxPlayers: 1
+                maxPlayers: 1,
+                development: true
             }
         ]
     }, {
         id: "typing",
-        name: "Typing on Steroids",
+        name: "Typing",
+        development: true,
         variants: [
             {
                 id: "debug",
                 name: "debug",
-                maxPlayers: 1
+                maxPlayers: 1,
+                development: true
             }
         ]
+    },{
+        "id": "mahjong",
+        "name": "Mahjong",
+        "appClass": "Mahjong.Client.MahjongApp",
+        "gameClass": "Mahjong.Client.MahjongGame",
+        "serviceClass": "Mahjong.Server.MahjongService",
+        development: true,
+        "variants": [{
+            "id": "debug",
+            "name": "debug",
+            "maxPlayers": 1,
+            development: true,
+        }]
+    },{
+        "id": "tetronimos",
+        "name": "Tetronimos",
+        "appClass": "Tetronimos.Client.MahjongApp",
+        "gameClass": "Tetronimos.Client.MahjongGame",
+        "serviceClass": "Tetronimos.Server.MahjongService",
+        "variants": [{
+            "id": "debug",
+            "name": "debug",
+            "maxPlayers": 1,
+            development: true,
+        }]
     }
+
 ];
