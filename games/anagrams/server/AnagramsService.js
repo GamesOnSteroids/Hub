@@ -27,7 +27,7 @@ var Anagrams;
                 letters += this.randomChar(conosants);
                 letters += this.randomChar(conosants);
                 letters += this.randomChar(conosants);
-                this.broadcast(new Anagrams.LettersMessage(letters));
+                this.lobby.broadcast(new Anagrams.LettersMessage(letters));
             }
             start() {
                 this.generateLetters();

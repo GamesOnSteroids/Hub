@@ -147,11 +147,11 @@ var gamesConfiguration = [
                 development: true,
             }]
     }, {
-        "id": "tetronimos",
-        "name": "Tetronimos",
-        "appClass": "Tetronimos.Client.MahjongApp",
-        "gameClass": "Tetronimos.Client.MahjongGame",
-        "serviceClass": "Tetronimos.Server.MahjongService",
+        "id": "tetrominoes",
+        "name": "tetrominoes",
+        "appClass": "Tetrominoes.Client.TetrominoesApp",
+        "gameClass": "Tetrominoes.Client.TetrominoesGame",
+        "serviceClass": "Tetrominoes.Server.TetrominoesService",
         development: true,
         "variants": [{
                 "id": "debug",

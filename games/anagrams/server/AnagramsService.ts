@@ -36,7 +36,7 @@ module Anagrams.Server {
             letters += this.randomChar(conosants);
             letters += this.randomChar(conosants);
 
-            this.broadcast(new LettersMessage(letters));
+            this.lobby.broadcast(new LettersMessage(letters));
         }
 
         public start(): void {

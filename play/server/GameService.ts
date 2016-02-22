@@ -35,21 +35,6 @@ module Play.Server {
             this.lobby.on(ServiceType.Game, id, <any>handler);
         }
 
-
-
-        protected broadcast<T extends GameMessage>(msg: T): void {
-            this.lobby.broadcast(<any>msg);
-        }
-
-        /**
-         * Sends message only to specific client
-         * @param client Client that will receive message
-         * @param msg Message to send
-         */
-        protected sendTo<T extends GameMessage>(client: Client, msg: T): void {
-            client.connection.send(msg);
-        }
-
         /**
          * Called every 1/60th of a second
          * @param delta time between last and current call

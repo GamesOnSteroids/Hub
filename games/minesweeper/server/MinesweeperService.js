@@ -46,7 +46,7 @@ var Minesweeper;
                 field.hasFlag = flag;
                 if (flag) {
                     field.owner = client;
-                    this.broadcast(new Minesweeper.FlagMessage(client.id, fieldId, true));
+                    this.lobby.broadcast(new Minesweeper.FlagMessage(client.id, fieldId, true));
                     if (field.hasMine) {
                         this.flaggedMines++;
                         this.checkGameOver();
@@ -54,7 +54,7 @@ var Minesweeper;
                 }
                 else {
                     field.owner = undefined;
-                    this.broadcast(new Minesweeper.FlagMessage(client.id, fieldId, false));
+                    this.lobby.broadcast(new Minesweeper.FlagMessage(client.id, fieldId, false));
                     if (field.hasMine) {
                         this.flaggedMines--;
                         this.checkGameOver();

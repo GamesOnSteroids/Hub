@@ -2,14 +2,14 @@ module Play.Server {
     "use strict";
 
     export interface IConnection {
-        send(msg: any): void;
+        send(msg: Message): void;
     }
 
     export class LocalClientConnection implements IConnection {
 
         public messageHandler: (msg: Message) => void;
 
-        public send(msg: any): void {
+        public send(msg: Message): void {
             this.messageHandler(msg);
         }
     }
@@ -35,7 +35,7 @@ module Play.Server {
         public dataChannel: RTCDataChannel;
         public messageHandler: (msg: Message) => void;
 
-        public send(msg: any): void {
+        public send(msg: Message): void {
             this.dataChannel.send(JSON.stringify(msg));
         }
     }
@@ -51,7 +51,7 @@ module Play.Server {
         public isConnected: boolean = false;
 
 
-        public send(msg: any): void {
+        public send(msg: Message): void {
             this.connection.send(msg);
         }
     }

@@ -67,14 +67,14 @@ module Minesweeper.Server {
             field.hasFlag = flag;
             if (flag) {
                 field.owner = client;
-                this.broadcast(new FlagMessage(client.id, fieldId, true));
+                this.lobby.broadcast(new FlagMessage(client.id, fieldId, true));
                 if (field.hasMine) {
                     this.flaggedMines++;
                     this.checkGameOver();
                 }
             } else {
                 field.owner = undefined;
-                this.broadcast(new FlagMessage(client.id, fieldId, false));
+                this.lobby.broadcast(new FlagMessage(client.id, fieldId, false));
                 if (field.hasMine) {
                     this.flaggedMines--;
                     this.checkGameOver();

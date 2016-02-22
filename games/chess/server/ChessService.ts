@@ -65,7 +65,7 @@ module Chess.Server {
                             this.destroyPiece(collision);
 
                             let score = ChessService.scores.get(piece.type);
-                            this.broadcast(new ScoreMessage(piece.owner.id, score));
+                            this.lobby.broadcast(new ScoreMessage(piece.owner.id, score));
                         }
                     }
 
@@ -86,7 +86,7 @@ module Chess.Server {
 
         private destroyPiece(piece: ChessPiece): void {
             this.chessBoard.pieces.splice(this.chessBoard.pieces.indexOf(piece), 1);
-            this.broadcast(new DestroyPieceMessage(piece.id));
+            this.lobby.broadcast(new DestroyPieceMessage(piece.id));
             if (piece.type == PieceType.King) {
                 this.gameOver();
             }
@@ -102,7 +102,7 @@ module Chess.Server {
             if (piece != undefined) {
                 // todo: check if move is valid
                 piece.goTo(message.x, message.y);
-                this.broadcast(new MovePieceMessage(piece.id, message.x, message.y));
+                this.lobby.broadcast(new MovePieceMessage(piece.id, message.x, message.y));
             }
         }
 

@@ -39,7 +39,7 @@ var Chess;
                             if (collision != undefined) {
                                 this.destroyPiece(collision);
                                 let score = ChessService.scores.get(piece.type);
-                                this.broadcast(new Chess.ScoreMessage(piece.owner.id, score));
+                                this.lobby.broadcast(new Chess.ScoreMessage(piece.owner.id, score));
                             }
                         }
                         if (piece.movementProgress == 1) {
@@ -56,7 +56,7 @@ var Chess;
             }
             destroyPiece(piece) {
                 this.chessBoard.pieces.splice(this.chessBoard.pieces.indexOf(piece), 1);
-                this.broadcast(new Chess.DestroyPieceMessage(piece.id));
+                this.lobby.broadcast(new Chess.DestroyPieceMessage(piece.id));
                 if (piece.type == Chess.PieceType.King) {
                     this.gameOver();
                 }
@@ -68,7 +68,7 @@ var Chess;
                 let piece = this.chessBoard.pieces.find(p => p.id == message.pieceId);
                 if (piece != undefined) {
                     piece.goTo(message.x, message.y);
-                    this.broadcast(new Chess.MovePieceMessage(piece.id, message.x, message.y));
+                    this.lobby.broadcast(new Chess.MovePieceMessage(piece.id, message.x, message.y));
                 }
             }
             createPiece(piece) {
