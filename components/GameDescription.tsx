@@ -58,7 +58,7 @@ class GameDescription extends React.Component<any, any> {
                 </div>
                 <div className="btn-group-vertical" role="group">
                     { this.props.game.variants
-                        .filter((v: any)=>v.development == false || environment == EnvironmentType.Development)
+                        .filter((v: any)=>v.development != true || environment == EnvironmentType.Development)
                         .map( (variant: any) => (
                     <button key={variant.id} type="button"
                             className={variant.id == "default" ? "btn btn-primary" : "btn btn-default"}

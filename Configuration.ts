@@ -180,6 +180,7 @@ var games: IGameConfiguration[] = [
         "appClass": "Tetronimos.Client.MahjongApp",
         "gameClass": "Tetronimos.Client.MahjongGame",
         "serviceClass": "Tetronimos.Server.MahjongService",
+        development: true,
         "variants": [{
             "id": "debug",
             "name": "debug",
