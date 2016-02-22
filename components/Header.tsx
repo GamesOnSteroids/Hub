@@ -29,7 +29,7 @@ class Header extends React.Component<any, any> {
         }
 
         localStorage.setItem("nickname", nickname);
-        this.setState( {
+        this.setState({
             nickname: localStorage.getItem("nickname")
         });
     }
@@ -44,7 +44,9 @@ class Header extends React.Component<any, any> {
                     <div id="navbar" className="navbar-collapse collapse">
                         <form className="navbar-form navbar-right">
                             <div className="form-group">
-                                <input type="text" placeholder="Nickname" className="form-control" onChange={this.onNicknameChange} value={localStorage.getItem("nickname")} autoComplete="nickname" />
+                                <input type="text" placeholder="Nickname" className="form-control"
+                                       onChange={this.onNicknameChange} value={localStorage.getItem("nickname")}
+                                       autoComplete="nickname"/>
                             </div>
                         </form>
                     </div>

@@ -11,44 +11,56 @@ module Minesweeper {
         SMSG_SCORE = 6,
     }
 
-    export interface ScoreMessage extends GameMessage {
-        playerId: string;
-        score: number;
+    export class ScoreMessage extends GameMessage {
+        constructor(public playerId: string,
+                    public score: number) {
+            super(MessageId.SMSG_SCORE);
+        }
     }
 
-    export interface GameConfiguration {
-        width: number;
-        height: number;
-        mines: number;
-    }
-
-
-    export interface RevealMessage extends GameMessage {
-        playerId: string;
-        fieldId: number;
-        adjacentMines: number;
-        hasMine: boolean;
-    }
-
-    export interface FlagMessage extends GameMessage {
-        playerId: string;
-        fieldId: number;
-        flag: boolean;
+    export class GameConfiguration {
+        public width: number;
+        public height: number;
+        public mines: number;
     }
 
 
-    export interface MassRevealRequestMessage extends GameMessage {
-        fieldId: number;
+    export class RevealMessage extends GameMessage {
+        constructor(public playerId: string,
+                    public fieldId: number,
+                    public adjacentMines: number,
+                    public hasMine: boolean) {
+            super(MessageId.SMSG_REVEAL);
+        }
     }
 
-    export interface FlagRequestMessage extends GameMessage {
-        fieldId: number;
-        flag: boolean;
+    export class FlagMessage extends GameMessage {
+        constructor(public playerId: string,
+                    public fieldId: number,
+                    public flag: boolean) {
+            super(MessageId.SMSG_FLAG);
+        }
     }
 
-    export interface RevealRequestMessage extends GameMessage {
-        fieldId: number;
-        doubt: boolean;
+
+    export class MassRevealRequestMessage extends GameMessage {
+        constructor(public fieldId: number) {
+            super(MessageId.CMSG_MASS_REVEAL_REQUEST);
+        }
+    }
+
+    export class FlagRequestMessage extends GameMessage {
+        constructor(public fieldId: number,
+                    public flag: boolean) {
+            super(MessageId.CMSG_FLAG_REQUEST);
+        }
+    }
+
+    export class RevealRequestMessage extends GameMessage {
+        constructor(public fieldId: number,
+                    public doubt: boolean) {
+            super(MessageId.CMSG_REVEAL_REQUEST);
+        }
     }
 
 }

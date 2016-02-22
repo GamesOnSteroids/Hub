@@ -5,7 +5,7 @@ class NoMatch extends React.Component<any, any> {
         super();
     }
 
-    render() {
+    public render(): JSX.Element {
         return (
             <div>
                 404

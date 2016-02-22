@@ -7,7 +7,6 @@ var Mahjong;
         class MahjongService extends GameService {
             constructor(lobby) {
                 super(lobby);
-                let configuration = this.lobby.configuration.gameConfiguration;
             }
         }
         Server.MahjongService = MahjongService;

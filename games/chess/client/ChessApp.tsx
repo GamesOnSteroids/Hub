@@ -5,25 +5,25 @@ module Chess.Client {
 
 
     export class ChessApp extends React.Component<any, {players: PlayerInfo[]}> {
-        private stateChangeToken:number;
+        private stateChangeToken: number;
 
         constructor() {
             super();
 
-            let game = ClientLobby.current.game as ChessGame;
+            // let game = ClientLobby.current.game as ChessGame;
 
             this.state = {
                 players: ClientLobby.current.players,
             }
         }
 
-        componentDidMount() {
+        protected componentDidMount(): void {
             console.log("ChessApp.componentDidMount");
 
             let game = ClientLobby.current.game as ChessGame;
             game.initialize();
 
-            this.stateChangeToken = game.changeListener.register( (game:ChessGame) => {
+            this.stateChangeToken = game.changeListener.register((game: ChessGame) => {
                 console.log("ChessApp.changeListener");
                 this.setState({
                     players: ClientLobby.current.players
@@ -31,13 +31,12 @@ module Chess.Client {
             });
         }
 
-        componentWillUnmount() {
+        protected componentWillUnmount(): void {
             let game = ClientLobby.current.game as ChessGame;
             game.changeListener.unregister(this.stateChangeToken);
-
         }
 
-        render() {
+        public render(): JSX.Element {
             return (
                 <div style={{position: "relative", textAlign: "center"}}>
                     <div className="row">
@@ -45,7 +44,7 @@ module Chess.Client {
                             <canvas id="game-canvas"/>
                         </div>
                         <div className="col-xs-12 col-md-4">
-                            <Chess.Client.ChessScore players={this.state.players} />
+                            <Chess.Client.ChessScore players={this.state.players}/>
                         </div>
                         <div className="col-xs-12 col-md-4">
                             <Chat/>

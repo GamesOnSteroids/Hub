@@ -1,7 +1,7 @@
 module Play.Client {
     "use strict";
-    import IConnection = Play.Server.IConnection;
 
+    import IConnection = Play.Server.IConnection;
 
 
     export enum LobbyState {
@@ -21,35 +21,35 @@ module Play.Client {
             this.text = text;
         }
     }
+
     export class ClientLobby {
-        static current:ClientLobby;
+        public static current: ClientLobby;
 
-        public game:Game;
-        protected messageHandlers:Array<Array<(msg:IMessage)=>void>>;
+        public game: Game;
 
-        public clientGUID:string;
-        public localPlayer:PlayerInfo;
-        public players:PlayerInfo[] = [];
+        public clientGUID: string;
+        public localPlayer: PlayerInfo;
+        public players: PlayerInfo[] = [];
 
         public configuration: LobbyConfiguration;
 
         public messageLog: ChatLog[] = [];
 
-        public serverConnection:IConnection;
+        public serverConnection: IConnection;
 
-
-        public state:LobbyState = LobbyState.IN_LOBBY;
+        public state: LobbyState = LobbyState.IN_LOBBY;
         public changeListener = new EventDispatcher<ClientLobby>();
 
-        public lobbyId:string;
+        public lobbyId: string;
 
-        constructor(lobbyId:string, configuration: LobbyConfiguration) {
+        private messageHandlers = new Map<ServiceType, Map<number, (msg: Message) => void>>([
+            [ServiceType.Lobby, new Map<number, (msg: Message) => void>()],
+            [ServiceType.Game, new Map<number, (msg: Message) => void>()]
+        ]);
+
+        constructor(lobbyId: string, configuration: LobbyConfiguration) {
             this.lobbyId = lobbyId;
             this.configuration = configuration;
-
-            this.messageHandlers = [];
-            this.messageHandlers[ServiceType.Lobby] = [];
-            this.messageHandlers[ServiceType.Game] = [];
 
             this.on<GameStartMessage>(ServiceType.Lobby, LobbyMessageId.SMSG_GAME_START, this.onGameStart.bind(this));
             this.on<PlayerJoinedMessage>(ServiceType.Lobby, LobbyMessageId.SMSG_PLAYER_JOINED, this.onJoin.bind(this));
@@ -60,35 +60,25 @@ module Play.Client {
 
         }
 
-        sendToServer<T extends IMessage>(msg:T) {
+        public sendToServer<T extends Message>(msg: T): void {
             this.serverConnection.send(msg);
         }
 
-        on<T extends IMessage>(service:ServiceType, messageId:number, callback:(msg:T) => void) {
-            this.messageHandlers[service][messageId] = callback;
+        public on<T extends Message>(service: ServiceType, messageId: number, callback: (msg: T) => void): void {
+            this.messageHandlers.get(service).set(messageId, callback);
         }
 
 
-        onMessage(msg:IMessage) {
-            let handler = this.messageHandlers[msg.service][msg.id];
-            if (handler != null) {
+        public onMessage(msg: Message): void {
+            let handler = this.messageHandlers.get(msg.service).get(msg.id);
+            if (handler != undefined) {
                 handler(msg);
             }
         }
 
-
-        private emitChange(completed?: ()=>void): void {
-            this.changeListener.dispatch(this, completed);
-        }
-
         public sendChat(message: string): void {
-            this.sendToServer<ChatMessage>({
-                id: LobbyMessageId.CMSG_CHAT,
-                service: ServiceType.Lobby,
-                text: message
-            })
+            this.sendToServer(new ChatMessage(message));
         }
-
         public backToLobby(): void {
             this.state = LobbyState.IN_LOBBY;
             this.emitChange(() => {
@@ -96,42 +86,46 @@ module Play.Client {
             });
         }
 
-        join(): void {
+        public join(): void {
             this.sendToServer<JoinRequestMessage>({
                 service: ServiceType.Lobby,
                 id: <number>LobbyMessageId.CMSG_JOIN_REQUEST,
                 name: localStorage.getItem("nickname"),
-                team: 1
+                team: 1,
             });
             this.ready();
         }
 
-        ready() {
+        public ready(): void {
             console.log("ClientLobby.ready");
             // preload assets
-            this.sendToServer<ReadyMessage>({service:ServiceType.Lobby, id: LobbyMessageId.CMSG_READY});
+            this.sendToServer<ReadyMessage>({service: ServiceType.Lobby, id: LobbyMessageId.CMSG_READY});
         }
 
-        onPlayerChat(message: PlayerChatMessage) {
-            let player = this.players.find(p=>p.id == message.playerId);
+        private emitChange(completed?: () => void): void {
+            this.changeListener.dispatch(this, completed);
+        }
+
+        private onPlayerChat(message: PlayerChatMessage): void {
+            let player = this.players.find(p => p.id == message.playerId);
             this.messageLog.push(new ChatLog(new Date(), player.name, message.text));
             this.emitChange();
         }
 
-        onPlayerReady(message: PlayerReadyMessage) {
+        private onPlayerReady(message: PlayerReadyMessage): void {
             console.log("ClientLobby.onPlayerReady");
-            let player = this.players.find(p=>p.id == message.playerId);
+            let player = this.players.find(p => p.id == message.playerId);
             player.isReady = true;
         }
 
-        onGameOver(message:GameOverMessage) {
+        private onGameOver(message: GameOverMessage): void {
             console.log("ClientLobby.onGameOver");
-            this.messageHandlers[ServiceType.Game] = [];
+            this.messageHandlers.get(ServiceType.Game).clear();
             this.state = LobbyState.GAME_OVER;
             this.emitChange();
         }
 
-        onGameStart(message:GameStartMessage) {
+        private onGameStart(message: GameStartMessage): void {
             console.log("ClientLobby.onGameStart");
 
 
@@ -141,7 +135,7 @@ module Play.Client {
             this.emitChange();
         }
 
-        onJoin(message:PlayerJoinedMessage) {
+        private onJoin(message: PlayerJoinedMessage): void {
             console.log("ClientLobby.onJoin", message);
 
             let player = new PlayerInfo();
@@ -157,10 +151,7 @@ module Play.Client {
                 this.localPlayer = player;
             }
 
-
             this.emitChange();
         }
     }
-
-
 }

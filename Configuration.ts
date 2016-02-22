@@ -5,7 +5,7 @@ enum EnvironmentType {
     Development
 }
 
-var environment:EnvironmentType = EnvironmentType.Production;
+var environment: EnvironmentType = EnvironmentType.Production;
 
 
 {
@@ -26,15 +26,15 @@ var config = new Map<EnvironmentType, IApplicationConfiguration>([
     [
         EnvironmentType.Development,
         {
-            firebaseURL: "https://gos-dev.firebaseio.com/"
-        }
+            firebaseURL: "https://gos-dev.firebaseio.com/",
+        },
     ],
     [
         EnvironmentType.Production,
         {
-            firebaseURL: "https://games-on-steroids.firebaseio.com/"
-        }
-    ]
+            firebaseURL: "https://games-on-steroids.firebaseio.com/",
+        },
+    ],
 ]);
 
 interface IGameConfiguration {
@@ -48,7 +48,7 @@ interface IGameConfiguration {
     development?: boolean;
 }
 
-var games: IGameConfiguration[] = [
+var gamesConfiguration: IGameConfiguration[] = [
     {
         id: "minesweeper",
         image: "https://upload.wikimedia.org/wikipedia/en/5/5c/Minesweeper_Icon.png",
@@ -81,14 +81,14 @@ var games: IGameConfiguration[] = [
                 height: 16,
                 mines: 99
             },
-            //{
+            // {
             //    id: "friend",
             //    name: "Play with friend",
             //    maxPlayers: 2,
             //    width: 10,
             //    height: 10,
             //    mines: 1
-            //},
+            // },
             {
                 id: "solo",
                 name: "1 Player",
@@ -116,7 +116,7 @@ var games: IGameConfiguration[] = [
         name: "Chess",
         variants: [
             {
-                id: "2players",
+                id: "default",
                 name: "2 Players",
                 maxPlayers: 2
             },
@@ -161,7 +161,7 @@ var games: IGameConfiguration[] = [
                 development: true
             }
         ]
-    },{
+    }, {
         "id": "mahjong",
         "name": "Mahjong",
         "appClass": "Mahjong.Client.MahjongApp",
@@ -174,7 +174,7 @@ var games: IGameConfiguration[] = [
             "maxPlayers": 1,
             development: true,
         }]
-    },{
+    }, {
         "id": "tetronimos",
         "name": "Tetronimos",
         "appClass": "Tetronimos.Client.MahjongApp",

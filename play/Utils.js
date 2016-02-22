@@ -1,13 +1,12 @@
 "use strict";
-function guid() {
-    function s4() {
+Math.guid = function () {
+    let s4 = () => {
         return Math.floor((1 + Math.random()) * 0x10000)
             .toString(16)
             .substring(1);
-    }
-    return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
-        s4() + '-' + s4() + s4() + s4();
-}
+    };
+    return s4() + s4() + "-" + s4() + "-" + s4() + "-" + s4() + "-" + s4() + s4() + s4();
+};
 Math.lerp = function (v0, v1, t) {
     return (1 - t) * v0 + t * v1;
 };

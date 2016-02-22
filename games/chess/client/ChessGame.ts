@@ -1,29 +1,27 @@
 module Chess.Client {
     "use strict";
 
-    import EventDispatcher = Play.Client.EventDispatcher;
     import Camera = Play.Client.Camera;
     import Game = Play.Client.Game;
     import Mouse = Play.Client.Mouse;
-    import Sprite = Play.Client.Sprite;
     import ClientLobby = Play.Client.ClientLobby;
 
 
-    const TILE_WIDTH = 52;
-    const TILE_HEIGHT = 42;
+    const TILE_WIDTH: number = 52;
+    const TILE_HEIGHT: number = 42;
 
 
     export class ChessGame extends Game {
 
-        private camera:Camera;
+        private camera: Camera;
 
-        private assets:any = {};
+        private assets: any = {};
 
-        private chessBoard:ChessBoard;
-        selectedPiece:ChessPiece = null;
+        private chessBoard: ChessBoard;
+        private selectedPiece: ChessPiece = null;
 
 
-        constructor(lobby:ClientLobby) {
+        constructor(lobby: ClientLobby) {
             super(lobby);
 
             this.load();
@@ -36,8 +34,8 @@ module Chess.Client {
 
             for (let player of this.players) {
                 player.gameData = {
+                    pieces: 0,
                     score: 0,
-                    pieces: 0
                 };
             }
             if (lobby.configuration.gameConfiguration.boardType == "4player") {
@@ -47,13 +45,7 @@ module Chess.Client {
             }
         }
 
-        onScore(msg:ScoreMessage) {
-            let player = this.players.find(p => p.id == msg.playerId);
-            player.gameData.score += msg.score;
-            this.emitChange();
-        }
-
-        initialize() {
+        public initialize(): void {
             super.initialize();
 
             this.canvas.width = this.chessBoard.size * TILE_WIDTH + TILE_WIDTH * 2;
@@ -69,62 +61,11 @@ module Chess.Client {
             this.emitChange();
         }
 
-        load() {
-            let root = "games/chess/assets/";
-
-            for (let pieceType = 1; pieceType <= 6; pieceType++) {
-                this.assets[pieceType] = [];
-                for (let team = 0; team < 4; team++) {
-                    this.assets[pieceType][team] = new Image();
-                    this.assets[pieceType][team].src = `${root}images/${pieceType}-${team}.png`;
-                }
-            }
-        }
-
-        onMovePiece(message:MovePieceMessage) {
-            console.log("ChessGame.onMovePiece", message);
-            let piece = this.chessBoard.pieces.find(p=>p.id == message.pieceId);
-            piece.goTo(message.x, message.y);
-
-        }
-
-        onDestroyPiece(message:DestroyPieceMessage) {
-            console.log("ChessGame.onDestroyPiece", message);
-            let piece = this.chessBoard.pieces.find(p=>p.id == message.pieceId);
-            if (this.selectedPiece == piece) {
-                this.selectedPiece = null;
-            }
-            this.chessBoard.pieces.splice(this.chessBoard.pieces.indexOf(piece),1);
-            piece.owner.gameData.pieces--;
-            this.emitChange();
-        }
-
-        onCreatePiece(message:CreatePieceMessage) {
-            console.log("ChessGame.onCreatePiece", message.pieceId, PieceType[message.pieceType], message.x, message.y);
-            let player = this.players.find(p=>p.id == message.playerId);
-            player.gameData.pieces++;
-            if (message.pieceType == PieceType.Queen) {
-                this.chessBoard.pieces.push(new Queen(message.pieceId, message.x, message.y, player));
-            } else if (message.pieceType == PieceType.King) {
-                this.chessBoard.pieces.push(new King(message.pieceId, message.x, message.y, player));
-            } else if (message.pieceType == PieceType.Knight) {
-                this.chessBoard.pieces.push(new Knight(message.pieceId, message.x, message.y, player));
-            } else if (message.pieceType == PieceType.Bishop) {
-                this.chessBoard.pieces.push(new Bishop(message.pieceId, message.x, message.y, player));
-            } else if (message.pieceType == PieceType.Rook) {
-                this.chessBoard.pieces.push(new Rook(message.pieceId, message.x, message.y, player));
-            } else if (message.pieceType == PieceType.Pawn) {
-                this.chessBoard.pieces.push(new Pawn(message.pieceId, message.x, message.y, message.direction, player));
-            }
-            this.emitChange();
-        }
-
-
-        update(delta:number) {
+        protected update(delta: number): void {
             this.camera.update(delta);
 
             for (let piece of this.chessBoard.pieces) {
-                if (piece.goal != null) {
+                if (piece.goal != undefined) {
                     let length = Math.length(piece.start.x, piece.start.y, piece.goal.x, piece.goal.y);
                     piece.movementProgress += (delta * MOVEMENT_SPEED) / length;
                     if (piece.movementProgress > 1) {
@@ -136,8 +77,8 @@ module Chess.Client {
                     if (piece.movementProgress == 1) {
                         piece.x = piece.goal.x;
                         piece.y = piece.goal.y;
-                        piece.goal = null;
-                        piece.start = null;
+                        piece.goal = undefined;
+                        piece.start = undefined;
                         piece.movementProgress = 0;
                         piece.timer = LOCK_TIMER;
                     }
@@ -149,48 +90,8 @@ module Chess.Client {
 
         }
 
-
-        movePiece(piece:ChessPiece, x:number, y:number) {
-            console.log("ChessGame.movePiece", PieceType[piece.type], x, y);
-
-            this.send<MovePieceRequestMessage>({
-                id: MessageId.CMSG_MOVE_PIECE_REQUEST,
-                pieceId: piece.id,
-                x: x,
-                y: y
-            })
-        }
-
-        onMouseDown(e:MouseEvent) {
-
-            let position = this.camera.unproject(e.offsetX, e.offsetY);
-            let x = (position.x / TILE_WIDTH) | 0;
-            let y = (position.y / TILE_HEIGHT) | 0;
-
-            if (Mouse.button == 1) {
-                let piece = this.chessBoard.pieces.find(p=>p.x == x && p.y == y);
-                if (piece != null && piece.timer <= 0 && piece.movementProgress == 0 && piece.owner.id == this.localPlayer.id) {
-
-                    console.log("Select", PieceType[piece.type], x, y);
-                    this.selectedPiece = piece;
-                } else if (this.selectedPiece != null) {
-                    console.log("MoveTo", PieceType[this.selectedPiece.type], x, y);
-                    let validMoves = this.selectedPiece.getValidMoves(this.chessBoard);
-                    if (validMoves.find(m=>m.x == x && m.y == y) != null) {
-                        this.movePiece(this.selectedPiece, x, y);
-                        this.selectedPiece = null;
-                    }
-
-                }
-            } else if (Mouse.button == 2) {
-                console.log("Deselect");
-                this.selectedPiece = null;
-            }
-        }
-
-
-        draw(delta:number):void {
-            var ctx = this.context;
+        protected draw(delta: number): void {
+            let ctx = this.context;
 
             ctx.setTransform(1, 0, 0, 1, 0, 0);
             ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -215,7 +116,7 @@ module Chess.Client {
                     }
                 }
             }
-            if (this.selectedPiece != null) {
+            if (this.selectedPiece != undefined) {
                 ctx.fillStyle = "#FFCC00";
                 ctx.fillRect(this.selectedPiece.x * TILE_WIDTH, this.selectedPiece.y * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT);
 
@@ -238,13 +139,101 @@ module Chess.Client {
             }
         }
 
+        protected onMouseDown(e: MouseEvent): void {
 
-        drawPiece(ctx:CanvasRenderingContext2D, piece:ChessPiece):void {
+            let position = this.camera.unproject(e.offsetX, e.offsetY);
+            let x = Math.floor(position.x / TILE_WIDTH);
+            let y = Math.floor(position.y / TILE_HEIGHT);
+
+            if (Mouse.button == 1) {
+                let piece = this.chessBoard.pieces.find(p => p.x == x && p.y == y);
+                if (piece != undefined && piece.timer <= 0 && piece.movementProgress == 0 && piece.owner.id == this.localPlayer.id) {
+
+                    console.log("Select", PieceType[piece.type], x, y);
+                    this.selectedPiece = piece;
+                } else if (this.selectedPiece != undefined) {
+                    console.log("MoveTo", PieceType[this.selectedPiece.type], x, y);
+                    let validMoves = this.selectedPiece.getValidMoves(this.chessBoard);
+                    if (validMoves.find(m => m.x == x && m.y == y) != undefined) {
+                        this.movePiece(this.selectedPiece, x, y);
+                        this.selectedPiece = undefined;
+                    }
+
+                }
+            } else if (Mouse.button == 2) {
+                console.log("Deselect");
+                this.selectedPiece = undefined;
+            }
+        }
+
+        private onScore(msg: ScoreMessage): void {
+            let player = this.players.find(p => p.id == msg.playerId);
+            player.gameData.score += msg.score;
+            this.emitChange();
+        }
+
+        private load(): void {
+            let root = "games/chess/assets/";
+
+            for (let pieceType = 1; pieceType <= 6; pieceType++) {
+                this.assets[pieceType] = [];
+                for (let team = 0; team < 4; team++) {
+                    this.assets[pieceType][team] = new Image();
+                    this.assets[pieceType][team].src = `${root}images/${pieceType}-${team}.png`;
+                }
+            }
+        }
+
+        private onMovePiece(message: MovePieceMessage): void {
+            console.log("ChessGame.onMovePiece", message);
+            let piece = this.chessBoard.pieces.find(p => p.id == message.pieceId);
+            piece.goTo(message.x, message.y);
+
+        }
+
+        private onDestroyPiece(message: DestroyPieceMessage): void {
+            console.log("ChessGame.onDestroyPiece", message);
+            let piece = this.chessBoard.pieces.find(p => p.id == message.pieceId);
+            if (this.selectedPiece == piece) {
+                this.selectedPiece = undefined;
+            }
+            this.chessBoard.pieces.splice(this.chessBoard.pieces.indexOf(piece), 1);
+            piece.owner.gameData.pieces--;
+            this.emitChange();
+        }
+
+        private onCreatePiece(message: CreatePieceMessage): void {
+            console.log("ChessGame.onCreatePiece", message.pieceId, PieceType[message.pieceType], message.x, message.y);
+            let player = this.players.find(p => p.id == message.playerId);
+            player.gameData.pieces++;
+            if (message.pieceType == PieceType.Queen) {
+                this.chessBoard.pieces.push(new Queen(message.pieceId, message.x, message.y, player));
+            } else if (message.pieceType == PieceType.King) {
+                this.chessBoard.pieces.push(new King(message.pieceId, message.x, message.y, player));
+            } else if (message.pieceType == PieceType.Knight) {
+                this.chessBoard.pieces.push(new Knight(message.pieceId, message.x, message.y, player));
+            } else if (message.pieceType == PieceType.Bishop) {
+                this.chessBoard.pieces.push(new Bishop(message.pieceId, message.x, message.y, player));
+            } else if (message.pieceType == PieceType.Rook) {
+                this.chessBoard.pieces.push(new Rook(message.pieceId, message.x, message.y, player));
+            } else if (message.pieceType == PieceType.Pawn) {
+                this.chessBoard.pieces.push(new Pawn(message.pieceId, message.x, message.y, message.direction, player));
+            }
+            this.emitChange();
+        }
+
+        private movePiece(piece: ChessPiece, x: number, y: number): void {
+            console.log("ChessGame.movePiece", PieceType[piece.type], x, y);
+
+            this.send(new MovePieceRequestMessage(piece.id, x, y));
+        }
+
+        private drawPiece(ctx: CanvasRenderingContext2D, piece: ChessPiece): void {
             let image = this.assets[piece.type][piece.owner.team];
 
             let x: number;
             let y: number;
-            if (piece.goal != null) {
+            if (piece.goal != undefined) {
                 x = Math.lerp(piece.start.x, piece.goal.x, piece.movementProgress) * TILE_WIDTH;
                 y = Math.lerp(piece.start.y, piece.goal.y, piece.movementProgress) * TILE_HEIGHT;
             } else {
@@ -253,7 +242,8 @@ module Chess.Client {
             }
 
             ctx.globalAlpha = 1;
-            ctx.drawImage(image,
+            ctx.drawImage(
+                image,
                 0, 0, image.width, image.height,
                 x - image.width / 2 + TILE_WIDTH / 2,
                 y + TILE_HEIGHT - image.width - TILE_HEIGHT / 4,
@@ -271,9 +261,6 @@ module Chess.Client {
                     TILE_WIDTH / 3,
                     0, progress);
                 ctx.fill();
-
-
-                //ctx.closePath();
             }
         }
     }

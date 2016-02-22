@@ -8,7 +8,6 @@ window.RTCIceCandidate = window.mozRTCIceCandidate || window.RTCIceCandidate;
 //navigator.getUserMedia = navigator.getUserMedia || navigator.mozGetUserMedia || navigator.webkitGetUserMedia || navigator.msGetUserMedia;
 
 
-
 class App extends React.Component<any, any> {
     render() {
         return (
@@ -28,7 +27,7 @@ class App extends React.Component<any, any> {
 document.onkeydown = function (event) {
     var doPrevent = false;
     if (event.keyCode === 8) {
-        let d:any = event.srcElement || event.target;
+        let d: any = event.srcElement || event.target;
         if ((d.tagName.toUpperCase() === 'INPUT' &&
                 (
                 d.type.toUpperCase() === 'TEXT' ||

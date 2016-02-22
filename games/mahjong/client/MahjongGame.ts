@@ -1,7 +1,7 @@
 module Mahjong.Client {
     import Direction4 = Chess.Direction4;
     "use strict";
-    
+
     import EventDispatcher = Play.Client.EventDispatcher;
     import Camera = Play.Client.Camera;
     import Game = Play.Client.Game;
@@ -41,30 +41,29 @@ module Mahjong.Client {
     }
 
     class Hand {
-        tiles: Tile[];
-        discards: Set[];
-        pond: Tile[];
+        public tiles: Tile[];
+        public discards: Set[];
+        public pond: Tile[];
     }
 
     export class MahjongGame extends Game {
 
-        private camera:Camera;
-        private assets:any;
+        private camera: Camera;
+        private assets: any;
 
-        constructor(lobby:ClientLobby) {
+        constructor(lobby: ClientLobby) {
             super(lobby);
-
 
 
             this.load();
 
-            //this.on(MessageId.SMSG_REVEAL, this.onReveal.bind(this));
-            //this.on(MessageId.SMSG_FLAG, this.onFlag.bind(this));
-            //this.on(MessageId.SMSG_SCORE, this.onScore.bind(this));
+            // this.on(MessageId.SMSG_REVEAL, this.onReveal.bind(this));
+            // this.on(MessageId.SMSG_FLAG, this.onFlag.bind(this));
+            // this.on(MessageId.SMSG_SCORE, this.onScore.bind(this));
 
         }
 
-        initialize() {
+        public initialize() {
             super.initialize();
 
 
@@ -84,8 +83,21 @@ module Mahjong.Client {
 
         }
 
+        protected onMouseDown(e: MouseEvent) {
 
-        load() {
+            if (Mouse.button == 2) {
+
+            }
+        }
+
+        protected onMouseUp(e: MouseEvent) {
+            if (Mouse.button == 1 || Mouse.button == 3) {
+                // let position = this.camera.unproject(e.offsetX, e.offsetY);
+
+            }
+        }
+
+        private load(): void {
             this.assets = {};
 
             let root = "games/mahjong/assets/";
@@ -104,14 +116,14 @@ module Mahjong.Client {
 
         }
 
-        update(delta:number) {
+        protected update(delta: number): void {
             this.camera.update(delta);
 
         }
 
 
-        draw(delta:number) {
-            var ctx = this.context;
+        protected draw(delta: number): void {
+            let ctx = this.context;
 
             ctx.setTransform(1, 0, 0, 1, 0, 0);
             ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -155,11 +167,11 @@ module Mahjong.Client {
             }
         }
 
-        drawWall(ctx: CanvasRenderingContext2D) {
+        private drawWall(ctx: CanvasRenderingContext2D) {
             let x = 120;
             let y = 80;
             for (let i = 0; i < 17; i++) {
-                let image= this.assets.backlying;
+                let image = this.assets.backlying;
                 ctx.drawImage(image, 0, 0, image.width, image.height, x, y, image.width, image.height);
                 ctx.drawImage(image, 0, 0, image.width, image.height, x, y - 12, image.width, image.height);
                 x += 23;
@@ -167,7 +179,7 @@ module Mahjong.Client {
             }
         }
 
-        drawHand(ctx:CanvasRenderingContext2D, hand: Hand):void {
+        private drawHand(ctx: CanvasRenderingContext2D, hand: Hand): void {
 
             let x = 160;
             let y = 400;
@@ -176,24 +188,12 @@ module Mahjong.Client {
                 x += 23;
             }
         }
-        drawTile(ctx:CanvasRenderingContext2D, tile: Tile, x: number, y: number):void {
+
+        private drawTile(ctx: CanvasRenderingContext2D, tile: Tile, x: number, y: number): void {
             let image = this.assets.pin1;
             ctx.drawImage(image, 0, 0, image.width, image.height, x, y, image.width, image.height);
         }
 
-        onMouseDown(e:MouseEvent) {
-
-            if (Mouse.button == 2) {
-
-            }
-        }
-
-        onMouseUp(e:MouseEvent) {
-            if (Mouse.button == 1 || Mouse.button == 3) {
-                let position = this.camera.unproject(e.offsetX, e.offsetY);
-
-            }
-        }
     }
 
 }

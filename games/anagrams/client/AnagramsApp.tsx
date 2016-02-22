@@ -5,7 +5,7 @@ module Anagrams.Client {
 
 
     export class AnagramsApp extends React.Component<any, {players: PlayerInfo[]}> {
-        private stateChangeToken:number;
+        private stateChangeToken: number;
 
         constructor() {
             super();
@@ -23,7 +23,7 @@ module Anagrams.Client {
             let game = ClientLobby.current.game as AnagramsGame;
             game.initialize();
 
-            this.stateChangeToken = game.changeListener.register( (game:AnagramsGame) => {
+            this.stateChangeToken = game.changeListener.register((game: AnagramsGame) => {
                 console.log("AnagramsApp.changeListener");
                 this.setState({
                     players: ClientLobby.current.players

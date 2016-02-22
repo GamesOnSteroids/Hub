@@ -7,11 +7,11 @@ module Play.Client {
         public translateX = 0;
         public translateY = 0;
 
-        private shakeMagnitude:number;
-        private shakeDuration:number = 0;
-        private shakeTimer:number;
-        private originalPositionX:number;
-        private originalPositionY:number;
+        private shakeMagnitude: number;
+        private shakeDuration: number = 0;
+        private shakeTimer: number;
+        private originalPositionX: number;
+        private originalPositionY: number;
 
         private canvas: HTMLCanvasElement;
 
@@ -19,13 +19,13 @@ module Play.Client {
             this.canvas = canvas;
         }
 
-        unproject(x:number, y:number):{x: number, y: number} {
+        unproject(x: number, y: number): {x: number, y: number} {
             x = x * this.canvas.width / this.canvas.clientWidth;
             y = y * this.canvas.height / this.canvas.clientHeight;
             return {x: (x - this.translateX) / this.scaleX, y: (y - this.translateY) / this.scaleY};
         }
 
-        update(delta:number) {
+        update(delta: number) {
 
             if (this.shakeDuration > 0) {
                 this.shakeTimer += delta;
@@ -48,7 +48,7 @@ module Play.Client {
             }
         }
 
-        shake(magnitude:number, duration:number) {
+        shake(magnitude: number, duration: number) {
             if (this.shakeDuration != 0) {
                 return;
             }

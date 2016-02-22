@@ -7,16 +7,15 @@ var Mahjong;
         class MahjongApp extends React.Component {
             constructor() {
                 super();
-                let game = ClientLobby.current.game;
                 this.state = {
-                    players: ClientLobby.current.players
+                    players: ClientLobby.current.players,
                 };
             }
             componentDidMount() {
                 console.log("MahjongApp.componentDidMount");
                 let game = ClientLobby.current.game;
                 game.initialize();
-                this.stateChangeToken = game.changeListener.register((game) => {
+                this.stateChangeToken = game.changeListener.register((g) => {
                     console.log("MahjongApp.changeListener");
                     this.setState({
                         players: ClientLobby.current.players

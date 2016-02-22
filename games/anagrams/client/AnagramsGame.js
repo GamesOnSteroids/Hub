@@ -8,7 +8,6 @@ var Anagrams;
         class AnagramsGame extends Game {
             constructor(lobby) {
                 super(lobby);
-                this.assets = {};
                 this.letters = "";
                 this.word = "";
                 this.locked = false;
@@ -25,34 +24,10 @@ var Anagrams;
                 this.camera = new Camera(this.canvas);
                 this.emitChange();
             }
-            load() {
-                let root = "games/anagrams/assets/";
-            }
-            onLetters(message) {
-                console.log(message.letters);
-            }
-            onWord(message) {
-            }
-            onInvalidWord(message) {
-            }
             update(delta) {
                 this.camera.update(delta);
             }
             onMouseDown(e) {
-                let position = this.camera.unproject(e.offsetX, e.offsetY);
-            }
-            guessWord() {
-                this.locked = true;
-                console.log(this.word);
-                this.word = "";
-            }
-            remaningLetters(letters, sentence) {
-                let result = sentence;
-                for (let i = 0; i < letters.length; i++) {
-                    let index = result.indexOf(letters[i]);
-                    result = result.slice(0, index) + result.slice(index + 1);
-                }
-                return result;
             }
             onKeyPress(e) {
                 console.log("press", e.charCode);
@@ -76,14 +51,13 @@ var Anagrams;
                 }
             }
             draw(delta) {
-                var ctx = this.context;
+                let ctx = this.context;
                 ctx.setTransform(1, 0, 0, 1, 0, 0);
                 ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
                 ctx.setTransform(this.camera.scaleX, 0, 0, this.camera.scaleY, this.camera.translateX, this.camera.translateY);
-                let word = this.word;
                 for (let i = 0; i < this.letters.length; i++) {
                     ctx.font = "48px serif";
-                    var char = this.letters[i];
+                    let char = this.letters[i];
                     if (this.word.indexOf(char) != -1) {
                         ctx.fillStyle = "#FF0000";
                     }
@@ -94,6 +68,28 @@ var Anagrams;
                 }
                 ctx.fillStyle = "#000000";
                 ctx.fillText(this.word, 0, 100);
+            }
+            load() {
+            }
+            onLetters(message) {
+                console.log(message.letters);
+            }
+            onWord(message) {
+            }
+            onInvalidWord(message) {
+            }
+            guessWord() {
+                this.locked = true;
+                console.log(this.word);
+                this.word = "";
+            }
+            remaningLetters(letters, sentence) {
+                let result = sentence;
+                for (let i = 0; i < letters.length; i++) {
+                    let index = result.indexOf(letters[i]);
+                    result = result.slice(0, index) + result.slice(index + 1);
+                }
+                return result;
             }
         }
         Client.AnagramsGame = AnagramsGame;

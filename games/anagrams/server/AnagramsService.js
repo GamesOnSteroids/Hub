@@ -27,10 +27,7 @@ var Anagrams;
                 letters += this.randomChar(conosants);
                 letters += this.randomChar(conosants);
                 letters += this.randomChar(conosants);
-                this.broadcast({
-                    id: Anagrams.MessageId.SMSG_LETTERS,
-                    letters: letters
-                });
+                this.broadcast(new Anagrams.LettersMessage(letters));
             }
             start() {
                 this.generateLetters();

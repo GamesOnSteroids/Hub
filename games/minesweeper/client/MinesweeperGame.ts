@@ -1,7 +1,6 @@
 module Minesweeper.Client {
     "use strict";
-    
-    import EventDispatcher = Play.Client.EventDispatcher;
+
     import Camera = Play.Client.Camera;
     import Game = Play.Client.Game;
     import Mouse = Play.Client.Mouse;
@@ -12,29 +11,36 @@ module Minesweeper.Client {
     const TILE_SIZE = 30;
 
     export class MinesweeperGame extends Game {
+        public remainingMines: number;
 
-        private camera:Camera;
-        private minefield:Minefield;
-        private assets:any;
+        private camera: Camera;
+        private minefield: Minefield;
+        private assets: any;
 
-        public remainingMines:number;
+        private sprites: Sprite[];
 
-        private sprites:Sprite[];
-
-        constructor(lobby:ClientLobby) {
+        constructor(lobby: ClientLobby) {
             super(lobby);
 
             this.remainingMines = this.configuration.mines;
 
             for (let player of this.players) {
                 player.gameData = {
-                    score: 0,
                     flags: 0,
-                    mines: 0
+                    mines: 0,
+                    score: 0,
                 };
             }
 
             this.minefield = new Minefield(this.configuration.width, this.configuration.height);
+
+            for (let i = 0; i < this.minefield.width * this.minefield.height; i++) {
+                let field: Field = new Field();
+                field.hasMine = false;
+                field.owner = undefined;
+
+                this.minefield.fields.push(field);
+            }
 
             this.load();
 
@@ -45,14 +51,13 @@ module Minesweeper.Client {
             this.sprites = [];
         }
 
-        initialize() {
+        public initialize(): void {
             super.initialize();
 
 
             this.canvas.width = this.minefield.width * TILE_SIZE + TILE_SIZE * 2;
             this.canvas.height = this.minefield.height * TILE_SIZE + TILE_SIZE * 2;
             (this.context as any).imageSmoothingEnabled = false;
-
 
 
             this.canvas.style.cursor = "pointer";
@@ -66,7 +71,101 @@ module Minesweeper.Client {
 
         }
 
-        flag(x:number, y:number) {
+
+        protected onMouseDown(e: MouseEvent): void {
+
+            if (Mouse.button == 2) {
+                let position = this.camera.unproject(e.offsetX, e.offsetY);
+                let x = Math.floor(position.x / TILE_SIZE);
+                let y = Math.floor(position.y / TILE_SIZE);
+                if (x >= 0 && y >= 0 && x < this.minefield.width && y < this.minefield.height) {
+                    this.flag(x, y);
+                }
+            }
+        }
+
+        protected onMouseUp(e: MouseEvent): void {
+            if (Mouse.button == 1 || Mouse.button == 3) {
+                let position = this.camera.unproject(e.offsetX, e.offsetY);
+
+                let x = Math.floor(position.x / TILE_SIZE);
+                let y = Math.floor(position.y / TILE_SIZE);
+                if (x >= 0 && y >= 0 && x < this.minefield.width && y < this.minefield.height) {
+                    if (Mouse.button == 3) {
+                        this.massReveal(x, y);
+                    } else {
+                        this.reveal(x, y);
+                    }
+                }
+            }
+        }
+
+
+        protected update(delta: number): void {
+            this.camera.update(delta);
+
+            for (let sprite of this.sprites) {
+                sprite.update(delta);
+            }
+
+            this.sprites = this.sprites.filter(s => !s.isFinished);
+        }
+
+
+        protected draw(delta: number): void {
+            let ctx = this.context;
+
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+            ctx.setTransform(this.camera.scaleX, 0, 0, this.camera.scaleY, this.camera.translateX, this.camera.translateY);
+
+
+            for (let y = 0; y < this.minefield.height; y++) {
+                for (let x = 0; x < this.minefield.width; x++) {
+                    let field = this.minefield.get(x + y * this.minefield.width);
+
+                    if (field.isRevealed) {
+                        this.drawTile(ctx, this.assets.reveal[field.owner.team], x, y);
+                        if (field.hasMine) {
+                            this.drawTile(ctx, this.assets.mines[field.owner.team], x, y);
+                        } else {
+                            if (field.adjacentMines > 0) {
+                                this.drawTile(ctx, this.assets.numbers[field.adjacentMines - 1], x, y);
+                            }
+                        }
+                    } else {
+
+                        // if mouse over
+                        let mousePosition = this.camera.unproject(Mouse.x, Mouse.y);
+
+                        if (field.hasFlag) {
+                            this.drawTile(ctx, this.assets.hidden, x, y);
+                            this.drawTile(ctx, this.assets.flags[field.owner.team], x, y);
+                        } else {
+
+                            if (x == Math.floor(mousePosition.x / TILE_SIZE) && y == Math.floor(mousePosition.y / TILE_SIZE)) {
+                                if (Mouse.button == 1) {
+                                    this.drawTile(ctx, this.assets.reveal[this.localPlayer.team], x, y);
+                                } else {
+                                    this.drawTile(ctx, this.assets.over, x, y);
+                                }
+                            } else {
+                                this.drawTile(ctx, this.assets.hidden, x, y);
+                            }
+                        }
+
+                    }
+                }
+            }
+
+            for (let sprite of this.sprites) {
+                sprite.draw(ctx, delta);
+            }
+        }
+
+
+        private flag(x: number, y: number): void {
 
             let field = this.minefield.get(x + y * this.minefield.width);
 
@@ -74,25 +173,17 @@ module Minesweeper.Client {
                 return;
             }
 
-            if (field.owner != null) {
+            if (field.owner != undefined) {
                 if (field.owner.id == this.localPlayer.id) {
-                    this.send<FlagRequestMessage>({
-                        id: MessageId.CMSG_FLAG_REQUEST,
-                        fieldId: x + y * this.minefield.width,
-                        flag: false
-                    });
+                    this.send(new FlagRequestMessage(x + y * this.minefield.width, false));
                 }
             } else {
-                this.send<FlagRequestMessage>({
-                    id: MessageId.CMSG_FLAG_REQUEST,
-                    fieldId: x + y * this.minefield.width,
-                    flag: true
-                });
+                this.send(new FlagRequestMessage(x + y * this.minefield.width, true));
             }
 
         }
 
-        massReveal(x:number, y:number) {
+        private massReveal(x: number, y: number): void {
             let fieldId = x + y * this.minefield.width;
             let field = this.minefield.get(fieldId);
             if (!field.isRevealed) {
@@ -101,27 +192,24 @@ module Minesweeper.Client {
 
             let flags = 0;
             let unknownFields = 0;
-            this.minefield.forAdjacent(fieldId, (fieldId) => {
-                let field = this.minefield.get(fieldId);
-                if (field.hasFlag || (field.isRevealed && field.hasMine)) {
+            this.minefield.forAdjacent(fieldId, (id) => {
+                let adjacentField = this.minefield.get(id);
+                if (adjacentField.hasFlag || (adjacentField.isRevealed && adjacentField.hasMine)) {
                     flags++;
                 }
-                if (!field.isRevealed && !field.hasFlag) { // are there any unrevealed unflagged fields left?
+                if (!adjacentField.isRevealed && !adjacentField.hasFlag) { // are there any unrevealed unflagged fields left?
                     unknownFields++;
                 }
             });
 
             if (flags == field.adjacentMines && unknownFields > 0) {
-                this.send<MassRevealRequestMessage>({
-                    id: MessageId.CMSG_MASS_REVEAL_REQUEST,
-                    fieldId: x + y * this.minefield.width
-                });
+                this.send(new MassRevealRequestMessage(x + y * this.minefield.width));
             } else {
                 this.playSound(this.assets.invalidmove);
             }
         }
 
-        reveal(x:number, y:number) {
+        private reveal(x: number, y: number): void {
             let field = this.minefield.get(x + y * this.minefield.width);
 
             if (field.isRevealed) {
@@ -132,34 +220,31 @@ module Minesweeper.Client {
             }
             let doubt = field.hasFlag;
 
-            this.send<RevealRequestMessage>({
-                id: MessageId.CMSG_REVEAL_REQUEST,
-                fieldId: x + y * this.minefield.width,
-                doubt: doubt
-            });
-            //TODO: play sound
+            this.send(new RevealRequestMessage(x + y * this.minefield.width, doubt));
+            // todo: play sound
         }
 
-        onScore(msg:ScoreMessage) {
+        private onScore(msg: ScoreMessage): void {
             let player = this.players.find(p => p.id == msg.playerId);
             player.gameData.score += msg.score;
             this.emitChange();
         }
 
-        onFlag(msg:FlagMessage) {
+        private onFlag(msg: FlagMessage): void {
             let field = this.minefield.get(msg.fieldId);
-            var player = this.players.find(p => p.id == msg.playerId);
+            let player = this.players.find(p => p.id == msg.playerId);
 
-            if (msg.flag)
+            if (msg.flag) {
                 player.gameData.flags++;
-            else
+            } else {
                 player.gameData.flags--;
+            }
 
             if (msg.flag) {
                 field.owner = player;
                 field.hasFlag = true;
             } else {
-                field.owner = null;
+                field.owner = undefined;
                 field.hasFlag = false;
             }
 
@@ -167,10 +252,9 @@ module Minesweeper.Client {
         }
 
 
-
-        onReveal(msg:RevealMessage) {
+        private onReveal(msg: RevealMessage): void {
             let field = this.minefield.get(msg.fieldId);
-            var player = this.players.find(p => p.id == msg.playerId);
+            let player = this.players.find(p => p.id == msg.playerId);
 
             field.isRevealed = true;
 
@@ -179,7 +263,7 @@ module Minesweeper.Client {
             field.adjacentMines = msg.adjacentMines;
             field.hasMine = msg.hasMine;
             field.hasFlag = false;
-            if (oldOwner != null) {
+            if (oldOwner != undefined) {
                 oldOwner.gameData.flags--;
                 this.emitChange();
             }
@@ -190,8 +274,8 @@ module Minesweeper.Client {
 
                 this.camera.shake(2, boomDuration / 2);
 
-                let x = (msg.fieldId % this.minefield.width) | 0;
-                let y = (msg.fieldId / this.minefield.width) | 0;
+                let x = Math.floor(msg.fieldId % this.minefield.width);
+                let y = Math.floor(msg.fieldId / this.minefield.width);
 
                 this.sprites.push(new Sprite(x * TILE_SIZE + TILE_SIZE / 2, y * TILE_SIZE + TILE_SIZE / 2, this.assets.explosion, 64, boomDuration));
 
@@ -204,12 +288,12 @@ module Minesweeper.Client {
 
         }
 
-        playSound(sound:HTMLAudioElement) {
+        private playSound(sound: HTMLAudioElement): void {
             sound.currentTime = 0;
             sound.play();
         }
 
-        load() {
+        private load(): void {
             this.assets = {};
 
             let root = "games/minesweeper/assets/";
@@ -248,103 +332,8 @@ module Minesweeper.Client {
 
         }
 
-        update(delta:number) {
-            this.camera.update(delta);
-
-            for (let sprite of this.sprites) {
-                sprite.update(delta);
-            }
-
-            this.sprites = this.sprites.filter(s=>!s.isFinished);
-        }
-
-
-        draw(delta:number) {
-            var ctx = this.context;
-
-            ctx.setTransform(1, 0, 0, 1, 0, 0);
-            ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
-            ctx.setTransform(this.camera.scaleX, 0, 0, this.camera.scaleY, this.camera.translateX, this.camera.translateY);
-
-
-            for (let y = 0; y < this.minefield.height; y++) {
-                for (let x = 0; x < this.minefield.width; x++) {
-                    let field = this.minefield.get(x + y * this.minefield.width);
-
-
-                    //console.log(x, y, field);
-                    if (field.isRevealed) {
-                        this.drawTile(ctx, this.assets.reveal[field.owner.team], x, y);
-                        if (field.hasMine) {
-                            this.drawTile(ctx, this.assets.mines[field.owner.team], x, y);
-                        } else {
-                            if (field.adjacentMines > 0) {
-                                this.drawTile(ctx, this.assets.numbers[field.adjacentMines - 1], x, y);
-                            }
-                        }
-                        // neco
-                    } else {
-
-                        // if mouse over
-                        let mousePosition = this.camera.unproject(Mouse.x, Mouse.y);
-
-                        if (field.hasFlag) {
-                            this.drawTile(ctx, this.assets.hidden, x, y);
-                            this.drawTile(ctx, this.assets.flags[field.owner.team], x, y);
-                        } else {
-
-                            if (x == ((mousePosition.x / TILE_SIZE) | 0) && y == ((mousePosition.y / TILE_SIZE) | 0)) {
-                                if (Mouse.button == 1) {
-                                    this.drawTile(ctx, this.assets.reveal[this.localPlayer.team], x, y);
-                                } else {
-                                    this.drawTile(ctx, this.assets.over, x, y);
-                                }
-                            } else {
-                                this.drawTile(ctx, this.assets.hidden, x, y);
-                            }
-                        }
-
-                    }
-                }
-            }
-
-            for (let sprite of this.sprites) {
-                sprite.draw(ctx, delta);
-            }
-        }
-
-        drawTile(ctx:CanvasRenderingContext2D, image:HTMLImageElement, x:number, y:number):void {
+        private drawTile(ctx: CanvasRenderingContext2D, image: HTMLImageElement, x: number, y: number): void {
             ctx.drawImage(image, 0, 0, image.width, image.height, x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
         }
-
-        onMouseDown(e:MouseEvent) {
-
-            if (Mouse.button == 2) {
-                let position = this.camera.unproject(e.offsetX, e.offsetY);
-                let x = (position.x / TILE_SIZE) | 0;
-                let y = (position.y / TILE_SIZE) | 0;
-                if (x >= 0 && y >= 0 && x < this.minefield.width && y < this.minefield.height) {
-                    this.flag(x, y);
-                }
-            }
-        }
-
-        onMouseUp(e:MouseEvent) {
-            if (Mouse.button == 1 || Mouse.button == 3) {
-                let position = this.camera.unproject(e.offsetX, e.offsetY);
-
-                let x = (position.x / TILE_SIZE) | 0;
-                let y = (position.y / TILE_SIZE) | 0;
-                if (x >= 0 && y >= 0 && x < this.minefield.width && y < this.minefield.height) {
-                    if (Mouse.button == 3) {
-                        this.massReveal(x, y)
-                    } else {
-                        this.reveal(x, y);
-                    }
-                }
-            }
-        }
     }
-
 }

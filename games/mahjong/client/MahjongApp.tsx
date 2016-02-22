@@ -5,38 +5,39 @@ module Mahjong.Client {
 
 
     export class MahjongApp extends React.Component<any, {players: PlayerInfo[]}> {
-        private stateChangeToken:number;
+        private stateChangeToken: number;
 
         constructor() {
             super();
 
-            let game = ClientLobby.current.game as MahjongGame;
+            // let game = ClientLobby.current.game as MahjongGame;
 
             this.state = {
-                players: ClientLobby.current.players
-            }
+                players: ClientLobby.current.players,
+            };
         }
 
-        componentDidMount() {
+        protected componentDidMount() {
             console.log("MahjongApp.componentDidMount");
 
             let game = ClientLobby.current.game as MahjongGame;
             game.initialize();
 
-            this.stateChangeToken = game.changeListener.register( (game:MahjongGame) => {
+            this.stateChangeToken = game.changeListener.register((g: MahjongGame) => {
                 console.log("MahjongApp.changeListener");
                 this.setState({
                     players: ClientLobby.current.players
-                })
+                });
             });
         }
-        componentWillUnmount() {
-            let game = ClientLobby.current.game as MahjongApp;
+
+        protected componentWillUnmount(): void {
+            let game = ClientLobby.current.game as MahjongGame;
             game.changeListener.unregister(this.stateChangeToken);
 
         }
 
-        render() {
+        public render(): JSX.Element {
             return (
                 <div style={{position: "relative", textAlign: "center"}}>
                     <div className="row">

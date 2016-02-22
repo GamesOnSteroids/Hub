@@ -4,7 +4,7 @@ class GameList extends React.Component {
         super();
     }
     render() {
-        return (React.createElement("div", {"className": "row"}, games
+        return (React.createElement("div", {"className": "row"}, gamesConfiguration
             .filter(g => g.development != true || environment == EnvironmentType.Development)
             .map((game, index) => {
             let result = [];

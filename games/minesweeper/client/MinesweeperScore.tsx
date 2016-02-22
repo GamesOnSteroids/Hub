@@ -2,8 +2,8 @@ module Minesweeper.Client {
     "use strict";
 
     export class MinesweeperScore extends React.Component<{players: PlayerInfo[], remainingMines: number}, any> {
-        render() {
-            var totalFlags:number = 0;
+        public render(): JSX.Element {
+            var totalFlags: number = 0;
             for (let player of this.props.players) {
                 totalFlags += player.gameData.flags;
             }
@@ -31,10 +31,12 @@ module Minesweeper.Client {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {this.props.players.sort((a,b)=>b.gameData.score - a.gameData.score).map( (p, index) =>{
+                                    {this.props.players.sort((a, b) => b.gameData.score - a.gameData.score).map( (p, index) => {
                                         return (
                                         <tr key={p.id}>
-                                            <th scope="row"><img src={"/games/minesweeper/assets/images/flag-"+p.team+".png"} /></th>
+                                            <th scope="row">
+                                                <img src={"/games/minesweeper/assets/images/flag-" + p.team + ".png"}/>
+                                            </th>
                                             <td>{p.name}</td>
                                             <td>{p.gameData.score}</td>
                                             <td>{p.gameData.flags}</td>

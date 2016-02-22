@@ -10,27 +10,27 @@ module Play {
         iceServers: [
             {urls: "stun:stun.l.google.com:19302"},
             {urls: "stun:23.21.150.121"},
-        ]
+        ],
     };
 
-    export var options:any = {
+    export var options: any = {
         mandatory: {
             OfferToReceiveAudio: true,
-            OfferToReceiveVideo: true
+            OfferToReceiveVideo: true,
         },
-        optional: []
+        optional: [],
     };
 
 
     export interface ISignalingService {
-        createSignalingServer(lobby:ServerLobby, channel: ISignalingChannel): void;
-        createSignalingClient(lobby:ClientLobby, channel: ISignalingChannel): void;
+        createSignalingServer(lobby: ServerLobby, channel: ISignalingChannel): void;
+        createSignalingClient(lobby: ClientLobby, channel: ISignalingChannel): void;
     }
 
     export class SignalingService implements ISignalingService {
 
 
-        onServerSdpMessage(server:ServerLobby, channel:ISignalingChannel, value: any): boolean {
+        private onServerSdpMessage(server: ServerLobby, channel: ISignalingChannel, value: any): boolean {
 
             if (value.type == "offer") {
                 console.log("SignalingService.offer");
@@ -56,46 +56,58 @@ module Play {
 
 
                 pc.onicecandidate = (event) => {
-                    if (event.candidate != null) {
+                    if (event.candidate != undefined) {
                         channel.send({
-                            type: "candidate",
+                            candidate: JSON.stringify(event.candidate),
                             target: value.source,
-                            candidate: JSON.stringify(event.candidate)
+                            type: "candidate",
                         });
                     }
                 };
 
                 let offer = new RTCSessionDescription(JSON.parse(value.offer));
                 pc.setRemoteDescription(offer);
-                pc.createAnswer((answer) => {
-                    pc.setLocalDescription(answer, () => {
-                        channel.send({type: "answer", target: value.source, answer: JSON.stringify(answer)});
-                    });
-                }, console.error);
+                pc.createAnswer(
+                    (answer) => {
+                        pc.setLocalDescription(
+                            answer,
+                            () => {
+                                channel.send({
+                                    type: "answer",
+                                    target: value.source,
+                                    answer: JSON.stringify(answer),
+                                });
+                            });
+                    },
+                    console.error);
                 return true;
             } else if (value.type == "candidate" && value.target == null) {
 
                 let candidate = new RTCIceCandidate(JSON.parse(value.candidate));
                 let client = server.clients.find(c => c.id == value.source);
                 let peerConnection = (<Peer2PeerConnection>client.connection).peerConnection;
-                peerConnection.addIceCandidate(candidate, () => {
-                }, console.error);
+                peerConnection.addIceCandidate(
+                    candidate,
+                    () => {
+                        // nothing to do
+                    },
+                    console.error);
                 return true;
             }
             return false;
         }
 
 
-        createSignalingServer(lobby:ServerLobby, channel: ISignalingChannel) {
+        public createSignalingServer(lobby: ServerLobby, channel: ISignalingChannel): void {
 
-            channel.onReceive( (snapshot) => {
+            channel.onReceive((snapshot) => {
                 return this.onServerSdpMessage(lobby, channel, snapshot);
             });
 
         }
 
 
-        onClientSdpMessage(lobby: ClientLobby, value: any): boolean {
+        private onClientSdpMessage(lobby: ClientLobby, value: any): boolean {
 
             if (value.type == "answer" && value.target == lobby.clientGUID) {
                 console.log("SignalingService.answer");
@@ -104,7 +116,7 @@ module Play {
                 (<Peer2PeerConnection>lobby.serverConnection).peerConnection.setRemoteDescription(answer);
                 return true;
 
-            } else if (value.type == "candidate" && (value.target != null && value.target == lobby.clientGUID)) {
+            } else if (value.type == "candidate" && (value.target != undefined && value.target == lobby.clientGUID)) {
                 let candidate = new RTCIceCandidate(JSON.parse(value.candidate));
                 (<Peer2PeerConnection>lobby.serverConnection).peerConnection.addIceCandidate(candidate, () => {
                 }, console.error);
@@ -113,9 +125,9 @@ module Play {
             return false;
         }
 
-        createSignalingClient(lobby:ClientLobby, channel: ISignalingChannel) {
+        public createSignalingClient(lobby: ClientLobby, channel: ISignalingChannel): void {
 
-            channel.onReceive( (data: any) => {
+            channel.onReceive((data: any) => {
                 return this.onClientSdpMessage(lobby, data);
             });
 
@@ -142,7 +154,7 @@ module Play {
             };
 
             pc.onicecandidate = (event) => {
-                if (event.candidate != null) {
+                if (event.candidate != undefined) {
                     channel.send({
                         type: "candidate",
                         source: lobby.clientGUID,
@@ -153,7 +165,11 @@ module Play {
             pc.createOffer((offer) => {
                 console.log("SignalingService.createOffer");
                 pc.setLocalDescription(offer, () => {
-                    channel.send({type: "offer", source: lobby.clientGUID, offer: JSON.stringify(offer)});
+                    channel.send({
+                        type: "offer",
+                        source: lobby.clientGUID,
+                        offer: JSON.stringify(offer),
+                    });
                 });
             }, console.error, options);
 

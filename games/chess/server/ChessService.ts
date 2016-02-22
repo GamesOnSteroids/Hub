@@ -6,24 +6,24 @@ module Chess.Server {
     import MessageId = Chess.MessageId;
     import CreatePieceMessage = Chess.CreatePieceMessage;
     import Client = Play.Server.Client;
-    import IPlayerInfo = Play.IPlayerInfo;
 
-
-    var scores = new Map<PieceType, number>(
-        [
-            [PieceType.Pawn, 100],
-            [PieceType.Rook, 500],
-            [PieceType.Bishop, 300],
-            [PieceType.Knight, 300],
-            [PieceType.Queen, 900],
-            [PieceType.King, 1000]
-        ]
-    );
 
     export class ChessService extends GameService {
-        private chessBoard:ChessBoard;
 
-        constructor(lobby:ServerLobby) {
+        private static scores = new Map<PieceType, number>(
+            [
+                [PieceType.Pawn, 100],
+                [PieceType.Rook, 500],
+                [PieceType.Bishop, 300],
+                [PieceType.Knight, 300],
+                [PieceType.Queen, 900],
+                [PieceType.King, 1000]
+            ]
+        );
+
+        private chessBoard: ChessBoard;
+
+        constructor(lobby: ServerLobby) {
             super(lobby);
 
             if (lobby.configuration.gameConfiguration.boardType == "4player") {
@@ -37,24 +37,17 @@ module Chess.Server {
             window.requestAnimationFrame(this.tick);
         }
 
-        destroyPiece(piece:ChessPiece):void {
-            this.chessBoard.pieces.splice(this.chessBoard.pieces.indexOf(piece), 1);
-            this.broadcast<DestroyPieceMessage>({
-                id: MessageId.SMSG_DESTROY_PIECE,
-                pieceId: piece.id
-            });
-            if (piece.type == PieceType.King) {
-                this.gameOver();
-            }
-        }
-
-        gameOver() {
-            this.lobby.gameOver();
-        }
-
-        update(delta:number) {
+        public start(): void {
+            this.chessBoard.initialize(this.players);
             for (let piece of this.chessBoard.pieces) {
-                if (piece.goal != null) {
+                this.createPiece(piece);
+            }
+
+        }
+
+        protected update(delta: number): void {
+            for (let piece of this.chessBoard.pieces) {
+                if (piece.goal != undefined) {
 
                     let length = Math.length(piece.start.x, piece.start.y, piece.goal.x, piece.goal.y);
                     piece.movementProgress += (delta * MOVEMENT_SPEED) / length;
@@ -66,26 +59,23 @@ module Chess.Server {
                     piece.y = Math.round(Math.lerp(piece.start.y, piece.goal.y, piece.movementProgress));
 
                     if (piece.type != PieceType.Knight || piece.movementProgress == 1) {
-                        let collision = this.chessBoard.pieces.find(p=> p.x == piece.x && p.y == piece.y && p.id != piece.id);
+                        let collision = this.chessBoard.pieces.find(p => p.x == piece.x && p.y == piece.y && p.id != piece.id);
 
-                        if (collision != null) {
+                        if (collision != undefined) {
                             this.destroyPiece(collision);
 
-                            this.broadcast<ScoreMessage>({
-                                id: MessageId.SMSG_SCORE,
-                                playerId: piece.owner.id,
-                                score: scores.get(piece.type)
-                            });
+                            let score = ChessService.scores.get(piece.type);
+                            this.broadcast(new ScoreMessage(piece.owner.id, score));
                         }
                     }
 
                     if (piece.movementProgress == 1) {
-                        piece.goal = null;
-                        piece.start = null;
+                        piece.goal = undefined;
+                        piece.start = undefined;
                         piece.movementProgress = 0;
                         piece.timer = LOCK_TIMER;
 
-                        //TODO: if this is last row, change to queen
+                        // todo: if this is last row, change to queen
                     }
                 }
                 if (piece.timer > 0) {
@@ -94,39 +84,32 @@ module Chess.Server {
             }
         }
 
-        onMovePieceRequest(player:Client, message:MovePieceRequestMessage) {
-            let piece = this.chessBoard.pieces.find(p=>p.id == message.pieceId);
-            if (piece != null) {
-                //TODO: check if move is valid
-                piece.goTo(message.x,  message.y);
-                this.broadcast<MovePieceMessage>({
-                    id: MessageId.SMSG_MOVE_PIECE,
-                    pieceId: piece.id,
-                    x: message.x,
-                    y: message.y
-                });
+        private destroyPiece(piece: ChessPiece): void {
+            this.chessBoard.pieces.splice(this.chessBoard.pieces.indexOf(piece), 1);
+            this.broadcast(new DestroyPieceMessage(piece.id));
+            if (piece.type == PieceType.King) {
+                this.gameOver();
             }
         }
 
-        createPiece(piece:ChessPiece) {
-            this.broadcast<CreatePieceMessage>({
-                id: MessageId.SMSG_CREATE_PIECE,
-                x: piece.x,
-                y: piece.y,
-                direction: (piece as Pawn).direction,
-                pieceId: piece.id,
-                pieceType: piece.type,
-                playerId: piece.owner.id
-            });
+        private gameOver(): void {
+            this.lobby.gameOver();
         }
 
-        start():void {
-            this.chessBoard.initialize(this.players);
-            for (let piece of this.chessBoard.pieces) {
-                this.createPiece(piece);
+
+        private onMovePieceRequest(player: Client, message: MovePieceRequestMessage): void {
+            let piece = this.chessBoard.pieces.find(p => p.id == message.pieceId);
+            if (piece != undefined) {
+                // todo: check if move is valid
+                piece.goTo(message.x, message.y);
+                this.broadcast(new MovePieceMessage(piece.id, message.x, message.y));
             }
-
         }
+
+        private createPiece(piece: ChessPiece): void {
+            this.lobby.broadcast(new CreatePieceMessage(piece.x, piece.y, piece.id, piece.type, piece.owner.id, (piece as Pawn).direction));
+        }
+
 
     }
 }

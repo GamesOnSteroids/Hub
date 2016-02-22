@@ -2,21 +2,28 @@ module Play {
     "use strict";
 
     export class LobbyConfiguration {
-        // lobbyId
         public lobbyId: string;
         public gameId: string;
 
+        /**
+         * Class representic react component for this game
+         */
         public appClass: any;
+        /**
+         * Class containing client side game logic
+         */
         public gameClass: any;
+        /**
+         * Class containing server side game logic
+         */
         public serviceClass: any;
 
         public maxPlayers: number;
 
+        /**
+         * Configuration specific to this game and game variant
+         */
         public gameConfiguration: any;
-    }
-
-    export interface GameMessage {
-        id: number;
     }
 
     export enum ServiceType {
@@ -36,46 +43,74 @@ module Play {
     }
 
 
-    export interface IMessage {
-        service: ServiceType;
-        id: number;
+    export abstract class Message {
+        constructor(public id: number, public service: ServiceType) {
+        }
     }
 
-    export interface ChatMessage extends IMessage {
-        text: string
-    }
-    export interface PlayerChatMessage extends IMessage {
-        playerId: string;
-        text: string;
+    export abstract class GameMessage extends Message {
+        constructor(public id: number) {
+            super(id, ServiceType.Game);
+        }
     }
 
-    export interface GameOverMessage extends IMessage {
-
+    export abstract class LobbyMessage extends Message {
+        constructor(public id: number) {
+            super(id, ServiceType.Lobby);
+        }
     }
 
 
-    export interface ReadyMessage extends IMessage {
-
+    export class ChatMessage extends LobbyMessage {
+        constructor(public text: string) {
+            super(LobbyMessageId.CMSG_CHAT);
+        }
     }
 
-    export interface PlayerReadyMessage extends IMessage {
-        playerId: string;
+    export class PlayerChatMessage extends LobbyMessage {
+        constructor(public playerId: string, public text: string) {
+            super(LobbyMessageId.SMSG_PLAYER_CHAT);
+        }
     }
 
-    export interface JoinRequestMessage extends IMessage {
-        name: string;
-        team: number;
+    export class GameOverMessage extends LobbyMessage {
+        constructor() {
+            super(LobbyMessageId.SMSG_GAME_OVER);
+        }
     }
 
-    export interface PlayerJoinedMessage extends IMessage {
-        playerId: string;
-        name: string;
-        team: number;
-        configuration?:any;
-        isYou?: boolean;
+
+    export class ReadyMessage extends LobbyMessage {
+        constructor() {
+            super(LobbyMessageId.CMSG_READY);
+        }
     }
 
-    export interface GameStartMessage extends IMessage {
+    export class PlayerReadyMessage extends LobbyMessage {
+        constructor(public playerId: string) {
+            super(LobbyMessageId.SMSG_PLAYER_READY);
+        }
+    }
 
+    export class JoinRequestMessage extends LobbyMessage {
+        constructor(public name: string, public team: number) {
+            super(LobbyMessageId.CMSG_JOIN_REQUEST);
+        }
+    }
+
+    export class PlayerJoinedMessage extends LobbyMessage {
+        constructor(public playerId: string,
+                    public name: string,
+                    public team: number,
+                    public configuration?: any,
+                    public isYou?: boolean) {
+            super(LobbyMessageId.SMSG_PLAYER_JOINED);
+        }
+    }
+
+    export class GameStartMessage extends LobbyMessage {
+        constructor() {
+            super(LobbyMessageId.SMSG_GAME_START);
+        }
     }
 }

@@ -5,7 +5,7 @@ module Minesweeper.Client {
 
 
     export class MinesweeperApp extends React.Component<any, {players: PlayerInfo[], remainingMines: number}> {
-        private stateChangeToken:number;
+        private stateChangeToken: number;
 
         constructor() {
             super();
@@ -14,31 +14,32 @@ module Minesweeper.Client {
 
             this.state = {
                 players: ClientLobby.current.players,
-                remainingMines: game.remainingMines
-            }
+                remainingMines: game.remainingMines,
+            };
         }
 
-        componentDidMount() {
+        protected componentDidMount(): void {
             console.log("MinesweeperApp.componentDidMount");
 
             let game = ClientLobby.current.game as MinesweeperGame;
             game.initialize();
 
-            this.stateChangeToken = game.changeListener.register( (game:MinesweeperGame) => {
+            this.stateChangeToken = game.changeListener.register((g: MinesweeperGame) => {
                 console.log("MinesweeperApp.changeListener");
                 this.setState({
                     players: ClientLobby.current.players,
-                    remainingMines: game.remainingMines
-                })
+                    remainingMines: g.remainingMines,
+                });
             });
         }
-        componentWillUnmount() {
+
+        protected componentWillUnmount(): void {
             let game = ClientLobby.current.game as MinesweeperGame;
             game.changeListener.unregister(this.stateChangeToken);
 
         }
 
-        render() {
+        public render(): JSX.Element {
             return (
                 <div style={{position: "relative", textAlign: "center"}}>
                     <div className="row">
@@ -47,7 +48,7 @@ module Minesweeper.Client {
                         </div>
                         <div className="col-xs-12 col-md-4">
                             <Minesweeper.Client.MinesweeperScore players={this.state.players}
-                                              remainingMines={this.state.remainingMines}/>
+                                                                 remainingMines={this.state.remainingMines}/>
                         </div>
                         <div className="col-xs-12 col-md-4">
                             <Chat/>

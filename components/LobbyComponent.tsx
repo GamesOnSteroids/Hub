@@ -59,24 +59,24 @@ class LobbyComponent extends React.Component<any, {state: LobbyState, players: P
         var lobby = ClientLobby.current;
         this.state = {state: lobby.state, players: lobby.players};
 
-        this.changeListenerToken = lobby.changeListener.register( (lobby, completed) => {
+        this.changeListenerToken = lobby.changeListener.register((lobby, completed) => {
             console.log("LobbyComponent.changeListener");
             this.setState({state: lobby.state, players: lobby.players}, completed);
         });
     }
 
-    componentWillUnmount() {
+    protected componentWillUnmount(): void {
         console.log("LobbyComponent.componentWillUnmount");
         var lobby = ClientLobby.current;
         lobby.changeListener.unregister(this.changeListenerToken);
     }
 
-    backToLobby() {
+    private backToLobby(): void {
         console.log("LobbyComponent.backToLobby");
         ClientLobby.current.backToLobby();
     }
 
-    render():JSX.Element {
+    public render(): JSX.Element {
         if (this.state.state == LobbyState.IN_LOBBY) {
             return (
                 <div>

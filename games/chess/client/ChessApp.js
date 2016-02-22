@@ -7,7 +7,6 @@ var Chess;
         class ChessApp extends React.Component {
             constructor() {
                 super();
-                let game = ClientLobby.current.game;
                 this.state = {
                     players: ClientLobby.current.players,
                 };

@@ -7,8 +7,8 @@ class GameDescription extends React.Component<any, any> {
         this.startGame = this.startGame.bind(this);
     }
 
-    static resolveClass(name:string) {
-        let result:any = window;
+    private static resolveClass(name: string): void {
+        let result: any = window;
         for (let part of name.split(".")) {
             result = result[part];
         }
@@ -19,16 +19,16 @@ class GameDescription extends React.Component<any, any> {
     }
 
 
-    //TODO: DEBUG ONLY
-    componentDidMount() {
+    // todo: DEBUG ONLY
+    protected componentDidMount(): void {
         if (environment == EnvironmentType.Development) {
             if (this.props.game.id == "mahjong") {
-                this.startGame(this.props.game.variants[0]);
+                //this.startGame(this.props.game.variants[0]);
             }
         }
     }
 
-    startGame(variant:any) {
+    private startGame(variant: any): void {
         console.log("GameDescription.startGame", variant);
 
         let lobbyConfiguration = new Play.LobbyConfiguration();
@@ -40,7 +40,7 @@ class GameDescription extends React.Component<any, any> {
         lobbyConfiguration.serviceClass = GameDescription.resolveClass(this.props.game.serviceClass);
 
 
-        let lobbyService:Play.ILobbyService = new Play.FirebaseLobbyService();
+        let lobbyService: Play.ILobbyService = new Play.FirebaseLobbyService();
         lobbyService.findLobby(lobbyConfiguration).then((lobby) => {
             Play.Client.ClientLobby.current = lobby;
 
@@ -48,7 +48,7 @@ class GameDescription extends React.Component<any, any> {
         });
     }
 
-    render() {
+    public render(): JSX.Element {
         return (
             <div>
                 <h3>{this.props.game.name}</h3>

@@ -15,21 +15,22 @@ var Play;
             constructor(lobbyId, configuration) {
                 this.clients = [];
                 this.state = LobbyState.IN_LOBBY;
+                this.messageHandlers = new Map([
+                    [Play.ServiceType.Lobby, new Map()],
+                    [Play.ServiceType.Game, new Map()]
+                ]);
                 this.lobbyId = lobbyId;
                 this.configuration = configuration;
-                this.messageHandlers = [];
-                this.messageHandlers[Play.ServiceType.Lobby] = [];
-                this.messageHandlers[Play.ServiceType.Game] = [];
                 this.on(Play.ServiceType.Lobby, Play.LobbyMessageId.CMSG_JOIN_REQUEST, this.onJoinRequest.bind(this));
                 this.on(Play.ServiceType.Lobby, Play.LobbyMessageId.CMSG_READY, this.onReady.bind(this));
                 this.on(Play.ServiceType.Lobby, Play.LobbyMessageId.CMSG_CHAT, this.onChat.bind(this));
             }
             on(service, messageId, callback) {
-                this.messageHandlers[service][messageId] = callback;
+                this.messageHandlers.get(service).set(messageId, callback);
             }
             onMessage(client, msg) {
-                let handler = this.messageHandlers[msg.service][msg.id];
-                if (handler != null) {
+                let handler = this.messageHandlers.get(msg.service).get(msg.id);
+                if (handler != undefined) {
                     handler(client, msg);
                 }
             }
@@ -42,26 +43,18 @@ var Play;
                 for (let client of this.clients) {
                     client.isReady = false;
                 }
-                this.broadcast({ service: Play.ServiceType.Lobby, id: Play.LobbyMessageId.SMSG_GAME_OVER });
+                this.broadcast(new Play.GameOverMessage());
                 this.state = LobbyState.IN_LOBBY;
-                this.messageHandlers[Play.ServiceType.Game] = [];
+                this.messageHandlers.get(Play.ServiceType.Game).clear();
             }
             startGame() {
                 this.gameService = new this.configuration.serviceClass(this);
                 this.state = LobbyState.GAME_RUNNING;
-                this.broadcast({
-                    service: Play.ServiceType.Lobby,
-                    id: Play.LobbyMessageId.SMSG_GAME_START
-                });
+                this.broadcast(new Play.GameStartMessage());
                 this.gameService.start();
             }
             onChat(client, msg) {
-                this.broadcast({
-                    id: Play.LobbyMessageId.SMSG_PLAYER_CHAT,
-                    service: Play.ServiceType.Lobby,
-                    playerId: client.id,
-                    text: msg.text
-                });
+                this.broadcast(new Play.PlayerChatMessage(client.id, msg.text));
             }
             onReady(client, msg) {
                 console.log("ServerLobby.onReady");
@@ -86,33 +79,12 @@ var Play;
                 client.isConnected = true;
                 for (let other of this.clients) {
                     if (other.id == client.id) {
-                        client.connection.send({
-                            service: Play.ServiceType.Lobby,
-                            id: Play.LobbyMessageId.SMSG_PLAYER_JOINED,
-                            name: other.name,
-                            playerId: other.id,
-                            team: other.team,
-                            isYou: true,
-                            configuration: this.configuration.gameConfiguration
-                        });
+                        client.connection.send(new Play.PlayerJoinedMessage(other.id, other.name, other.team, this.configuration.gameConfiguration, true));
                     }
                     else {
                         if (other.isConnected) {
-                            client.connection.send({
-                                service: Play.ServiceType.Lobby,
-                                id: Play.LobbyMessageId.SMSG_PLAYER_JOINED,
-                                name: other.name,
-                                playerId: other.id,
-                                team: other.team,
-                                isReady: other.isReady
-                            });
-                            other.connection.send({
-                                service: Play.ServiceType.Lobby,
-                                id: Play.LobbyMessageId.SMSG_PLAYER_JOINED,
-                                name: client.name,
-                                playerId: client.id,
-                                team: client.team
-                            });
+                            client.connection.send(new Play.PlayerJoinedMessage(other.id, other.name, other.team));
+                            other.connection.send(new Play.PlayerJoinedMessage(client.id, client.name, client.team));
                         }
                     }
                 }

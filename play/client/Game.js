@@ -59,16 +59,6 @@ var Play;
                 this.lastFrame = performance.now();
                 window.requestAnimationFrame(this.tick);
             }
-            tick(time) {
-                let delta = time - this.lastFrame;
-                if (this.lobby.state != Client.LobbyState.GAME_RUNNING && this.lobby.state != Client.LobbyState.GAME_OVER) {
-                    return;
-                }
-                this.draw(delta);
-                this.update(delta);
-                this.lastFrame = time;
-                window.requestAnimationFrame(this.tick);
-            }
             draw(delta) {
             }
             update(delta) {
@@ -87,8 +77,17 @@ var Play;
                 });
             }
             send(msg) {
-                msg.service = Play.ServiceType.Game;
                 this.lobby.sendToServer(msg);
+            }
+            tick(time) {
+                let delta = time - this.lastFrame;
+                if (this.lobby.state != Client.LobbyState.GAME_RUNNING && this.lobby.state != Client.LobbyState.GAME_OVER) {
+                    return;
+                }
+                this.draw(delta);
+                this.update(delta);
+                this.lastFrame = time;
+                window.requestAnimationFrame(this.tick);
             }
         }
         Client.Game = Game;

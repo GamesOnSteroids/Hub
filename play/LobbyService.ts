@@ -8,43 +8,43 @@ module Play {
 
 
     export interface ILobbyService {
-        findLobby(gameConfiguration:LobbyConfiguration):Promise<ClientLobby>;
-        onClientJoined(lobby: ServerLobby, client:Client): void;
+        findLobby(gameConfiguration: LobbyConfiguration): Promise<ClientLobby>;
+        onClientJoined(lobby: ServerLobby, client: Client): void;
     }
 
     export class FirebaseLobbyService implements ILobbyService {
 
-        onClientJoined(lobby: ServerLobby, client:Client) {
+        public onClientJoined(lobby: ServerLobby, client: Client): void {
 
             let firebase = new Firebase(config.get(environment).firebaseURL);
             let lobbyRef = firebase.child("lobby").child(lobby.lobbyId);
 
-            lobbyRef.transaction( (data) => {
-                if (data != null) {
+            lobbyRef.transaction((data) => {
+                if (data != undefined) {
                     data.playerCount += 1;
                 }
                 return data;
             }, (error, commited, snapshot) => {
-                if (error != null) {
+                if (error != undefined) {
                     console.error(error);
                 }
             }, true);
         }
 
-        findLobby(configuration:LobbyConfiguration):Promise<ClientLobby> {
+        public findLobby(configuration: LobbyConfiguration): Promise<ClientLobby> {
             return new Promise<ClientLobby>((resolve, reject) => {
                 let lobbiesRef = new Firebase(config.get(environment).firebaseURL).child("lobby");
 
                 // no desired game
-                if (configuration.lobbyId == null) {
+                if (configuration.lobbyId == undefined) {
 
                     // try to find relevant games
                     lobbiesRef.once("value", (snapshot) => {
-                        let lobbyRef:Firebase = null;
-                        let found = snapshot.forEach((snapshot) => {
-                            let value = snapshot.val();
+                        let lobbyRef: Firebase = undefined;
+                        let found = snapshot.forEach((lobbySnapshot) => {
+                            let value = lobbySnapshot.val();
                             if (value.playerCount < value.maxPlayers && value.gameId == configuration.gameId && value.gameVariant == configuration.gameConfiguration.id) {
-                                lobbyRef = snapshot.ref();
+                                lobbyRef = lobbySnapshot.ref();
                                 return true;
                             }
                         });
@@ -55,7 +55,7 @@ module Play {
                                 maxPlayers: configuration.maxPlayers,
                                 gameId: configuration.gameId,
                                 createdAt: new Date(),
-                                gameVariant: configuration.gameConfiguration.id
+                                gameVariant: configuration.gameConfiguration.id,
                             };
 
                             let lobbyRef = lobbiesRef.push();
@@ -64,7 +64,7 @@ module Play {
                                 let lobbyId = lobbyRef.key();
 
                                 let clientLobby = new ClientLobby(lobbyId, configuration);
-                                clientLobby.clientGUID = guid();
+                                clientLobby.clientGUID = Math.guid();
 
                                 let localClient = new Client();
                                 localClient.id = clientLobby.clientGUID;
@@ -80,7 +80,7 @@ module Play {
 
 
                                 let localServerConnection = new LocalServerConnection(localClient);
-                                localServerConnection.messageHandler = (client: Client, msg:IMessage) => {
+                                localServerConnection.messageHandler = (client: Client, msg: Message) => {
                                     serverLobby.onMessage(localClient, <any>msg);
                                 };
                                 clientLobby.serverConnection = localServerConnection;
@@ -93,7 +93,6 @@ module Play {
                                 localClient.connection = localClientConnection;
 
 
-
                                 serverLobby.clients.push(localClient);
                                 clientLobby.join();
 
@@ -102,10 +101,10 @@ module Play {
                         } else {
                             let lobbyId = lobbyRef.key();
                             let lobby = new ClientLobby(lobbyId, configuration);
-                            lobby.clientGUID = guid();
+                            lobby.clientGUID = Math.guid();
 
                             let signalingService = new SignalingService();
-                            var ref = new Firebase(config.get(environment).firebaseURL).child("lobby").child(lobby.lobbyId).child("sdp");
+                            let ref = new Firebase(config.get(environment).firebaseURL).child("lobby").child(lobby.lobbyId).child("sdp");
                             signalingService.createSignalingClient(lobby, new FirebaseSignalingChannel(ref));
 
                             resolve(lobby);
@@ -113,7 +112,7 @@ module Play {
                     });
 
                 } else {
-                    //let lobbyRef = lobbies.child(configuration.lobbyId);
+                    // let lobbyRef = lobbies.child(configuration.lobbyId);
                     throw "Not implemented";
                 }
             });

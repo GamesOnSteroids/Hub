@@ -1,42 +1,46 @@
 module Play.Client {
+
     "use strict";
 
+    import GameConfiguration = Minesweeper.GameConfiguration;
 
     export class Mouse {
-        public static button:number = 0;
-        public static x:number = 0;
-        public static y:number = 0;
+        public static button: number = 0;
+        public static x: number = 0;
+        public static y: number = 0;
     }
 
 
     export class Game {
-        private lobby:ClientLobby;
-        protected canvas:HTMLCanvasElement;
-        protected context:CanvasRenderingContext2D;
         public changeListener = new EventDispatcher<this>();
+
+        protected canvas: HTMLCanvasElement;
+        protected context: CanvasRenderingContext2D;
+
+        private lobby: ClientLobby;
         private lastFrame: number;
 
-        get players() {
+        get players(): PlayerInfo[] {
             return this.lobby.players;
         }
 
-        get localPlayer() {
+        get localPlayer(): PlayerInfo {
             return this.lobby.localPlayer;
         }
 
-        get configuration() {
+        get configuration(): GameConfiguration {
             return this.lobby.configuration.gameConfiguration;
         }
 
-        emitChange(): void {
+        protected emitChange(): void {
             this.changeListener.dispatch(this);
         }
 
-        constructor(lobby:ClientLobby) {
+        constructor(lobby: ClientLobby) {
             this.lobby = lobby;
         }
 
-        initialize() {
+        public initialize(): void {
             this.canvas = <HTMLCanvasElement>document.getElementById("game-canvas");
             this.context = this.canvas.getContext("2d");
             this.canvas.onkeypress = this.onKeyPress.bind(this);
@@ -71,7 +75,38 @@ module Play.Client {
             window.requestAnimationFrame(this.tick);
         }
 
-        tick(time:number) {
+        protected draw(delta: number): void {
+        }
+
+        protected update(delta: number): void {
+        }
+
+        protected onMouseUp(e: MouseEvent): void {
+        }
+
+        protected onMouseDown(e: MouseEvent): void {
+        }
+
+        protected onKeyDown(e: KeyboardEvent): void {
+
+        }
+
+        protected onKeyPress(e: KeyboardEvent): void {
+
+        }
+
+        protected on<T extends GameMessage>(id: number, handler: (message: T) => void): void {
+            this.lobby.on(ServiceType.Game, id, (message: Message) => {
+                handler(message as T);
+            });
+        }
+
+        protected send(msg: GameMessage): void {
+            this.lobby.sendToServer(msg);
+        }
+
+
+        private tick(time: number): void {
             let delta = time - this.lastFrame;
             if (this.lobby.state != LobbyState.GAME_RUNNING && this.lobby.state != LobbyState.GAME_OVER) {
                 return;
@@ -82,37 +117,6 @@ module Play.Client {
 
             this.lastFrame = time;
             window.requestAnimationFrame(this.tick);
-        }
-
-        draw(delta:number): void {
-        }
-
-        update(delta:number): void {
-        }
-
-        onMouseUp(e:MouseEvent): void {
-        }
-
-        onMouseDown(e:MouseEvent): void {
-        }
-
-        onKeyDown(e: KeyboardEvent): void {
-
-        }
-
-        onKeyPress(e: KeyboardEvent): void {
-
-        }
-
-        on<T extends GameMessage>(id:number, handler:(message:T) => void):void {
-            this.lobby.on(ServiceType.Game, id, (message:IMessage) => {
-                handler(<any>message);
-            });
-        }
-
-        send<T extends GameMessage>(msg:T):void {
-            (<any>msg).service = ServiceType.Game;
-            this.lobby.sendToServer((<any>msg));
         }
     }
 }

@@ -9,27 +9,27 @@ var Play;
                 this.tick = this.tick.bind(this);
                 this.lastFrame = performance.now();
             }
+            start() {
+            }
+            get players() {
+                return this.lobby.clients;
+            }
+            on(id, handler) {
+                this.lobby.on(Play.ServiceType.Game, id, handler);
+            }
+            broadcast(msg) {
+                this.lobby.broadcast(msg);
+            }
+            sendTo(client, msg) {
+                client.connection.send(msg);
+            }
+            update(delta) {
+            }
             tick(time) {
                 let delta = time - this.lastFrame;
                 this.update(delta);
                 this.lastFrame = time;
                 window.requestAnimationFrame(this.tick);
-            }
-            get players() {
-                return this.lobby.clients;
-            }
-            start() { }
-            update(delta) { }
-            on(id, handler) {
-                this.lobby.on(Play.ServiceType.Game, id, handler);
-            }
-            broadcast(msg) {
-                msg.service = Play.ServiceType.Game;
-                this.lobby.broadcast(msg);
-            }
-            sendTo(client, msg) {
-                msg.service = Play.ServiceType.Game;
-                client.connection.send(msg);
             }
         }
         Server.GameService = GameService;

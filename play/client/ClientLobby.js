@@ -23,11 +23,12 @@ var Play;
                 this.messageLog = [];
                 this.state = LobbyState.IN_LOBBY;
                 this.changeListener = new Client.EventDispatcher();
+                this.messageHandlers = new Map([
+                    [Play.ServiceType.Lobby, new Map()],
+                    [Play.ServiceType.Game, new Map()]
+                ]);
                 this.lobbyId = lobbyId;
                 this.configuration = configuration;
-                this.messageHandlers = [];
-                this.messageHandlers[Play.ServiceType.Lobby] = [];
-                this.messageHandlers[Play.ServiceType.Game] = [];
                 this.on(Play.ServiceType.Lobby, Play.LobbyMessageId.SMSG_GAME_START, this.onGameStart.bind(this));
                 this.on(Play.ServiceType.Lobby, Play.LobbyMessageId.SMSG_PLAYER_JOINED, this.onJoin.bind(this));
                 this.on(Play.ServiceType.Lobby, Play.LobbyMessageId.SMSG_GAME_OVER, this.onGameOver.bind(this));
@@ -38,23 +39,16 @@ var Play;
                 this.serverConnection.send(msg);
             }
             on(service, messageId, callback) {
-                this.messageHandlers[service][messageId] = callback;
+                this.messageHandlers.get(service).set(messageId, callback);
             }
             onMessage(msg) {
-                let handler = this.messageHandlers[msg.service][msg.id];
-                if (handler != null) {
+                let handler = this.messageHandlers.get(msg.service).get(msg.id);
+                if (handler != undefined) {
                     handler(msg);
                 }
             }
-            emitChange(completed) {
-                this.changeListener.dispatch(this, completed);
-            }
             sendChat(message) {
-                this.sendToServer({
-                    id: Play.LobbyMessageId.CMSG_CHAT,
-                    service: Play.ServiceType.Lobby,
-                    text: message
-                });
+                this.sendToServer(new Play.ChatMessage(message));
             }
             backToLobby() {
                 this.state = LobbyState.IN_LOBBY;
@@ -67,13 +61,16 @@ var Play;
                     service: Play.ServiceType.Lobby,
                     id: Play.LobbyMessageId.CMSG_JOIN_REQUEST,
                     name: localStorage.getItem("nickname"),
-                    team: 1
+                    team: 1,
                 });
                 this.ready();
             }
             ready() {
                 console.log("ClientLobby.ready");
                 this.sendToServer({ service: Play.ServiceType.Lobby, id: Play.LobbyMessageId.CMSG_READY });
+            }
+            emitChange(completed) {
+                this.changeListener.dispatch(this, completed);
             }
             onPlayerChat(message) {
                 let player = this.players.find(p => p.id == message.playerId);
@@ -87,7 +84,7 @@ var Play;
             }
             onGameOver(message) {
                 console.log("ClientLobby.onGameOver");
-                this.messageHandlers[Play.ServiceType.Game] = [];
+                this.messageHandlers.get(Play.ServiceType.Game).clear();
                 this.state = LobbyState.GAME_OVER;
                 this.emitChange();
             }

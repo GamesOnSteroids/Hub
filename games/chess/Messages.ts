@@ -33,35 +33,45 @@ module Chess {
         SMSG_SCORE = 5,
     }
 
-    export interface ScoreMessage extends GameMessage {
-        playerId: string;
-        score: number;
+    export class ScoreMessage extends GameMessage {
+        constructor(public playerId: string,
+                    public score: number) {
+            super(MessageId.SMSG_SCORE);
+        }
     }
 
-    export interface CreatePieceMessage extends GameMessage {
-        x: number;
-        y: number;
-        pieceId: number;
-        pieceType: PieceType;
-        playerId: string;
-        direction: number;
+    export class CreatePieceMessage extends GameMessage {
+        constructor(public x: number,
+                    public y: number,
+                    public pieceId: number,
+                    public pieceType: PieceType,
+                    public playerId: string,
+                    public direction: number) {
+            super(MessageId.SMSG_CREATE_PIECE);
+        }
     }
 
 
-    export interface MovePieceRequestMessage extends GameMessage {
-        pieceId: number;
-        x: number;
-        y: number;
+    export class MovePieceRequestMessage extends GameMessage {
+        constructor(public pieceId: number,
+                    public x: number,
+                    public y: number) {
+            super(MessageId.CMSG_MOVE_PIECE_REQUEST);
+        }
     }
 
-    export interface MovePieceMessage extends GameMessage {
-        pieceId: number;
-        x: number;
-        y: number;
+    export class MovePieceMessage extends GameMessage {
+        constructor(public pieceId: number,
+                    public x: number,
+                    public y: number) {
+            super(MessageId.SMSG_MOVE_PIECE);
+        }
     }
 
-    export interface DestroyPieceMessage extends GameMessage {
-        pieceId: number;
+    export class DestroyPieceMessage extends GameMessage {
+        constructor(public pieceId: number) {
+            super(MessageId.SMSG_DESTROY_PIECE);
+        }
     }
 
 

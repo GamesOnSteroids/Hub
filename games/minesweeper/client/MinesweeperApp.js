@@ -10,18 +10,18 @@ var Minesweeper;
                 let game = ClientLobby.current.game;
                 this.state = {
                     players: ClientLobby.current.players,
-                    remainingMines: game.remainingMines
+                    remainingMines: game.remainingMines,
                 };
             }
             componentDidMount() {
                 console.log("MinesweeperApp.componentDidMount");
                 let game = ClientLobby.current.game;
                 game.initialize();
-                this.stateChangeToken = game.changeListener.register((game) => {
+                this.stateChangeToken = game.changeListener.register((g) => {
                     console.log("MinesweeperApp.changeListener");
                     this.setState({
                         players: ClientLobby.current.players,
-                        remainingMines: game.remainingMines
+                        remainingMines: g.remainingMines,
                     });
                 });
             }

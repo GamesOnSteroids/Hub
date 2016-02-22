@@ -18,17 +18,17 @@ var config = new Map([
     [
         EnvironmentType.Development,
         {
-            firebaseURL: "https://gos-dev.firebaseio.com/"
-        }
+            firebaseURL: "https://gos-dev.firebaseio.com/",
+        },
     ],
     [
         EnvironmentType.Production,
         {
-            firebaseURL: "https://games-on-steroids.firebaseio.com/"
-        }
-    ]
+            firebaseURL: "https://games-on-steroids.firebaseio.com/",
+        },
+    ],
 ]);
-var games = [
+var gamesConfiguration = [
     {
         id: "minesweeper",
         image: "https://upload.wikimedia.org/wikipedia/en/5/5c/Minesweeper_Icon.png",
@@ -88,7 +88,7 @@ var games = [
         name: "Chess",
         variants: [
             {
-                id: "2players",
+                id: "default",
                 name: "2 Players",
                 maxPlayers: 2
             },

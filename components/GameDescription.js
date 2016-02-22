@@ -17,7 +17,6 @@ class GameDescription extends React.Component {
     componentDidMount() {
         if (environment == EnvironmentType.Development) {
             if (this.props.game.id == "mahjong") {
-                this.startGame(this.props.game.variants[0]);
             }
         }
     }

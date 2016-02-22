@@ -15,7 +15,7 @@ class ChatMessageComponent extends React.Component<ChatLog, any> {
 
 class Chat extends React.Component<any, {messageLog: ChatLog[] }> {
 
-    private stateChangeToken:number;
+    private stateChangeToken: number;
 
     constructor() {
         super();
@@ -25,7 +25,7 @@ class Chat extends React.Component<any, {messageLog: ChatLog[] }> {
             messageLog: lobby.messageLog
         };
 
-        this.stateChangeToken = lobby.changeListener.register((lobby:ClientLobby) => {
+        this.stateChangeToken = lobby.changeListener.register((lobby: ClientLobby) => {
             this.setState({
                 messageLog: lobby.messageLog
             }, () => {
@@ -41,7 +41,7 @@ class Chat extends React.Component<any, {messageLog: ChatLog[] }> {
     }
 
 
-    sendMessage(e:React.SyntheticEvent) {
+    sendMessage(e: React.SyntheticEvent) {
         let input = document.getElementById("chatMessage") as HTMLInputElement;
         ClientLobby.current.sendChat(input.value);
         input.value = "";

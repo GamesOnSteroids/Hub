@@ -20,8 +20,8 @@ var Chess;
                 this.on(Chess.MessageId.SMSG_SCORE, this.onScore.bind(this));
                 for (let player of this.players) {
                     player.gameData = {
+                        pieces: 0,
                         score: 0,
-                        pieces: 0
                     };
                 }
                 if (lobby.configuration.gameConfiguration.boardType == "4player") {
@@ -31,11 +31,6 @@ var Chess;
                     this.chessBoard = new Chess.TwoPlayerChessBoard();
                 }
             }
-            onScore(msg) {
-                let player = this.players.find(p => p.id == msg.playerId);
-                player.gameData.score += msg.score;
-                this.emitChange();
-            }
             initialize() {
                 super.initialize();
                 this.canvas.width = this.chessBoard.size * TILE_WIDTH + TILE_WIDTH * 2;
@@ -44,6 +39,102 @@ var Chess;
                 this.camera = new Camera(this.canvas);
                 this.camera.translateX = TILE_WIDTH;
                 this.camera.translateY = TILE_HEIGHT;
+                this.emitChange();
+            }
+            update(delta) {
+                this.camera.update(delta);
+                for (let piece of this.chessBoard.pieces) {
+                    if (piece.goal != undefined) {
+                        let length = Math.length(piece.start.x, piece.start.y, piece.goal.x, piece.goal.y);
+                        piece.movementProgress += (delta * Chess.MOVEMENT_SPEED) / length;
+                        if (piece.movementProgress > 1) {
+                            piece.movementProgress = 1;
+                        }
+                        piece.x = Math.round(Math.lerp(piece.start.x, piece.goal.x, piece.movementProgress));
+                        piece.y = Math.round(Math.lerp(piece.start.y, piece.goal.y, piece.movementProgress));
+                        if (piece.movementProgress == 1) {
+                            piece.x = piece.goal.x;
+                            piece.y = piece.goal.y;
+                            piece.goal = undefined;
+                            piece.start = undefined;
+                            piece.movementProgress = 0;
+                            piece.timer = Chess.LOCK_TIMER;
+                        }
+                    }
+                    if (piece.timer > 0) {
+                        piece.timer -= delta * (1 / 1000);
+                    }
+                }
+            }
+            draw(delta) {
+                let ctx = this.context;
+                ctx.setTransform(1, 0, 0, 1, 0, 0);
+                ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                ctx.setTransform(this.camera.scaleX, 0, 0, this.camera.scaleY, this.camera.translateX, this.camera.translateY);
+                ctx.globalAlpha = 1;
+                ctx.strokeStyle = "#000000";
+                ctx.lineWidth = 1;
+                ctx.strokeRect(0, 0, this.chessBoard.size * TILE_WIDTH, this.chessBoard.size * TILE_HEIGHT);
+                for (let y = 0; y < this.chessBoard.size; y++) {
+                    for (let x = 0; x < this.chessBoard.size; x++) {
+                        if (this.chessBoard.isValidPosition(x, y)) {
+                            if ((x % 2) == (y % 2)) {
+                                ctx.fillStyle = "#000000";
+                                ctx.fillRect(x * TILE_WIDTH, y * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT);
+                            }
+                            else {
+                                ctx.fillStyle = "#FFFFFF";
+                                ctx.fillRect(x * TILE_WIDTH, y * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT);
+                            }
+                        }
+                    }
+                }
+                if (this.selectedPiece != undefined) {
+                    ctx.fillStyle = "#FFCC00";
+                    ctx.fillRect(this.selectedPiece.x * TILE_WIDTH, this.selectedPiece.y * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT);
+                    ctx.globalAlpha = 0.6;
+                    let validMoves = this.selectedPiece.getValidMoves(this.chessBoard);
+                    for (let validMove of validMoves) {
+                        if (validMove.constraints == Chess.MoveType.Capture) {
+                            ctx.fillStyle = "#FF3B30";
+                        }
+                        else {
+                            ctx.fillStyle = "#4CD964";
+                        }
+                        ctx.fillRect(validMove.x * TILE_WIDTH, validMove.y * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT);
+                    }
+                }
+                for (let piece of this.chessBoard.pieces.sort((a, b) => a.y - b.y)) {
+                    this.drawPiece(ctx, piece);
+                }
+            }
+            onMouseDown(e) {
+                let position = this.camera.unproject(e.offsetX, e.offsetY);
+                let x = Math.floor(position.x / TILE_WIDTH);
+                let y = Math.floor(position.y / TILE_HEIGHT);
+                if (Mouse.button == 1) {
+                    let piece = this.chessBoard.pieces.find(p => p.x == x && p.y == y);
+                    if (piece != undefined && piece.timer <= 0 && piece.movementProgress == 0 && piece.owner.id == this.localPlayer.id) {
+                        console.log("Select", Chess.PieceType[piece.type], x, y);
+                        this.selectedPiece = piece;
+                    }
+                    else if (this.selectedPiece != undefined) {
+                        console.log("MoveTo", Chess.PieceType[this.selectedPiece.type], x, y);
+                        let validMoves = this.selectedPiece.getValidMoves(this.chessBoard);
+                        if (validMoves.find(m => m.x == x && m.y == y) != undefined) {
+                            this.movePiece(this.selectedPiece, x, y);
+                            this.selectedPiece = undefined;
+                        }
+                    }
+                }
+                else if (Mouse.button == 2) {
+                    console.log("Deselect");
+                    this.selectedPiece = undefined;
+                }
+            }
+            onScore(msg) {
+                let player = this.players.find(p => p.id == msg.playerId);
+                player.gameData.score += msg.score;
                 this.emitChange();
             }
             load() {
@@ -65,7 +156,7 @@ var Chess;
                 console.log("ChessGame.onDestroyPiece", message);
                 let piece = this.chessBoard.pieces.find(p => p.id == message.pieceId);
                 if (this.selectedPiece == piece) {
-                    this.selectedPiece = null;
+                    this.selectedPiece = undefined;
                 }
                 this.chessBoard.pieces.splice(this.chessBoard.pieces.indexOf(piece), 1);
                 piece.owner.gameData.pieces--;
@@ -95,111 +186,15 @@ var Chess;
                 }
                 this.emitChange();
             }
-            update(delta) {
-                this.camera.update(delta);
-                for (let piece of this.chessBoard.pieces) {
-                    if (piece.goal != null) {
-                        let length = Math.length(piece.start.x, piece.start.y, piece.goal.x, piece.goal.y);
-                        piece.movementProgress += (delta * Chess.MOVEMENT_SPEED) / length;
-                        if (piece.movementProgress > 1) {
-                            piece.movementProgress = 1;
-                        }
-                        piece.x = Math.round(Math.lerp(piece.start.x, piece.goal.x, piece.movementProgress));
-                        piece.y = Math.round(Math.lerp(piece.start.y, piece.goal.y, piece.movementProgress));
-                        if (piece.movementProgress == 1) {
-                            piece.x = piece.goal.x;
-                            piece.y = piece.goal.y;
-                            piece.goal = null;
-                            piece.start = null;
-                            piece.movementProgress = 0;
-                            piece.timer = Chess.LOCK_TIMER;
-                        }
-                    }
-                    if (piece.timer > 0) {
-                        piece.timer -= delta * (1 / 1000);
-                    }
-                }
-            }
             movePiece(piece, x, y) {
                 console.log("ChessGame.movePiece", Chess.PieceType[piece.type], x, y);
-                this.send({
-                    id: Chess.MessageId.CMSG_MOVE_PIECE_REQUEST,
-                    pieceId: piece.id,
-                    x: x,
-                    y: y
-                });
-            }
-            onMouseDown(e) {
-                let position = this.camera.unproject(e.offsetX, e.offsetY);
-                let x = (position.x / TILE_WIDTH) | 0;
-                let y = (position.y / TILE_HEIGHT) | 0;
-                if (Mouse.button == 1) {
-                    let piece = this.chessBoard.pieces.find(p => p.x == x && p.y == y);
-                    if (piece != null && piece.timer <= 0 && piece.movementProgress == 0 && piece.owner.id == this.localPlayer.id) {
-                        console.log("Select", Chess.PieceType[piece.type], x, y);
-                        this.selectedPiece = piece;
-                    }
-                    else if (this.selectedPiece != null) {
-                        console.log("MoveTo", Chess.PieceType[this.selectedPiece.type], x, y);
-                        let validMoves = this.selectedPiece.getValidMoves(this.chessBoard);
-                        if (validMoves.find(m => m.x == x && m.y == y) != null) {
-                            this.movePiece(this.selectedPiece, x, y);
-                            this.selectedPiece = null;
-                        }
-                    }
-                }
-                else if (Mouse.button == 2) {
-                    console.log("Deselect");
-                    this.selectedPiece = null;
-                }
-            }
-            draw(delta) {
-                var ctx = this.context;
-                ctx.setTransform(1, 0, 0, 1, 0, 0);
-                ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-                ctx.setTransform(this.camera.scaleX, 0, 0, this.camera.scaleY, this.camera.translateX, this.camera.translateY);
-                ctx.globalAlpha = 1;
-                ctx.strokeStyle = "#000000";
-                ctx.lineWidth = 1;
-                ctx.strokeRect(0, 0, this.chessBoard.size * TILE_WIDTH, this.chessBoard.size * TILE_HEIGHT);
-                for (let y = 0; y < this.chessBoard.size; y++) {
-                    for (let x = 0; x < this.chessBoard.size; x++) {
-                        if (this.chessBoard.isValidPosition(x, y)) {
-                            if ((x % 2) == (y % 2)) {
-                                ctx.fillStyle = "#000000";
-                                ctx.fillRect(x * TILE_WIDTH, y * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT);
-                            }
-                            else {
-                                ctx.fillStyle = "#FFFFFF";
-                                ctx.fillRect(x * TILE_WIDTH, y * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT);
-                            }
-                        }
-                    }
-                }
-                if (this.selectedPiece != null) {
-                    ctx.fillStyle = "#FFCC00";
-                    ctx.fillRect(this.selectedPiece.x * TILE_WIDTH, this.selectedPiece.y * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT);
-                    ctx.globalAlpha = 0.6;
-                    let validMoves = this.selectedPiece.getValidMoves(this.chessBoard);
-                    for (let validMove of validMoves) {
-                        if (validMove.constraints == Chess.MoveType.Capture) {
-                            ctx.fillStyle = "#FF3B30";
-                        }
-                        else {
-                            ctx.fillStyle = "#4CD964";
-                        }
-                        ctx.fillRect(validMove.x * TILE_WIDTH, validMove.y * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT);
-                    }
-                }
-                for (let piece of this.chessBoard.pieces.sort((a, b) => a.y - b.y)) {
-                    this.drawPiece(ctx, piece);
-                }
+                this.send(new Chess.MovePieceRequestMessage(piece.id, x, y));
             }
             drawPiece(ctx, piece) {
                 let image = this.assets[piece.type][piece.owner.team];
                 let x;
                 let y;
-                if (piece.goal != null) {
+                if (piece.goal != undefined) {
                     x = Math.lerp(piece.start.x, piece.goal.x, piece.movementProgress) * TILE_WIDTH;
                     y = Math.lerp(piece.start.y, piece.goal.y, piece.movementProgress) * TILE_HEIGHT;
                 }

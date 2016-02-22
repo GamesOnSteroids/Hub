@@ -7,11 +7,11 @@ class GameList extends React.Component<any, any> {
         super();
     }
 
-    render() {
+    public render(): JSX.Element {
 
         return (
             <div className="row">
-                {games
+                {gamesConfiguration
                     .filter(g=>g.development != true || environment == EnvironmentType.Development)
                     .map( (game, index) => {
                     let result:JSX.Element[] = [];

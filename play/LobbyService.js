@@ -10,12 +10,12 @@ var Play;
             let firebase = new Firebase(config.get(environment).firebaseURL);
             let lobbyRef = firebase.child("lobby").child(lobby.lobbyId);
             lobbyRef.transaction((data) => {
-                if (data != null) {
+                if (data != undefined) {
                     data.playerCount += 1;
                 }
                 return data;
             }, (error, commited, snapshot) => {
-                if (error != null) {
+                if (error != undefined) {
                     console.error(error);
                 }
             }, true);
@@ -23,13 +23,13 @@ var Play;
         findLobby(configuration) {
             return new Promise((resolve, reject) => {
                 let lobbiesRef = new Firebase(config.get(environment).firebaseURL).child("lobby");
-                if (configuration.lobbyId == null) {
+                if (configuration.lobbyId == undefined) {
                     lobbiesRef.once("value", (snapshot) => {
-                        let lobbyRef = null;
-                        let found = snapshot.forEach((snapshot) => {
-                            let value = snapshot.val();
+                        let lobbyRef = undefined;
+                        let found = snapshot.forEach((lobbySnapshot) => {
+                            let value = lobbySnapshot.val();
                             if (value.playerCount < value.maxPlayers && value.gameId == configuration.gameId && value.gameVariant == configuration.gameConfiguration.id) {
-                                lobbyRef = snapshot.ref();
+                                lobbyRef = lobbySnapshot.ref();
                                 return true;
                             }
                         });
@@ -39,13 +39,13 @@ var Play;
                                 maxPlayers: configuration.maxPlayers,
                                 gameId: configuration.gameId,
                                 createdAt: new Date(),
-                                gameVariant: configuration.gameConfiguration.id
+                                gameVariant: configuration.gameConfiguration.id,
                             };
                             let lobbyRef = lobbiesRef.push();
                             lobbyRef.set(lobbyDescription, () => {
                                 let lobbyId = lobbyRef.key();
                                 let clientLobby = new ClientLobby(lobbyId, configuration);
-                                clientLobby.clientGUID = guid();
+                                clientLobby.clientGUID = Math.guid();
                                 let localClient = new Client();
                                 localClient.id = clientLobby.clientGUID;
                                 localClient.name = "server";
@@ -72,9 +72,9 @@ var Play;
                         else {
                             let lobbyId = lobbyRef.key();
                             let lobby = new ClientLobby(lobbyId, configuration);
-                            lobby.clientGUID = guid();
+                            lobby.clientGUID = Math.guid();
                             let signalingService = new Play.SignalingService();
-                            var ref = new Firebase(config.get(environment).firebaseURL).child("lobby").child(lobby.lobbyId).child("sdp");
+                            let ref = new Firebase(config.get(environment).firebaseURL).child("lobby").child(lobby.lobbyId).child("sdp");
                             signalingService.createSignalingClient(lobby, new Play.FirebaseSignalingChannel(ref));
                             resolve(lobby);
                         }

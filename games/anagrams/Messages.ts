@@ -11,20 +11,24 @@ module Anagrams {
         SMSG_LETTERS = 4
     }
 
-    export interface LettersMessage extends GameMessage {
-        letters: string;
+    export class LettersMessage extends GameMessage {
+        constructor(public letters: string) {
+            super(MessageId.SMSG_LETTERS);
+        }
     }
-    export interface WordGuessMessage extends GameMessage {
-        word: string;
-    }
-
-    export interface InvalidWordMessage extends GameMessage {
-    }
-
-    export interface WordMessage extends GameMessage {
-        word: string;
-        playerId: string;
+    export class WordGuessMessage extends GameMessage {
+        constructor(public word: string) {
+            super(MessageId.CMSG_WORD_GUESS);
+        }
     }
 
+    export class InvalidWordMessage extends GameMessage {
+    }
 
+    export class WordMessage extends GameMessage {
+        constructor(public word: string,
+                    public playerId: string) {
+            super(MessageId.SMSG_WORD);
+        }
+    }
 }

@@ -16,8 +16,7 @@ module Play.Client {
         public isFinished: boolean;
 
 
-        constructor(positionX: number, positionY: number, image: HTMLImageElement, frameSize: number, duration: number)
-        {
+        constructor(positionX: number, positionY: number, image: HTMLImageElement, frameSize: number, duration: number) {
             this.positionX = positionX;
             this.positionY = positionY;
             this.frameSize = frameSize;
@@ -28,7 +27,7 @@ module Play.Client {
             this.time = 0;
         }
 
-        public update(delta: number) {
+        public update(delta: number): void {
             this.time += delta;
             while (this.time > this.duration) {
                 this.time -= this.duration;
@@ -41,7 +40,7 @@ module Play.Client {
             }
         }
 
-        public draw(ctx: CanvasRenderingContext2D, delta: number) {
+        public draw(ctx: CanvasRenderingContext2D, delta: number): void {
             ctx.drawImage(this.image, this.frameIndex * this.frameSize, 0, this.frameSize, this.frameSize, this.positionX - this.frameSize / 2, this.positionY - this.frameSize / 2, this.frameSize, this.frameSize);
         }
     }

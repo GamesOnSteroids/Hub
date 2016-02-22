@@ -7,13 +7,14 @@ var Minesweeper;
         class MinesweeperService extends GameService {
             constructor(lobby) {
                 super(lobby);
+                this.flaggedMines = 0;
+                this.generated = false;
                 this.on(Minesweeper.MessageId.CMSG_REVEAL_REQUEST, this.onRevealRequest.bind(this));
                 this.on(Minesweeper.MessageId.CMSG_FLAG_REQUEST, this.onFlagRequest.bind(this));
                 this.on(Minesweeper.MessageId.CMSG_MASS_REVEAL_REQUEST, this.onMassRevealRequest.bind(this));
                 let configuration = this.lobby.configuration.gameConfiguration;
-                this.minefield = new Server.Minefield(configuration.width, configuration.height);
+                this.minefield = new Minesweeper.Minefield(configuration.width, configuration.height);
                 this.mines = configuration.mines;
-                this.flaggedMines = 0;
             }
             checkGameOver() {
                 if (this.flaggedMines == this.mines) {
@@ -35,11 +36,7 @@ var Minesweeper;
                 this.lobby.gameOver();
             }
             score(client, score) {
-                this.broadcast({
-                    id: Minesweeper.MessageId.SMSG_SCORE,
-                    playerId: client.id,
-                    score: score
-                });
+                this.broadcast(new Minesweeper.ScoreMessage(client.id, score));
             }
             flag(client, fieldId, flag) {
                 let field = this.minefield.get(fieldId);
@@ -49,25 +46,15 @@ var Minesweeper;
                 field.hasFlag = flag;
                 if (flag) {
                     field.owner = client;
-                    this.broadcast({
-                        id: Minesweeper.MessageId.SMSG_FLAG,
-                        playerId: client.id,
-                        fieldId: fieldId,
-                        flag: true
-                    });
+                    this.broadcast(new Minesweeper.FlagMessage(client.id, fieldId, true));
                     if (field.hasMine) {
                         this.flaggedMines++;
                         this.checkGameOver();
                     }
                 }
                 else {
-                    field.owner = null;
-                    this.broadcast({
-                        id: Minesweeper.MessageId.SMSG_FLAG,
-                        playerId: client.id,
-                        fieldId: fieldId,
-                        flag: false
-                    });
+                    field.owner = undefined;
+                    this.broadcast(new Minesweeper.FlagMessage(client.id, fieldId, false));
                     if (field.hasMine) {
                         this.flaggedMines--;
                         this.checkGameOver();
@@ -81,20 +68,20 @@ var Minesweeper;
                 }
                 let flags = 0;
                 let unknownFields = 0;
-                this.minefield.forAdjacent(fieldId, (fieldId) => {
-                    let field = this.minefield.get(fieldId);
-                    if (field.hasFlag || (field.isRevealed && field.hasMine)) {
+                this.minefield.forAdjacent(fieldId, (id) => {
+                    let adjacentField = this.minefield.get(id);
+                    if (adjacentField.hasFlag || (adjacentField.isRevealed && adjacentField.hasMine)) {
                         flags++;
                     }
-                    if (!field.isRevealed && !field.hasFlag) {
+                    if (!adjacentField.isRevealed && !adjacentField.hasFlag) {
                         unknownFields++;
                     }
                 });
                 if (flags == field.adjacentMines && unknownFields > 0) {
-                    this.minefield.forAdjacent(fieldId, (fieldId) => {
-                        let field = this.minefield.get(fieldId);
-                        if (!field.isRevealed && !field.hasFlag) {
-                            this.reveal(client, fieldId);
+                    this.minefield.forAdjacent(fieldId, (id) => {
+                        let adjacentField = this.minefield.get(id);
+                        if (!adjacentField.isRevealed && !adjacentField.hasFlag) {
+                            this.reveal(client, id);
                         }
                     });
                 }
@@ -116,13 +103,7 @@ var Minesweeper;
                 field.isRevealed = true;
                 field.owner = client;
                 field.hasFlag = false;
-                this.broadcast({
-                    id: Minesweeper.MessageId.SMSG_REVEAL,
-                    playerId: client.id,
-                    fieldId: fieldId,
-                    adjacentMines: field.adjacentMines,
-                    hasMine: field.hasMine
-                });
+                this.broadcast(new Minesweeper.RevealMessage(client.id, fieldId, field.adjacentMines, field.hasMine));
                 if (field.hasFlag) {
                     if (field.hasMine) {
                         this.score(oldOwner, MinesweeperService.SCORE_EXPLOSION);
@@ -143,10 +124,10 @@ var Minesweeper;
                     }
                     else {
                         if (field.adjacentMines == 0) {
-                            this.minefield.forAdjacent(fieldId, (fieldId) => {
-                                let field = this.minefield.get(fieldId);
-                                if (!field.hasMine && !field.isRevealed && !field.hasFlag) {
-                                    this.reveal(client, fieldId);
+                            this.minefield.forAdjacent(fieldId, (id) => {
+                                let adjacentField = this.minefield.get(id);
+                                if (!adjacentField.hasMine && !adjacentField.isRevealed && !adjacentField.hasFlag) {
+                                    this.reveal(client, id);
                                 }
                             });
                         }
@@ -160,19 +141,25 @@ var Minesweeper;
                 this.massReveal(client, msg.fieldId);
             }
             onRevealRequest(client, msg) {
-                if (!this.minefield.generated) {
+                if (!this.generated) {
                     this.generate(msg.fieldId);
                 }
                 this.reveal(client, msg.fieldId, msg.doubt);
             }
             generate(safeFieldId) {
                 let result = this.minefield;
+                for (let i = 0; i < result.width * result.height; i++) {
+                    let field = new Minesweeper.Field();
+                    field.hasMine = false;
+                    field.owner = undefined;
+                    result.fields.push(field);
+                }
                 let safePosition = { x: (safeFieldId % result.width) | 0, y: (safeFieldId / result.width) | 0 };
                 let minesRemaining = this.mines;
                 while (minesRemaining > 0) {
-                    let fieldId = (Math.random() * result.width * result.height) | 0;
-                    let x = (fieldId % result.width) | 0;
-                    let y = (fieldId / result.width) | 0;
+                    let fieldId = Math.floor(Math.random() * result.width * result.height);
+                    let x = Math.floor(fieldId % result.width);
+                    let y = Math.floor(fieldId / result.width);
                     if (x >= safePosition.x - 1 && x <= safePosition.x + 1 && y >= safePosition.y - 1 && y <= safePosition.y + 1) {
                         continue;
                     }
@@ -194,7 +181,7 @@ var Minesweeper;
                         });
                     }
                 }
-                result.generated = true;
+                this.generated = true;
             }
         }
         MinesweeperService.SCORE_INCORRECT_FLAG = -500;

@@ -47,6 +47,14 @@ var Mahjong;
                 this.camera.translateY = 0;
                 this.emitChange();
             }
+            onMouseDown(e) {
+                if (Mouse.button == 2) {
+                }
+            }
+            onMouseUp(e) {
+                if (Mouse.button == 1 || Mouse.button == 3) {
+                }
+            }
             load() {
                 this.assets = {};
                 let root = "games/mahjong/assets/";
@@ -65,7 +73,7 @@ var Mahjong;
                 this.camera.update(delta);
             }
             draw(delta) {
-                var ctx = this.context;
+                let ctx = this.context;
                 ctx.setTransform(1, 0, 0, 1, 0, 0);
                 ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
                 ctx.setTransform(this.camera.scaleX, 0, 0, this.camera.scaleY, this.camera.translateX, this.camera.translateY);
@@ -124,15 +132,6 @@ var Mahjong;
             drawTile(ctx, tile, x, y) {
                 let image = this.assets.pin1;
                 ctx.drawImage(image, 0, 0, image.width, image.height, x, y, image.width, image.height);
-            }
-            onMouseDown(e) {
-                if (Mouse.button == 2) {
-                }
-            }
-            onMouseUp(e) {
-                if (Mouse.button == 1 || Mouse.button == 3) {
-                    let position = this.camera.unproject(e.offsetX, e.offsetY);
-                }
             }
         }
         Client.MahjongGame = MahjongGame;

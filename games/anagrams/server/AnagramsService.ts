@@ -5,7 +5,6 @@ module Anagrams.Server {
     import ServerLobby = Play.Server.ServerLobby;
     import Client = Play.Server.Client;
 
-
     export class AnagramsService extends GameService {
 
         constructor(lobby:ServerLobby) {
@@ -14,15 +13,15 @@ module Anagrams.Server {
             this.on(MessageId.CMSG_WORD_GUESS, this.onWordGuess.bind(this));
         }
 
-        onWordGuess(player:Client, message:WordGuessMessage) {
-
+        private onWordGuess(player:Client, message:WordGuessMessage): void {
+            // todo: implement
         }
 
-        randomChar(value: string): string {
+        private randomChar(value: string): string {
             return value[(Math.random() * value.length) | 0];
         }
 
-        generateLetters(): void {
+        private generateLetters(): void {
             let vowels = "aeiouy";
             let conosants = "bcdfghjklmnpqrtsvwx";
 
@@ -37,13 +36,10 @@ module Anagrams.Server {
             letters += this.randomChar(conosants);
             letters += this.randomChar(conosants);
 
-            this.broadcast<LettersMessage>({
-                id: MessageId.SMSG_LETTERS,
-                letters: letters
-            })
+            this.broadcast(new LettersMessage(letters));
         }
 
-        start():void {
+        public start(): void {
             this.generateLetters();
         }
 

@@ -7,14 +7,14 @@ var Play;
         iceServers: [
             { urls: "stun:stun.l.google.com:19302" },
             { urls: "stun:23.21.150.121" },
-        ]
+        ],
     };
     Play.options = {
         mandatory: {
             OfferToReceiveAudio: true,
-            OfferToReceiveVideo: true
+            OfferToReceiveVideo: true,
         },
-        optional: []
+        optional: [],
     };
     class SignalingService {
         onServerSdpMessage(server, channel, value) {
@@ -36,11 +36,11 @@ var Play;
                 };
                 server.clients.push(client);
                 pc.onicecandidate = (event) => {
-                    if (event.candidate != null) {
+                    if (event.candidate != undefined) {
                         channel.send({
-                            type: "candidate",
+                            candidate: JSON.stringify(event.candidate),
                             target: value.source,
-                            candidate: JSON.stringify(event.candidate)
+                            type: "candidate",
                         });
                     }
                 };
@@ -48,7 +48,11 @@ var Play;
                 pc.setRemoteDescription(offer);
                 pc.createAnswer((answer) => {
                     pc.setLocalDescription(answer, () => {
-                        channel.send({ type: "answer", target: value.source, answer: JSON.stringify(answer) });
+                        channel.send({
+                            type: "answer",
+                            target: value.source,
+                            answer: JSON.stringify(answer),
+                        });
                     });
                 }, console.error);
                 return true;
@@ -75,7 +79,7 @@ var Play;
                 lobby.serverConnection.peerConnection.setRemoteDescription(answer);
                 return true;
             }
-            else if (value.type == "candidate" && (value.target != null && value.target == lobby.clientGUID)) {
+            else if (value.type == "candidate" && (value.target != undefined && value.target == lobby.clientGUID)) {
                 let candidate = new RTCIceCandidate(JSON.parse(value.candidate));
                 lobby.serverConnection.peerConnection.addIceCandidate(candidate, () => {
                 }, console.error);
@@ -106,7 +110,7 @@ var Play;
                 }
             };
             pc.onicecandidate = (event) => {
-                if (event.candidate != null) {
+                if (event.candidate != undefined) {
                     channel.send({
                         type: "candidate",
                         source: lobby.clientGUID,
@@ -117,7 +121,11 @@ var Play;
             pc.createOffer((offer) => {
                 console.log("SignalingService.createOffer");
                 pc.setLocalDescription(offer, () => {
-                    channel.send({ type: "offer", source: lobby.clientGUID, offer: JSON.stringify(offer) });
+                    channel.send({
+                        type: "offer",
+                        source: lobby.clientGUID,
+                        offer: JSON.stringify(offer),
+                    });
                 });
             }, console.error, Play.options);
         }
