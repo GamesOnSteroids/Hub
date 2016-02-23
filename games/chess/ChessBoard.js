@@ -141,15 +141,15 @@ var Chess;
         getValidMoves(board) {
             let result = [];
             let dir;
-            if (this.direction == Chess.Direction4.Left || this.direction == Chess.Direction4.Up) {
+            if (this.direction == Direction4.Left || this.direction == Direction4.Up) {
                 dir = -1;
             }
             else {
                 dir = 1;
             }
-            if (this.direction == Chess.Direction4.Up || this.direction == Chess.Direction4.Down) {
+            if (this.direction == Direction4.Up || this.direction == Direction4.Down) {
                 let forward = this.addIfValid(result, board, this.x, this.y + dir, true);
-                if (forward && ((this.direction == Chess.Direction4.Up && this.y == board.size - 2) || (this.direction == Chess.Direction4.Down && this.y == 1))) {
+                if (forward && ((this.direction == Direction4.Up && this.y == board.size - 2) || (this.direction == Direction4.Down && this.y == 1))) {
                     this.addIfValid(result, board, this.x, this.y + 2 * dir, true);
                 }
                 {
@@ -165,9 +165,9 @@ var Chess;
                     }
                 }
             }
-            else if (this.direction == Chess.Direction4.Left || this.direction == Chess.Direction4.Right) {
+            else if (this.direction == Direction4.Left || this.direction == Direction4.Right) {
                 let forward = this.addIfValid(result, board, this.x + dir, this.y, true);
-                if (forward && ((this.direction == Chess.Direction4.Left && this.x == board.size - 2) || (this.direction == Chess.Direction4.Right && this.x == 1))) {
+                if (forward && ((this.direction == Direction4.Left && this.x == board.size - 2) || (this.direction == Direction4.Right && this.x == 1))) {
                     this.addIfValid(result, board, this.x + 2 * dir, this.y, true);
                 }
                 {
@@ -256,8 +256,8 @@ var Chess;
         }
         initialize(players) {
             for (let i = 0; i < 8; i++) {
-                this.pieces.push(new Pawn(this.pieces.length, i, 6, Chess.Direction4.Up, players[0]));
-                this.pieces.push(new Pawn(this.pieces.length, i, 1, Chess.Direction4.Down, players[1]));
+                this.pieces.push(new Pawn(this.pieces.length, i, 6, Direction4.Up, players[0]));
+                this.pieces.push(new Pawn(this.pieces.length, i, 1, Direction4.Down, players[1]));
             }
             for (let i = 0; i < 2; i++) {
                 let row;
@@ -303,10 +303,10 @@ var Chess;
         }
         initialize(players) {
             for (let i = 0; i < 8; i++) {
-                this.pieces.push(new Pawn(this.pieces.length, 3 + i, 12, Chess.Direction4.Up, players[0]));
-                this.pieces.push(new Pawn(this.pieces.length, 3 + i, 1, Chess.Direction4.Down, players[1]));
-                this.pieces.push(new Pawn(this.pieces.length, 12, 3 + i, Chess.Direction4.Left, players[2]));
-                this.pieces.push(new Pawn(this.pieces.length, 1, 3 + i, Chess.Direction4.Right, players[3]));
+                this.pieces.push(new Pawn(this.pieces.length, 3 + i, 12, Direction4.Up, players[0]));
+                this.pieces.push(new Pawn(this.pieces.length, 3 + i, 1, Direction4.Down, players[1]));
+                this.pieces.push(new Pawn(this.pieces.length, 12, 3 + i, Direction4.Left, players[2]));
+                this.pieces.push(new Pawn(this.pieces.length, 1, 3 + i, Direction4.Right, players[3]));
             }
             for (let i = 0; i < 2; i++) {
                 let row;

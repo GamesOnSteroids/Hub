@@ -1,4 +1,4 @@
-module Minesweeper.Client {
+namespace Minesweeper.Client {
     "use strict";
 
     import ClientLobby = Play.Client.ClientLobby;

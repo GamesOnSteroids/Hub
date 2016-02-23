@@ -1,4 +1,4 @@
-module Chess.Server {
+namespace Chess.Server {
     "use strict";
 
     import GameService = Play.Server.GameService;
@@ -49,14 +49,14 @@ module Chess.Server {
             for (let piece of this.chessBoard.pieces) {
                 if (piece.goal != undefined) {
 
-                    let length = Math.length(piece.start.x, piece.start.y, piece.goal.x, piece.goal.y);
+                    let length = MathUtils.length(piece.start.x, piece.start.y, piece.goal.x, piece.goal.y);
                     piece.movementProgress += (delta * MOVEMENT_SPEED) / length;
                     if (piece.movementProgress > 1) {
                         piece.movementProgress = 1;
                     }
 
-                    piece.x = Math.round(Math.lerp(piece.start.x, piece.goal.x, piece.movementProgress));
-                    piece.y = Math.round(Math.lerp(piece.start.y, piece.goal.y, piece.movementProgress));
+                    piece.x = Math.round(MathUtils.lerp(piece.start.x, piece.goal.x, piece.movementProgress));
+                    piece.y = Math.round(MathUtils.lerp(piece.start.y, piece.goal.y, piece.movementProgress));
 
                     if (piece.type != PieceType.Knight || piece.movementProgress == 1) {
                         let collision = this.chessBoard.pieces.find(p => p.x == piece.x && p.y == piece.y && p.id != piece.id);

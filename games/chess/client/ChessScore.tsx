@@ -1,4 +1,4 @@
-module Chess.Client {
+namespace Chess.Client {
     "use strict";
 
     export class ChessScore extends React.Component<{players: PlayerInfo[]}, any> {

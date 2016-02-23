@@ -1,4 +1,4 @@
-module Anagrams.Server {
+namespace Anagrams.Server {
     "use strict";
 
     import GameService = Play.Server.GameService;

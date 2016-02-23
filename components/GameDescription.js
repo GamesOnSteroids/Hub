@@ -4,19 +4,15 @@ class GameDescription extends React.Component {
         super();
         this.startGame = this.startGame.bind(this);
     }
-    static resolveClass(name) {
-        let result = window;
-        for (let part of name.split(".")) {
-            result = result[part];
-        }
-        if (result == null) {
-            throw `Class: ${name} not found`;
-        }
-        return result;
+    render() {
+        return (React.createElement("div", null, React.createElement("h3", null, this.props.game.name), React.createElement("div", null, React.createElement("p", null, this.props.game.description), React.createElement("span", null, "Currently playing: ? games")), React.createElement("div", {"className": "btn-group-vertical", "role": "group"}, this.props.game.variants
+            .filter((v) => v.development != true || environment == EnvironmentType.Development)
+            .map((variant) => (React.createElement("button", {"key": variant.id, "type": "button", "className": variant.id == "default" ? "btn btn-primary" : "btn btn-default", "onClick": this.startGame.bind(this, variant)}, variant.name))))));
     }
     componentDidMount() {
         if (environment == EnvironmentType.Development) {
             if (this.props.game.id == "mahjong") {
+                this.startGame(this.props.game.variants[0]);
             }
         }
     }
@@ -26,19 +22,14 @@ class GameDescription extends React.Component {
         lobbyConfiguration.maxPlayers = variant.maxPlayers;
         lobbyConfiguration.gameConfiguration = variant;
         lobbyConfiguration.gameId = this.props.game.id;
-        lobbyConfiguration.appClass = GameDescription.resolveClass(this.props.game.appClass);
-        lobbyConfiguration.gameClass = GameDescription.resolveClass(this.props.game.gameClass);
-        lobbyConfiguration.serviceClass = GameDescription.resolveClass(this.props.game.serviceClass);
+        lobbyConfiguration.appClass = ClassUtils.resolveClass(this.props.game.appClass);
+        lobbyConfiguration.gameClass = ClassUtils.resolveClass(this.props.game.gameClass);
+        lobbyConfiguration.serviceClass = ClassUtils.resolveClass(this.props.game.serviceClass);
         let lobbyService = new Play.FirebaseLobbyService();
         lobbyService.findLobby(lobbyConfiguration).then((lobby) => {
             Play.Client.ClientLobby.current = lobby;
-            ReactRouter.hashHistory.pushState(null, `/lobby/${lobby.lobbyId}`);
+            ReactRouter.hashHistory.pushState(undefined, `/lobby/${lobby.lobbyId}`);
         });
-    }
-    render() {
-        return (React.createElement("div", null, React.createElement("h3", null, this.props.game.name), React.createElement("div", null, React.createElement("p", null, this.props.game.description), React.createElement("span", null, "Currently playing: ? games")), React.createElement("div", {"className": "btn-group-vertical", "role": "group"}, this.props.game.variants
-            .filter((v) => v.development != true || environment == EnvironmentType.Development)
-            .map((variant) => (React.createElement("button", {"key": variant.id, "type": "button", "className": variant.id == "default" ? "btn btn-primary" : "btn btn-default", "onClick": this.startGame.bind(this, variant)}, variant.name))))));
     }
 }
 //# sourceMappingURL=GameDescription.js.map

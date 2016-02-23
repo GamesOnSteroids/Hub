@@ -8,18 +8,18 @@ class App extends React.Component {
     }
 }
 document.onkeydown = function (event) {
-    var doPrevent = false;
+    let doPrevent = false;
     if (event.keyCode === 8) {
         let d = event.srcElement || event.target;
-        if ((d.tagName.toUpperCase() === 'INPUT' &&
-            (d.type.toUpperCase() === 'TEXT' ||
-                d.type.toUpperCase() === 'PASSWORD' ||
-                d.type.toUpperCase() === 'FILE' ||
-                d.type.toUpperCase() === 'SEARCH' ||
-                d.type.toUpperCase() === 'EMAIL' ||
-                d.type.toUpperCase() === 'NUMBER' ||
-                d.type.toUpperCase() === 'DATE')) ||
-            d.tagName.toUpperCase() === 'TEXTAREA') {
+        if ((d.tagName.toUpperCase() === "INPUT" &&
+            (d.type.toUpperCase() === "TEXT" ||
+                d.type.toUpperCase() === "PASSWORD" ||
+                d.type.toUpperCase() === "FILE" ||
+                d.type.toUpperCase() === "SEARCH" ||
+                d.type.toUpperCase() === "EMAIL" ||
+                d.type.toUpperCase() === "NUMBER" ||
+                d.type.toUpperCase() === "DATE")) ||
+            d.tagName.toUpperCase() === "TEXTAREA") {
             doPrevent = d.readOnly || d.disabled;
         }
         else {

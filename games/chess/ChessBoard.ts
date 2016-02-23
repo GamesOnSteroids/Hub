@@ -1,4 +1,4 @@
-module Chess {
+namespace Chess {
     "use strict";
 
     import IPlayerInfo = Play.IPlayerInfo;

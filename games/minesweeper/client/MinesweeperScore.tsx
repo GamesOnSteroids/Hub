@@ -1,4 +1,4 @@
-module Minesweeper.Client {
+namespace Minesweeper.Client {
     "use strict";
 
     export class MinesweeperScore extends React.Component<{players: PlayerInfo[], remainingMines: number}, any> {

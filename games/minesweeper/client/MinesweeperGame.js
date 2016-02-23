@@ -247,7 +247,7 @@ var Minesweeper;
                 this.assets.numbers = [];
                 for (let i = 0; i < 8; i++) {
                     this.assets.numbers[i] = new Image();
-                    this.assets.numbers[i].src = root + `images/${(i + 1)}.png`;
+                    this.assets.numbers[i].src = `${root}images/${(i + 1)}.png`;
                 }
                 this.assets.explosion = new Image();
                 this.assets.explosion.src = root + "images/explosion.png";

@@ -55,20 +55,6 @@ var Mahjong;
                 if (Mouse.button == 1 || Mouse.button == 3) {
                 }
             }
-            load() {
-                this.assets = {};
-                let root = "games/mahjong/assets/";
-                this.assets.pin1 = new Image();
-                this.assets.pin1.src = root + "images/1-1.png";
-                this.assets.back = new Image();
-                this.assets.back.src = root + "images/back.png";
-                this.assets.left = new Image();
-                this.assets.left.src = root + "images/left.png";
-                this.assets.right = new Image();
-                this.assets.right.src = root + "images/right.png";
-                this.assets.backlying = new Image();
-                this.assets.backlying.src = root + "images/back-lying.png";
-            }
             update(delta) {
                 this.camera.update(delta);
             }
@@ -132,6 +118,20 @@ var Mahjong;
             drawTile(ctx, tile, x, y) {
                 let image = this.assets.pin1;
                 ctx.drawImage(image, 0, 0, image.width, image.height, x, y, image.width, image.height);
+            }
+            load() {
+                this.assets = {};
+                let root = "games/mahjong/assets/";
+                this.assets.pin1 = new Image();
+                this.assets.pin1.src = root + "images/1-1.png";
+                this.assets.back = new Image();
+                this.assets.back.src = root + "images/back.png";
+                this.assets.left = new Image();
+                this.assets.left.src = root + "images/left.png";
+                this.assets.right = new Image();
+                this.assets.right.src = root + "images/right.png";
+                this.assets.backlying = new Image();
+                this.assets.backlying.src = root + "images/back-lying.png";
             }
         }
         Client.MahjongGame = MahjongGame;

@@ -45,13 +45,13 @@ var Chess;
                 this.camera.update(delta);
                 for (let piece of this.chessBoard.pieces) {
                     if (piece.goal != undefined) {
-                        let length = Math.length(piece.start.x, piece.start.y, piece.goal.x, piece.goal.y);
+                        let length = MathUtils.length(piece.start.x, piece.start.y, piece.goal.x, piece.goal.y);
                         piece.movementProgress += (delta * Chess.MOVEMENT_SPEED) / length;
                         if (piece.movementProgress > 1) {
                             piece.movementProgress = 1;
                         }
-                        piece.x = Math.round(Math.lerp(piece.start.x, piece.goal.x, piece.movementProgress));
-                        piece.y = Math.round(Math.lerp(piece.start.y, piece.goal.y, piece.movementProgress));
+                        piece.x = Math.round(MathUtils.lerp(piece.start.x, piece.goal.x, piece.movementProgress));
+                        piece.y = Math.round(MathUtils.lerp(piece.start.y, piece.goal.y, piece.movementProgress));
                         if (piece.movementProgress == 1) {
                             piece.x = piece.goal.x;
                             piece.y = piece.goal.y;
@@ -195,8 +195,8 @@ var Chess;
                 let x;
                 let y;
                 if (piece.goal != undefined) {
-                    x = Math.lerp(piece.start.x, piece.goal.x, piece.movementProgress) * TILE_WIDTH;
-                    y = Math.lerp(piece.start.y, piece.goal.y, piece.movementProgress) * TILE_HEIGHT;
+                    x = MathUtils.lerp(piece.start.x, piece.goal.x, piece.movementProgress) * TILE_WIDTH;
+                    y = MathUtils.lerp(piece.start.y, piece.goal.y, piece.movementProgress) * TILE_HEIGHT;
                 }
                 else {
                     x = piece.x * TILE_WIDTH;

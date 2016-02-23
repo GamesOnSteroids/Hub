@@ -36,7 +36,7 @@ var Minesweeper;
                 this.lobby.gameOver();
             }
             score(client, score) {
-                this.broadcast(new Minesweeper.ScoreMessage(client.id, score));
+                this.lobby.broadcast(new Minesweeper.ScoreMessage(client.id, score));
             }
             flag(client, fieldId, flag) {
                 let field = this.minefield.get(fieldId);
@@ -103,7 +103,7 @@ var Minesweeper;
                 field.isRevealed = true;
                 field.owner = client;
                 field.hasFlag = false;
-                this.broadcast(new Minesweeper.RevealMessage(client.id, fieldId, field.adjacentMines, field.hasMine));
+                this.lobby.broadcast(new Minesweeper.RevealMessage(client.id, fieldId, field.adjacentMines, field.hasMine));
                 if (field.hasFlag) {
                     if (field.hasMine) {
                         this.score(oldOwner, MinesweeperService.SCORE_EXPLOSION);

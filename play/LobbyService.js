@@ -45,7 +45,7 @@ var Play;
                             lobbyRef.set(lobbyDescription, () => {
                                 let lobbyId = lobbyRef.key();
                                 let clientLobby = new ClientLobby(lobbyId, configuration);
-                                clientLobby.clientGUID = Math.guid();
+                                clientLobby.clientGUID = Guid.generate();
                                 let localClient = new Client();
                                 localClient.id = clientLobby.clientGUID;
                                 localClient.name = "server";
@@ -72,7 +72,7 @@ var Play;
                         else {
                             let lobbyId = lobbyRef.key();
                             let lobby = new ClientLobby(lobbyId, configuration);
-                            lobby.clientGUID = Math.guid();
+                            lobby.clientGUID = Guid.generate();
                             let signalingService = new Play.SignalingService();
                             let ref = new Firebase(config.get(environment).firebaseURL).child("lobby").child(lobby.lobbyId).child("sdp");
                             signalingService.createSignalingClient(lobby, new Play.FirebaseSignalingChannel(ref));

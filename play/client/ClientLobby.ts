@@ -1,4 +1,4 @@
-module Play.Client {
+namespace Play.Client {
     "use strict";
 
     import IConnection = Play.Server.IConnection;

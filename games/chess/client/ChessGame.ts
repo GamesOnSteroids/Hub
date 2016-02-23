@@ -1,4 +1,4 @@
-module Chess.Client {
+namespace Chess.Client {
     "use strict";
 
     import Camera = Play.Client.Camera;
@@ -66,13 +66,13 @@ module Chess.Client {
 
             for (let piece of this.chessBoard.pieces) {
                 if (piece.goal != undefined) {
-                    let length = Math.length(piece.start.x, piece.start.y, piece.goal.x, piece.goal.y);
+                    let length = MathUtils.length(piece.start.x, piece.start.y, piece.goal.x, piece.goal.y);
                     piece.movementProgress += (delta * MOVEMENT_SPEED) / length;
                     if (piece.movementProgress > 1) {
                         piece.movementProgress = 1;
                     }
-                    piece.x = Math.round(Math.lerp(piece.start.x, piece.goal.x, piece.movementProgress));
-                    piece.y = Math.round(Math.lerp(piece.start.y, piece.goal.y, piece.movementProgress));
+                    piece.x = Math.round(MathUtils.lerp(piece.start.x, piece.goal.x, piece.movementProgress));
+                    piece.y = Math.round(MathUtils.lerp(piece.start.y, piece.goal.y, piece.movementProgress));
 
                     if (piece.movementProgress == 1) {
                         piece.x = piece.goal.x;
@@ -234,8 +234,8 @@ module Chess.Client {
             let x: number;
             let y: number;
             if (piece.goal != undefined) {
-                x = Math.lerp(piece.start.x, piece.goal.x, piece.movementProgress) * TILE_WIDTH;
-                y = Math.lerp(piece.start.y, piece.goal.y, piece.movementProgress) * TILE_HEIGHT;
+                x = MathUtils.lerp(piece.start.x, piece.goal.x, piece.movementProgress) * TILE_WIDTH;
+                y = MathUtils.lerp(piece.start.y, piece.goal.y, piece.movementProgress) * TILE_HEIGHT;
             } else {
                 x = piece.x * TILE_WIDTH;
                 y = piece.y * TILE_HEIGHT;

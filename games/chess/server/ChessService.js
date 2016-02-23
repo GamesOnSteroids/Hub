@@ -27,13 +27,13 @@ var Chess;
             update(delta) {
                 for (let piece of this.chessBoard.pieces) {
                     if (piece.goal != undefined) {
-                        let length = Math.length(piece.start.x, piece.start.y, piece.goal.x, piece.goal.y);
+                        let length = MathUtils.length(piece.start.x, piece.start.y, piece.goal.x, piece.goal.y);
                         piece.movementProgress += (delta * Chess.MOVEMENT_SPEED) / length;
                         if (piece.movementProgress > 1) {
                             piece.movementProgress = 1;
                         }
-                        piece.x = Math.round(Math.lerp(piece.start.x, piece.goal.x, piece.movementProgress));
-                        piece.y = Math.round(Math.lerp(piece.start.y, piece.goal.y, piece.movementProgress));
+                        piece.x = Math.round(MathUtils.lerp(piece.start.x, piece.goal.x, piece.movementProgress));
+                        piece.y = Math.round(MathUtils.lerp(piece.start.y, piece.goal.y, piece.movementProgress));
                         if (piece.type != Chess.PieceType.Knight || piece.movementProgress == 1) {
                             let collision = this.chessBoard.pieces.find(p => p.x == piece.x && p.y == piece.y && p.id != piece.id);
                             if (collision != undefined) {

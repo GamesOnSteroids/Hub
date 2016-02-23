@@ -1,4 +1,4 @@
-module Anagrams.Client {
+namespace Anagrams.Client {
     "use strict";
 
     import ClientLobby = Play.Client.ClientLobby;

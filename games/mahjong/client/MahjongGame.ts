@@ -1,5 +1,4 @@
-module Mahjong.Client {
-    import Direction4 = Chess.Direction4;
+namespace Mahjong.Client {
     "use strict";
 
     import EventDispatcher = Play.Client.EventDispatcher;
@@ -37,7 +36,7 @@ module Mahjong.Client {
     class Set {
         tiles: Tile[];
 
-        //todo: closed kan
+        // todo: closed kan
     }
 
     class Hand {
@@ -95,25 +94,6 @@ module Mahjong.Client {
                 // let position = this.camera.unproject(e.offsetX, e.offsetY);
 
             }
-        }
-
-        private load(): void {
-            this.assets = {};
-
-            let root = "games/mahjong/assets/";
-
-            this.assets.pin1 = new Image();
-            this.assets.pin1.src = root + "images/1-1.png";
-            this.assets.back = new Image();
-            this.assets.back.src = root + "images/back.png";
-            this.assets.left = new Image();
-            this.assets.left.src = root + "images/left.png";
-            this.assets.right = new Image();
-            this.assets.right.src = root + "images/right.png";
-
-            this.assets.backlying = new Image();
-            this.assets.backlying.src = root + "images/back-lying.png";
-
         }
 
         protected update(delta: number): void {
@@ -192,6 +172,25 @@ module Mahjong.Client {
         private drawTile(ctx: CanvasRenderingContext2D, tile: Tile, x: number, y: number): void {
             let image = this.assets.pin1;
             ctx.drawImage(image, 0, 0, image.width, image.height, x, y, image.width, image.height);
+        }
+
+        private load(): void {
+            this.assets = {};
+
+            let root = "games/mahjong/assets/";
+
+            this.assets.pin1 = new Image();
+            this.assets.pin1.src = root + "images/1-1.png";
+            this.assets.back = new Image();
+            this.assets.back.src = root + "images/back.png";
+            this.assets.left = new Image();
+            this.assets.left.src = root + "images/left.png";
+            this.assets.right = new Image();
+            this.assets.right.src = root + "images/right.png";
+
+            this.assets.backlying = new Image();
+            this.assets.backlying.src = root + "images/back-lying.png";
+
         }
 
     }

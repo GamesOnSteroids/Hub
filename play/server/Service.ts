@@ -1,4 +1,4 @@
-module Play.Server {
+namespace Play.Server {
     "use strict";
 
     export class Service {

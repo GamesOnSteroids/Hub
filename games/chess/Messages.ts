@@ -1,4 +1,4 @@
-module Chess {
+namespace Chess {
     "use strict";
 
     import GameMessage = Play.GameMessage;
@@ -17,13 +17,6 @@ module Chess {
         King = 6
     }
 
-
-    export enum Direction4 {
-        Left = 1,
-        Right = 2,
-        Up = 3,
-        Down = 4
-    }
 
     export enum MessageId {
         SMSG_CREATE_PIECE = 1,

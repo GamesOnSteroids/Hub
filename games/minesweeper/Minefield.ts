@@ -1,4 +1,4 @@
-module Minesweeper {
+namespace Minesweeper {
     "use strict";
     import IPlayerInfo = Play.IPlayerInfo;
 

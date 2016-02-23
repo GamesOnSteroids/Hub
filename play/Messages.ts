@@ -1,4 +1,4 @@
-module Play {
+namespace Play {
     "use strict";
 
     export class LobbyConfiguration {

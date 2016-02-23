@@ -1,4 +1,4 @@
-module Minesweeper.Server {
+namespace Minesweeper.Server {
     "use strict";
 
     import Client = Play.Server.Client;
@@ -54,7 +54,7 @@ module Minesweeper.Server {
 
 
         private score(client: IPlayerInfo, score: number): void {
-            this.broadcast(new ScoreMessage(client.id, score));
+            this.lobby.broadcast(new ScoreMessage(client.id, score));
         }
 
 
@@ -138,7 +138,7 @@ module Minesweeper.Server {
             field.owner = client;
             field.hasFlag = false;
 
-            this.broadcast(new RevealMessage(client.id, fieldId, field.adjacentMines, field.hasMine));
+            this.lobby.broadcast(new RevealMessage(client.id, fieldId, field.adjacentMines, field.hasMine));
 
             if (field.hasFlag) {
                 if (field.hasMine) { // doubt mine

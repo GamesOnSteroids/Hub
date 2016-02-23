@@ -5,11 +5,11 @@ window.RTCPeerConnection = window.RTCPeerConnection || window.mozRTCPeerConnecti
 window.RTCSessionDescription = window.RTCSessionDescription || window.mozRTCSessionDescription || window.webkitRTCSessionDescription;
 window.RTCIceCandidate = window.mozRTCIceCandidate || window.RTCIceCandidate;
 
-//navigator.getUserMedia = navigator.getUserMedia || navigator.mozGetUserMedia || navigator.webkitGetUserMedia || navigator.msGetUserMedia;
+// navigator.getUserMedia = navigator.getUserMedia || navigator.mozGetUserMedia || navigator.webkitGetUserMedia || navigator.msGetUserMedia;
 
 
 class App extends React.Component<any, any> {
-    render() {
+    public render(): JSX.Element {
         return (
             <div>
                 <Header />,
@@ -21,27 +21,26 @@ class App extends React.Component<any, any> {
     }
 }
 
-//var createHistory = ((window as any).History as HistoryModule.Module).createHistory;
-//ReactRouter.browserHistory = createHistory();
+// var createHistory = ((window as any).History as HistoryModule.Module).createHistory;
+// ReactRouter.browserHistory = createHistory();
 
 document.onkeydown = function (event) {
-    var doPrevent = false;
+    let doPrevent = false;
     if (event.keyCode === 8) {
         let d: any = event.srcElement || event.target;
-        if ((d.tagName.toUpperCase() === 'INPUT' &&
+        if ((d.tagName.toUpperCase() === "INPUT" &&
                 (
-                d.type.toUpperCase() === 'TEXT' ||
-                d.type.toUpperCase() === 'PASSWORD' ||
-                d.type.toUpperCase() === 'FILE' ||
-                d.type.toUpperCase() === 'SEARCH' ||
-                d.type.toUpperCase() === 'EMAIL' ||
-                d.type.toUpperCase() === 'NUMBER' ||
-                d.type.toUpperCase() === 'DATE' )
+                d.type.toUpperCase() === "TEXT" ||
+                d.type.toUpperCase() === "PASSWORD" ||
+                d.type.toUpperCase() === "FILE" ||
+                d.type.toUpperCase() === "SEARCH" ||
+                d.type.toUpperCase() === "EMAIL" ||
+                d.type.toUpperCase() === "NUMBER" ||
+                d.type.toUpperCase() === "DATE" )
             ) ||
-            d.tagName.toUpperCase() === 'TEXTAREA') {
+            d.tagName.toUpperCase() === "TEXTAREA") {
             doPrevent = d.readOnly || d.disabled;
-        }
-        else {
+        } else {
             doPrevent = true;
         }
     }

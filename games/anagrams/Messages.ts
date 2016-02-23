@@ -1,4 +1,4 @@
-module Anagrams {
+namespace Anagrams {
     "use strict";
 
     import GameMessage = Play.GameMessage;

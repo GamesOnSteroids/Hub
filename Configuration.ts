@@ -176,7 +176,7 @@ var gamesConfiguration: IGameConfiguration[] = [
         }]
     }, {
         "id": "tetrominoes",
-        "name": "tetrominoes",
+        "name": "Tetrominoes",
         "appClass": "Tetrominoes.Client.TetrominoesApp",
         "gameClass": "Tetrominoes.Client.TetrominoesGame",
         "serviceClass": "Tetrominoes.Server.TetrominoesService",

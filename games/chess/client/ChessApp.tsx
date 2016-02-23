@@ -1,4 +1,4 @@
-module Chess.Client {
+namespace Chess.Client {
     "use strict";
 
     import ClientLobby = Play.Client.ClientLobby;

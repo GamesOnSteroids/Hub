@@ -1,4 +1,4 @@
-module Mahjong.Client {
+namespace Mahjong.Client {
     "use strict";
 
     import ClientLobby = Play.Client.ClientLobby;
