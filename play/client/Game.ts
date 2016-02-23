@@ -106,6 +106,24 @@ namespace Play.Client {
         }
 
 
+        protected loadAsset(assetName: string): Promise<any> {
+
+            return new Promise<any>((resolve, reject) => {
+                if (assetName.endsWith(".png")) {
+                    let asset = new Image();
+                    asset.onload = () => {
+                        resolve(asset);
+                    };
+                    asset.onerror = (ev: Event) => {
+                        reject(ev);
+                    };
+                    asset.src = assetName;
+                } else {
+                    throw "Unsupported type";
+                }
+            });
+        }
+
         private tick(time: number): void {
             let delta = time - this.lastFrame;
             if (this.lobby.state != LobbyState.GAME_RUNNING && this.lobby.state != LobbyState.GAME_OVER) {
