@@ -3,5 +3,5 @@ typings/
 .dist
 .idea
 *.iml
-*.js
+app/**/*.js
 *.js.map
