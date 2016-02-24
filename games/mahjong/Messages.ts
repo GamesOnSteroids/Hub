@@ -76,7 +76,7 @@ namespace Mahjong {
                 nthIndex %= this.list.length;
             }
             if (nthIndex >= this.list.length || nthIndex < 0) {
-                return undefined;
+                return null;
             } else {
                 return this.list[nthIndex];
             }
@@ -112,29 +112,27 @@ namespace Mahjong {
     }
 
     export class Meld {
-        public tiles: TileId[];
         public open: boolean;
+
+        constructor(public tiles: Tile[], public type: MeldType) {}
 
         // todo: closed kan
     }
 
-    enum TileType {
-        Suite,
+    export enum TileType {
+        Suit,
         Dragon,
         Wind,
     }
-    enum SuiteType {
+
+    export enum Suit {
         Pin,
         Man,
-        Sou
+        Sou,
+        Honor
     }
 
-    export class Tile {
-        public id: TileId;
-
-    }
-
-    enum SetType {
+    export enum MeldType {
         Chi,
         Pon,
         Kan

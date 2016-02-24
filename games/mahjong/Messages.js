@@ -71,7 +71,7 @@ var Mahjong;
                 nthIndex %= this.list.length;
             }
             if (nthIndex >= this.list.length || nthIndex < 0) {
-                return undefined;
+                return null;
             }
             else {
                 return this.list[nthIndex];
@@ -106,29 +106,31 @@ var Mahjong;
     }
     Mahjong.Move = Move;
     class Meld {
+        constructor(tiles, type) {
+            this.tiles = tiles;
+            this.type = type;
+        }
     }
     Mahjong.Meld = Meld;
-    var TileType;
     (function (TileType) {
-        TileType[TileType["Suite"] = 0] = "Suite";
+        TileType[TileType["Suit"] = 0] = "Suit";
         TileType[TileType["Dragon"] = 1] = "Dragon";
         TileType[TileType["Wind"] = 2] = "Wind";
-    })(TileType || (TileType = {}));
-    var SuiteType;
-    (function (SuiteType) {
-        SuiteType[SuiteType["Pin"] = 0] = "Pin";
-        SuiteType[SuiteType["Man"] = 1] = "Man";
-        SuiteType[SuiteType["Sou"] = 2] = "Sou";
-    })(SuiteType || (SuiteType = {}));
-    class Tile {
-    }
-    Mahjong.Tile = Tile;
-    var SetType;
-    (function (SetType) {
-        SetType[SetType["Chi"] = 0] = "Chi";
-        SetType[SetType["Pon"] = 1] = "Pon";
-        SetType[SetType["Kan"] = 2] = "Kan";
-    })(SetType || (SetType = {}));
+    })(Mahjong.TileType || (Mahjong.TileType = {}));
+    var TileType = Mahjong.TileType;
+    (function (Suit) {
+        Suit[Suit["Pin"] = 0] = "Pin";
+        Suit[Suit["Man"] = 1] = "Man";
+        Suit[Suit["Sou"] = 2] = "Sou";
+        Suit[Suit["Honor"] = 3] = "Honor";
+    })(Mahjong.Suit || (Mahjong.Suit = {}));
+    var Suit = Mahjong.Suit;
+    (function (MeldType) {
+        MeldType[MeldType["Chi"] = 0] = "Chi";
+        MeldType[MeldType["Pon"] = 1] = "Pon";
+        MeldType[MeldType["Kan"] = 2] = "Kan";
+    })(Mahjong.MeldType || (Mahjong.MeldType = {}));
+    var MeldType = Mahjong.MeldType;
     class MoveRequestMessage extends GameMessage {
         constructor(moveType, tileId) {
             super(MessageId.SMSG_DEAL_TILE);

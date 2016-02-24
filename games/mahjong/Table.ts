@@ -19,18 +19,18 @@ namespace Mahjong {
 
         private getAvailableMovesOnOpponentsTurn(newTile: TileId, hand: Hand): Move[] {
             let moves: Move[] = [];
-            if (this.isPreviousPlayerTurn(hand) && this.canCompleteRun(newTile)) {
+            if (this.isPreviousPlayerTurn(hand) && this.canCompleteRun(newTile, hand)) {
                 moves.push(new Move(MoveType.Chi, newTile));
             }
             return moves;
         }
 
-        private canCompleteRun(tile: TileId): boolean {
-            return true;
+        private canCompleteRun(tile: TileId, hand: Hand): boolean {
+
         }
 
         private isPreviousPlayerTurn(hand: Hand): boolean {
-            return WIND_SUCCESSION.getPrevious(hand.wind) == this.currentTurn;
+            return WIND_SUCCESSION.precedes(this.currentTurn, hand.wind);
         }
 
         private isMyTurn(hand: Hand): boolean {
