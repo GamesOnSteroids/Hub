@@ -1,6 +1,7 @@
 node_modules/
 typings/
-*.iml
+.dist
 .idea
+*.iml
 *.js
 *.js.map
