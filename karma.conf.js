@@ -25,7 +25,7 @@ module.exports = function(config) {
             'app/games/**/*.js',
             'app/**/*.test.js'
         ],
-        browsers: ['PhantomJS'],
+        browsers: ['Chrome'],
 
     });
 };
