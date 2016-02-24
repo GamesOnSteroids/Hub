@@ -90,37 +90,36 @@ namespace Mahjong.Client {
             let hand = new Hand();
             hand.tiles = [];
             for (let i = 0; i < 12; i++) {
-                let tile = new Tile();
+                let tile = TILE_MAP.get(TileId.Pin1);
                 hand.tiles.push(tile);
             }
-
-            return;
-            this.drawHand(ctx, hand);
-            {
-                let x = 160;
-                let y = 20;
-                for (let i = 0; i < 12; i++) {
-                    let image = this.assets.back;
-                    ctx.drawImage(image, 0, 0, image.width, image.height, x, y, image.width, image.height);
-                    x += 23;
-                }
-            }
-            {
-                let y = 140;
-                for (let i = 0; i < 12; i++) {
-                    let image = this.assets.side;
-                    ctx.drawImage(image, 0, 0, image.width, image.height, 40, y, image.width, image.height);
-                    y += 12;
-                }
-            }
-            {
-                let y = 140;
-                for (let i = 0; i < 12; i++) {
-                    let image = this.assets.side;
-                    ctx.drawImage(image, 0, 0, image.width, image.height, 540, y, image.width, image.height);
-                    y += 12;
-                }
-            }
+            //
+            //this.drawHand(ctx, hand);
+            //{
+            //    let x = 160;
+            //    let y = 20;
+            //    for (let i = 0; i < 12; i++) {
+            //        let image = this.assets.back;
+            //        ctx.drawImage(image, 0, 0, image.width, image.height, x, y, image.width, image.height);
+            //        x += 23;
+            //    }
+            //}
+            //{
+            //    let y = 140;
+            //    for (let i = 0; i < 12; i++) {
+            //        let image = this.assets.side;
+            //        ctx.drawImage(image, 0, 0, image.width, image.height, 40, y, image.width, image.height);
+            //        y += 12;
+            //    }
+            //}
+            //{
+            //    let y = 140;
+            //    for (let i = 0; i < 12; i++) {
+            //        let image = this.assets.side;
+            //        ctx.drawImage(image, 0, 0, image.width, image.height, 540, y, image.width, image.height);
+            //        y += 12;
+            //    }
+            //}
         }
 
         private drawWall(ctx: CanvasRenderingContext2D): void {

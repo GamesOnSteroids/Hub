@@ -6,7 +6,7 @@ namespace Mahjong {
     export class Tile {
 
         private get succession(): TileSuccession<Tile> {
-            return new TileSuccession<Tile>(Tile.ofSuit(suit), false);
+            return new TileSuccession<Tile>(Tile.ofSuit(this.suit), false);
         }
 
         constructor(public id: TileId, public type: TileType, public suit: Suit) {

@@ -26,7 +26,7 @@ namespace Mahjong {
         }
 
         private canCompleteRun(tile: TileId, hand: Hand): boolean {
-
+            throw "Not implemented";
         }
 
         private isPreviousPlayerTurn(hand: Hand): boolean {
