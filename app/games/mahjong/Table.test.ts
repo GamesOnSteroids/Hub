@@ -3,8 +3,13 @@ namespace Mahjong.Test {
 
     describe("chi tests", () => {
 
+        let table = new Table();
+        table.currentTurn = Wind.North;
+        let myHand = new Hand();
+        myHand.wind = Wind.East;
+
         beforeEach(() => {
-            //spyOn(hand, "someMethod").andCallThrough();
+
         });
 
         afterEach(() => {
@@ -12,10 +17,9 @@ namespace Mahjong.Test {
         });
 
         it("man 123", () => {
-            let table = new Table();
-            let myHand = new Hand();
+
             myHand.tiles.push(TILE_MAP.get(TileId.Man1), TILE_MAP.get(TileId.Man2));
-            let moves = table.getAvailableMovesOnYourTurn(TileId.Man1, myHand);
+            let moves = table.getAvailableMoves(TileId.Man1, myHand);
             expect(moves.length).toBe(1, "One available move expected");
             expect(moves[0].type).toBe(Mahjong.MoveType.Chi, "Move should be chi");
             expect(moves[0].tile[0]).toBe(TileId.Man1);

@@ -4,7 +4,7 @@ module.exports = function(config) {
         frameworks: ['jasmine'],
         plugins: [
             "karma-jasmine",
-            "karma-requirejs"
+            "karma-phantomjs-launcher"
         ],
         files: [
             "https://cdnjs.cloudflare.com/ajax/libs/react/0.14.4/react.js",
@@ -25,7 +25,7 @@ module.exports = function(config) {
             'app/games/**/*.js',
             'app/**/*.test.js'
         ],
-        browsers: ['Chrome'],
+        browsers: ['PhantomJS'],
 
     });
 };
