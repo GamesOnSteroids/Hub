@@ -52,13 +52,46 @@ var Mahjong;
         TileId[TileId["White"] = 33] = "White";
     })(Mahjong.TileId || (Mahjong.TileId = {}));
     var TileId = Mahjong.TileId;
-    var Wind;
     (function (Wind) {
         Wind[Wind["East"] = 0] = "East";
         Wind[Wind["South"] = 1] = "South";
         Wind[Wind["West"] = 2] = "West";
         Wind[Wind["North"] = 3] = "North";
-    })(Wind || (Wind = {}));
+    })(Mahjong.Wind || (Mahjong.Wind = {}));
+    var Wind = Mahjong.Wind;
+    Mahjong.WIND_SUCCESSION = new TileSuccession([Wind.East, Wind.South, Wind.West, Wind.North], true);
+    class TileSuccession {
+        constructor(list, circular) {
+            this.list = list;
+            this.circular = circular;
+        }
+        getNext(item) {
+            return this.getNthFrom(item, 1);
+        }
+        getPrevious(item) {
+            return this.getNthFrom(item, -1);
+        }
+        succedes(a, b) {
+            return this.getNext(b) == a;
+        }
+        precedes(a, b) {
+            return this.getNext(a) == b;
+        }
+        getNthFrom(item, n) {
+            let index = this.list.indexOf(item);
+            let nthIndex = index + n;
+            if (this.circular) {
+                nthIndex %= this.list.length;
+            }
+            if (nthIndex >= this.list.length || nthIndex < 0) {
+                return null;
+            }
+            else {
+                return this.list[nthIndex];
+            }
+        }
+    }
+    Mahjong.TileSuccession = TileSuccession;
     (function (MessageId) {
         MessageId[MessageId["SMSG_DEAL_TILE"] = 1] = "SMSG_DEAL_TILE";
         MessageId[MessageId["CMSG_MOVE_REQUEST"] = 2] = "CMSG_MOVE_REQUEST";
@@ -78,6 +111,39 @@ var Mahjong;
         MoveType[MoveType["Discard"] = 8] = "Discard";
     })(Mahjong.MoveType || (Mahjong.MoveType = {}));
     var MoveType = Mahjong.MoveType;
+    class Move {
+        constructor(type, tile) {
+            this.type = type;
+            this.tile = tile;
+        }
+    }
+    Mahjong.Move = Move;
+    class Meld {
+        constructor(tiles, type) {
+            this.tiles = tiles;
+            this.type = type;
+        }
+    }
+    Mahjong.Meld = Meld;
+    (function (TileType) {
+        TileType[TileType["Suit"] = 0] = "Suit";
+        TileType[TileType["Dragon"] = 1] = "Dragon";
+        TileType[TileType["Wind"] = 2] = "Wind";
+    })(Mahjong.TileType || (Mahjong.TileType = {}));
+    var TileType = Mahjong.TileType;
+    (function (Suit) {
+        Suit[Suit["Pin"] = 0] = "Pin";
+        Suit[Suit["Man"] = 1] = "Man";
+        Suit[Suit["Sou"] = 2] = "Sou";
+        Suit[Suit["Honor"] = 3] = "Honor";
+    })(Mahjong.Suit || (Mahjong.Suit = {}));
+    var Suit = Mahjong.Suit;
+    (function (MeldType) {
+        MeldType[MeldType["Chi"] = 0] = "Chi";
+        MeldType[MeldType["Pon"] = 1] = "Pon";
+        MeldType[MeldType["Kan"] = 2] = "Kan";
+    })(Mahjong.MeldType || (Mahjong.MeldType = {}));
+    var MeldType = Mahjong.MeldType;
     class MoveRequestMessage extends GameMessage {
         constructor(moveType, tileId) {
             super(MessageId.SMSG_DEAL_TILE);

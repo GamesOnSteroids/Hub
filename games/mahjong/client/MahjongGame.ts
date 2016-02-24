@@ -11,44 +11,6 @@ namespace Mahjong.Client {
 
     const TILE_SIZE = 30;
 
-    enum TileType {
-        Suite,
-        Dragon,
-        Wind,
-    }
-    enum SuiteType {
-        Pin,
-        Man,
-        Sou
-    }
-
-    class Tile {
-        public suite: SuiteType;
-        public number: number;
-    }
-
-    enum SetType {
-        Chi,
-        Pon,
-        Kan
-    }
-
-    class Set {
-        tiles: Tile[];
-
-        // todo: closed kan
-    }
-
-    export class Hand {
-        public tiles: Tile[];
-        public discards: Set[];
-        public pond: Tile[];
-
-        public someMethod() {
-            return "test";
-        }
-    }
-
     export class MahjongGame extends Game {
 
         private camera: Camera;

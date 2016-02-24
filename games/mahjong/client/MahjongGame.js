@@ -20,34 +20,6 @@ var Mahjong;
         var Game = Play.Client.Game;
         var Mouse = Play.Client.Mouse;
         const TILE_SIZE = 30;
-        var TileType;
-        (function (TileType) {
-            TileType[TileType["Suite"] = 0] = "Suite";
-            TileType[TileType["Dragon"] = 1] = "Dragon";
-            TileType[TileType["Wind"] = 2] = "Wind";
-        })(TileType || (TileType = {}));
-        var SuiteType;
-        (function (SuiteType) {
-            SuiteType[SuiteType["Pin"] = 0] = "Pin";
-            SuiteType[SuiteType["Man"] = 1] = "Man";
-            SuiteType[SuiteType["Sou"] = 2] = "Sou";
-        })(SuiteType || (SuiteType = {}));
-        class Tile {
-        }
-        var SetType;
-        (function (SetType) {
-            SetType[SetType["Chi"] = 0] = "Chi";
-            SetType[SetType["Pon"] = 1] = "Pon";
-            SetType[SetType["Kan"] = 2] = "Kan";
-        })(SetType || (SetType = {}));
-        class Set {
-        }
-        class Hand {
-            someMethod() {
-                return "test";
-            }
-        }
-        Client.Hand = Hand;
         class MahjongGame extends Game {
             constructor(lobby) {
                 super(lobby);
@@ -90,11 +62,11 @@ var Mahjong;
                 ctx.fillStyle = "#2F6231";
                 ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
                 ctx.setTransform(this.camera.scaleX, 0, 0, this.camera.scaleY, this.camera.translateX, this.camera.translateY);
-                this.drawWalls(ctx);
-                let hand = new Hand();
+                this.drawWall(ctx);
+                let hand = new Mahjong.Hand();
                 hand.tiles = [];
                 for (let i = 0; i < 12; i++) {
-                    let tile = new Tile();
+                    let tile = new Mahjong.Tile();
                     hand.tiles.push(tile);
                 }
                 return;
@@ -126,29 +98,11 @@ var Mahjong;
                 }
             }
             drawWall(ctx) {
-            }
-            drawWalls(ctx) {
-                let wallBreak = 7 * 2;
+                let x = 138;
+                let y = 123;
                 let wallSize = 34;
                 let tilesInAllWalls = 43;
-                if (tilesInAllWalls > wallSize * 1) {
-                    let x = 527;
-                    let y = 122;
-                    let tilesInWall = Math.min(tilesInAllWalls - wallSize * 1, wallSize);
-                    for (let i = 0; i < tilesInWall; i++) {
-                        let image = this.assets.backside;
-                        if (i % 2 == 0) {
-                            ctx.drawImage(image, 0, 0, image.width, image.height, x, y, image.width, image.height);
-                        }
-                        else {
-                            ctx.drawImage(image, 0, 0, image.width, image.height, x, y - 12, image.width, image.height);
-                            y += 12;
-                        }
-                    }
-                }
                 {
-                    let x = 526;
-                    let y = 130;
                     let tilesInWall = Math.min(tilesInAllWalls, wallSize);
                     for (let i = 0; i < tilesInWall; i++) {
                         let image = this.assets.backdown;
@@ -157,13 +111,13 @@ var Mahjong;
                         }
                         else {
                             ctx.drawImage(image, 0, 0, image.width, image.height, x, y - 12, image.width, image.height);
-                            x -= image.width;
+                            x += image.width;
                         }
                     }
                 }
                 if (tilesInAllWalls > wallSize * 1) {
-                    let x = 527;
-                    let y = 122;
+                    x = 527;
+                    y = 122;
                     let tilesInWall = Math.min(tilesInAllWalls - wallSize * 1, wallSize);
                     for (let i = 0; i < tilesInWall; i++) {
                         let image = this.assets.backside;
@@ -173,21 +127,6 @@ var Mahjong;
                         else {
                             ctx.drawImage(image, 0, 0, image.width, image.height, x, y - 12, image.width, image.height);
                             y += 12;
-                        }
-                    }
-                }
-                if (tilesInAllWalls > wallSize * 2) {
-                    let x = 527;
-                    let y = 122;
-                    let tilesInWall = Math.min(tilesInAllWalls - wallSize * 2, wallSize);
-                    for (let i = 0; i < tilesInWall; i++) {
-                        let image = this.assets.backside;
-                        if (i % 2 == 0) {
-                            ctx.drawImage(image, 0, 0, image.width, image.height, x, y, image.width, image.height);
-                        }
-                        else {
-                            ctx.drawImage(image, 0, 0, image.width, image.height, x, y - 12, image.width, image.height);
-                            y -= 12;
                         }
                     }
                 }
