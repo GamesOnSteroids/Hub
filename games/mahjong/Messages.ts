@@ -40,11 +40,48 @@ namespace Mahjong {
         White
     }
 
-    enum Wind {
+    export enum Wind {
         East,
         South,
         West,
         North,
+    }
+
+    export var WIND_SUCCESSION = new TileSuccession<Wind>([Wind.East, Wind.South, Wind.West, Wind.North], true);
+
+    export class TileSuccession<T> {
+
+        constructor(private list: T[], private circular: boolean) {}
+
+        public getNext(item: T): T {
+            return this.getNthFrom(item, 1);
+        }
+
+        public getPrevious(item: T): T {
+            return this.getNthFrom(item, -1);
+        }
+
+        public succedes(a: T, b: T): boolean {
+            return this.getNext(b) == a;
+        }
+
+        public precedes(a: T, b: T): boolean {
+            return this.getNext(a) == b;
+        }
+
+        private getNthFrom(item: T, n: number): T {
+            let index = this.list.indexOf(item);
+            let nthIndex = index + n;
+            if (this.circular) {
+                nthIndex %= this.list.length;
+            }
+            if (nthIndex >= this.list.length || nthIndex < 0) {
+                return undefined;
+            } else {
+                return this.list[nthIndex];
+            }
+        }
+
     }
 
     export enum MessageId {
@@ -65,6 +102,42 @@ namespace Mahjong {
         Tsumo,
         Pass,
         Discard
+    }
+
+    export class Move {
+
+        constructor(public type: MoveType, public tile: TileId) {
+        }
+
+    }
+
+    export class Meld {
+        public tiles: TileId[];
+        public open: boolean;
+
+        // todo: closed kan
+    }
+
+    enum TileType {
+        Suite,
+        Dragon,
+        Wind,
+    }
+    enum SuiteType {
+        Pin,
+        Man,
+        Sou
+    }
+
+    export class Tile {
+        public id: TileId;
+
+    }
+
+    enum SetType {
+        Chi,
+        Pon,
+        Kan
     }
 
     export class MoveRequestMessage extends GameMessage {

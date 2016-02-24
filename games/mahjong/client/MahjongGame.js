@@ -20,30 +20,6 @@ var Mahjong;
         var Game = Play.Client.Game;
         var Mouse = Play.Client.Mouse;
         const TILE_SIZE = 30;
-        var TileType;
-        (function (TileType) {
-            TileType[TileType["Suite"] = 0] = "Suite";
-            TileType[TileType["Dragon"] = 1] = "Dragon";
-            TileType[TileType["Wind"] = 2] = "Wind";
-        })(TileType || (TileType = {}));
-        var SuiteType;
-        (function (SuiteType) {
-            SuiteType[SuiteType["Pin"] = 0] = "Pin";
-            SuiteType[SuiteType["Man"] = 1] = "Man";
-            SuiteType[SuiteType["Sou"] = 2] = "Sou";
-        })(SuiteType || (SuiteType = {}));
-        class Tile {
-        }
-        var SetType;
-        (function (SetType) {
-            SetType[SetType["Chi"] = 0] = "Chi";
-            SetType[SetType["Pon"] = 1] = "Pon";
-            SetType[SetType["Kan"] = 2] = "Kan";
-        })(SetType || (SetType = {}));
-        class Set {
-        }
-        class Hand {
-        }
         class MahjongGame extends Game {
             constructor(lobby) {
                 super(lobby);
@@ -87,10 +63,10 @@ var Mahjong;
                 ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
                 ctx.setTransform(this.camera.scaleX, 0, 0, this.camera.scaleY, this.camera.translateX, this.camera.translateY);
                 this.drawWall(ctx);
-                let hand = new Hand();
+                let hand = new Mahjong.Hand();
                 hand.tiles = [];
                 for (let i = 0; i < 12; i++) {
-                    let tile = new Tile();
+                    let tile = new Mahjong.Tile();
                     hand.tiles.push(tile);
                 }
                 return;
