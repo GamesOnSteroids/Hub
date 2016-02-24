@@ -1,5 +1,6 @@
-import SyntheticEvent = __React.SyntheticEvent;
 "use strict";
+
+import SyntheticEvent = __React.SyntheticEvent;
 
 class Header extends React.Component<any, any> {
 

@@ -39,10 +39,14 @@ namespace Mahjong.Client {
         // todo: closed kan
     }
 
-    class Hand {
+    export class Hand {
         public tiles: Tile[];
         public discards: Set[];
         public pond: Tile[];
+
+        public someMethod() {
+            return "test";
+        }
     }
 
     export class MahjongGame extends Game {
@@ -119,7 +123,7 @@ namespace Mahjong.Client {
 
             ctx.setTransform(this.camera.scaleX, 0, 0, this.camera.scaleY, this.camera.translateX, this.camera.translateY);
 
-            this.drawWall(ctx);
+            this.drawWalls(ctx);
 
             let hand = new Hand();
             hand.tiles = [];
@@ -158,29 +162,19 @@ namespace Mahjong.Client {
         }
 
         private drawWall(ctx: CanvasRenderingContext2D): void {
-            let x = 138;
-            let y = 123;
 
+        }
+
+        private drawWalls(ctx: CanvasRenderingContext2D): void {
+
+            let wallBreak = 7 * 2;
             let wallSize = 34;
 
             let tilesInAllWalls = 43;
 
-            {
-                let tilesInWall = Math.min(tilesInAllWalls, wallSize);
-                for (let i = 0; i < tilesInWall; i++) {
-                    let image = this.assets.backdown;
-                    if (i % 2 == 0) {
-                        ctx.drawImage(image, 0, 0, image.width, image.height, x, y, image.width, image.height);
-                    } else {
-                        ctx.drawImage(image, 0, 0, image.width, image.height, x, y - 12, image.width, image.height);
-                        x += image.width;
-                    }
-                }
-            }
-
             if (tilesInAllWalls > wallSize * 1) {
-                x = 527;
-                y = 122;
+                let x = 527;
+                let y = 122;
                 let tilesInWall = Math.min(tilesInAllWalls - wallSize * 1, wallSize);
                 for (let i = 0; i < tilesInWall; i++) {
                     let image = this.assets.backside;
@@ -189,6 +183,54 @@ namespace Mahjong.Client {
                     } else {
                         ctx.drawImage(image, 0, 0, image.width, image.height, x, y - 12, image.width, image.height);
                         y += 12;
+                    }
+                }
+            }
+
+
+            {
+                let x = 526;
+                let y = 130;
+
+
+                let tilesInWall = Math.min(tilesInAllWalls, wallSize);
+                for (let i = 0; i < tilesInWall; i++) {
+                    let image = this.assets.backdown;
+                    if (i % 2 == 0) {
+                        ctx.drawImage(image, 0, 0, image.width, image.height, x, y, image.width, image.height);
+                    } else {
+                        ctx.drawImage(image, 0, 0, image.width, image.height, x, y - 12, image.width, image.height);
+                        x -= image.width;
+                    }
+                }
+            }
+
+            if (tilesInAllWalls > wallSize * 1) {
+                let x = 527;
+                let y = 122;
+                let tilesInWall = Math.min(tilesInAllWalls - wallSize * 1, wallSize);
+                for (let i = 0; i < tilesInWall; i++) {
+                    let image = this.assets.backside;
+                    if (i % 2 == 0) {
+                        ctx.drawImage(image, 0, 0, image.width, image.height, x, y, image.width, image.height);
+                    } else {
+                        ctx.drawImage(image, 0, 0, image.width, image.height, x, y - 12, image.width, image.height);
+                        y += 12;
+                    }
+                }
+            }
+
+            if (tilesInAllWalls > wallSize * 2) {
+                let x = 527;
+                let y = 122;
+                let tilesInWall = Math.min(tilesInAllWalls - wallSize * 2, wallSize);
+                for (let i = 0; i < tilesInWall; i++) {
+                    let image = this.assets.backside;
+                    if (i % 2 == 0) {
+                        ctx.drawImage(image, 0, 0, image.width, image.height, x, y, image.width, image.height);
+                    } else {
+                        ctx.drawImage(image, 0, 0, image.width, image.height, x, y - 12, image.width, image.height);
+                        y -= 12;
                     }
                 }
             }

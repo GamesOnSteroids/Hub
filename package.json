@@ -5,10 +5,17 @@
   "main": "index.js",
   "dependencies": {
     "firebase": "^2.4.0",
+    "karma": "^0.13.21",
+    "karma-requirejs": "^0.2.5",
     "react": "^0.14.7",
-    "react-dom": "^0.14.7"
+    "react-dom": "^0.14.7",
+    "requirejs": "^2.1.22"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-gh-pages": "^0.5.4",
+    "gulp-typescript": "^2.12.0"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

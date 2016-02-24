@@ -50,13 +50,15 @@ document.onkeydown = function (event) {
     }
 };
 
-ReactDOM.render((
-    <ReactRouter.Router history={ReactRouter.hashHistory}>
-        <ReactRouter.Route path="/" component={App}>
-            <ReactRouter.IndexRoute component={GameList}/>
-            <ReactRouter.Route path="/games" component={GameList}/>
-            <ReactRouter.Route path="/lobby/:lobbyId" component={LobbyComponent}/>
-            <ReactRouter.Route path="*" component={NoMatch}/>
-        </ReactRouter.Route>
-    </ReactRouter.Router>
-), document.getElementById('content'));
+ReactDOM.render(
+    (
+        <ReactRouter.Router history={ReactRouter.hashHistory}>
+            <ReactRouter.Route path="/" component={App}>
+                <ReactRouter.IndexRoute component={GameList}/>
+                <ReactRouter.Route path="/games" component={GameList}/>
+                <ReactRouter.Route path="/lobby/:lobbyId" component={LobbyComponent}/>
+                <ReactRouter.Route path="*" component={NoMatch}/>
+            </ReactRouter.Route>
+        </ReactRouter.Router>
+    ),
+    document.getElementById("content"));

@@ -1,21 +1,23 @@
 {
   "name": "GamesOnSteroids",
   "ambientDependencies": {
-    "react-global": "github:DefinitelyTyped/DefinitelyTyped/react/react-global.d.ts#bcd5761826eb567876c197ccc6a87c4d05731054",
-    "react-dom": "github:DefinitelyTyped/DefinitelyTyped/react/react-dom.d.ts#bcd5761826eb567876c197ccc6a87c4d05731054",
-    "react-addons-create-fragment": "github:DefinitelyTyped/DefinitelyTyped/react/react-addons-create-fragment.d.ts#bcd5761826eb567876c197ccc6a87c4d05731054",
-    "react-addons-linked-state-mixin": "github:DefinitelyTyped/DefinitelyTyped/react/react-addons-linked-state-mixin.d.ts#bcd5761826eb567876c197ccc6a87c4d05731054",
-    "react-addons-transition-group": "github:DefinitelyTyped/DefinitelyTyped/react/react-addons-transition-group.d.ts#bcd5761826eb567876c197ccc6a87c4d05731054",
-    "react": "github:DefinitelyTyped/DefinitelyTyped/react/react.d.ts#bcd5761826eb567876c197ccc6a87c4d05731054",
-    "react-addons-perf": "github:DefinitelyTyped/DefinitelyTyped/react/react-addons-perf.d.ts#bcd5761826eb567876c197ccc6a87c4d05731054",
-    "react-addons-css-transition-group": "github:DefinitelyTyped/DefinitelyTyped/react/react-addons-css-transition-group.d.ts#bcd5761826eb567876c197ccc6a87c4d05731054",
-    "react-addons-pure-render-mixin": "github:DefinitelyTyped/DefinitelyTyped/react/react-addons-pure-render-mixin.d.ts#bcd5761826eb567876c197ccc6a87c4d05731054",
-    "react-addons-update": "github:DefinitelyTyped/DefinitelyTyped/react/react-addons-update.d.ts#bcd5761826eb567876c197ccc6a87c4d05731054",
-    "react-addons-test-utils": "github:DefinitelyTyped/DefinitelyTyped/react/react-addons-test-utils.d.ts#bcd5761826eb567876c197ccc6a87c4d05731054",
-    "firebase": "github:DefinitelyTyped/DefinitelyTyped/firebase/firebase.d.ts#bcd5761826eb567876c197ccc6a87c4d05731054",
     "MediaStream": "github:DefinitelyTyped/DefinitelyTyped/webrtc/MediaStream.d.ts#bcd5761826eb567876c197ccc6a87c4d05731054",
     "RTCPeerConnection": "github:DefinitelyTyped/DefinitelyTyped/webrtc/RTCPeerConnection.d.ts#bcd5761826eb567876c197ccc6a87c4d05731054",
-    "react-router": "github:DefinitelyTyped/DefinitelyTyped/react-router/react-router.d.ts#bcd5761826eb567876c197ccc6a87c4d05731054",
-    "history": "github:DefinitelyTyped/DefinitelyTyped/react-router/history.d.ts#bcd5761826eb567876c197ccc6a87c4d05731054"
+    "firebase": "github:DefinitelyTyped/DefinitelyTyped/firebase/firebase.d.ts#bcd5761826eb567876c197ccc6a87c4d05731054",
+    "history": "github:DefinitelyTyped/DefinitelyTyped/react-router/history.d.ts#bcd5761826eb567876c197ccc6a87c4d05731054",
+    "jasmine": "github:DefinitelyTyped/DefinitelyTyped/jasmine/jasmine.d.ts#dd638012d63e069f2c99d06ef4dcc9616a943ee4",
+    "karma": "github:DefinitelyTyped/DefinitelyTyped/karma/karma.d.ts#02dd2f323e1bcb8a823269f89e0909ec9e5e38b5",
+    "react": "github:DefinitelyTyped/DefinitelyTyped/react/react.d.ts#bcd5761826eb567876c197ccc6a87c4d05731054",
+    "react-addons-create-fragment": "github:DefinitelyTyped/DefinitelyTyped/react/react-addons-create-fragment.d.ts#bcd5761826eb567876c197ccc6a87c4d05731054",
+    "react-addons-css-transition-group": "github:DefinitelyTyped/DefinitelyTyped/react/react-addons-css-transition-group.d.ts#bcd5761826eb567876c197ccc6a87c4d05731054",
+    "react-addons-linked-state-mixin": "github:DefinitelyTyped/DefinitelyTyped/react/react-addons-linked-state-mixin.d.ts#bcd5761826eb567876c197ccc6a87c4d05731054",
+    "react-addons-perf": "github:DefinitelyTyped/DefinitelyTyped/react/react-addons-perf.d.ts#bcd5761826eb567876c197ccc6a87c4d05731054",
+    "react-addons-pure-render-mixin": "github:DefinitelyTyped/DefinitelyTyped/react/react-addons-pure-render-mixin.d.ts#bcd5761826eb567876c197ccc6a87c4d05731054",
+    "react-addons-test-utils": "github:DefinitelyTyped/DefinitelyTyped/react/react-addons-test-utils.d.ts#bcd5761826eb567876c197ccc6a87c4d05731054",
+    "react-addons-transition-group": "github:DefinitelyTyped/DefinitelyTyped/react/react-addons-transition-group.d.ts#bcd5761826eb567876c197ccc6a87c4d05731054",
+    "react-addons-update": "github:DefinitelyTyped/DefinitelyTyped/react/react-addons-update.d.ts#bcd5761826eb567876c197ccc6a87c4d05731054",
+    "react-dom": "github:DefinitelyTyped/DefinitelyTyped/react/react-dom.d.ts#bcd5761826eb567876c197ccc6a87c4d05731054",
+    "react-global": "github:DefinitelyTyped/DefinitelyTyped/react/react-global.d.ts#bcd5761826eb567876c197ccc6a87c4d05731054",
+    "react-router": "github:DefinitelyTyped/DefinitelyTyped/react-router/react-router.d.ts#bcd5761826eb567876c197ccc6a87c4d05731054"
   }
 }
