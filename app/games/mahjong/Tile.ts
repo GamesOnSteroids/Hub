@@ -1,6 +1,45 @@
 namespace Mahjong {
     "use strict";
 
+
+
+    export class Tile {
+
+        private get succession(): TileSuccession<Tile> {
+            return new TileSuccession<Tile>(Tile.ofSuit(suit), false);
+        }
+
+        constructor(public id: TileId, public type: TileType, public suit: Suit) {
+
+        }
+
+        public static ofSuit(suit: Suit): Tile[] {
+            return Array.from(TILE_MAP.values()).filter(tile => tile.suit == suit);
+        }
+
+        public static ofType(type: TileType): Tile[] {
+            return Array.from(TILE_MAP.values()).filter(tile => tile.type == type);
+        }
+
+        public getPrevious(): Tile {
+            return this.succession.getPrevious(this);
+        }
+
+        public getNext(): Tile {
+            return this.succession.getNext(this);
+        }
+
+        public succedes(tile: Tile): boolean {
+            return this.succession.succedes(this, tile);
+        }
+
+        public precedes(tile: Tile): boolean {
+            return this.succession.precedes(this, tile);
+        }
+
+    }
+
+
     export var TILE_MAP: Map<TileId, Tile> = new Map<TileId, Tile>([
         [TileId.Man1, new Tile(TileId.Man1, TileType.Suit, Suit.Man)],
         [TileId.Man2, new Tile(TileId.Man2, TileType.Suit, Suit.Man)],
@@ -41,39 +80,4 @@ namespace Mahjong {
         [TileId.Green, new Tile(TileId.Green, TileType.Dragon, Suit.Honor)],
         [TileId.White, new Tile(TileId.White, TileType.Dragon, Suit.Honor)],
     ]);
-
-    export class Tile {
-
-        private succession: TileSuccession<Tile>;
-
-        constructor(public id: TileId, public type: TileType, public suit: Suit) {
-            this.succession = new TileSuccession<Tile>(Tile.ofSuit(suit), false);
-        }
-
-        public static ofSuit(suit: Suit): Tile[] {
-            return Array.from(TILE_MAP.values()).filter(tile => tile.suit == suit);
-        }
-
-        public static ofType(type: TileType): Tile[] {
-            return Array.from(TILE_MAP.values()).filter(tile => tile.type == type);
-        }
-
-        public getPrevious(): Tile {
-            return this.succession.getPrevious(this);
-        }
-
-        public getNext(): Tile {
-            return this.succession.getNext(this);
-        }
-
-        public succedes(tile: Tile): boolean {
-            return this.succession.succedes(this, tile);
-        }
-
-        public precedes(tile: Tile): boolean {
-            return this.succession.precedes(this, tile);
-        }
-
-    }
-
 }

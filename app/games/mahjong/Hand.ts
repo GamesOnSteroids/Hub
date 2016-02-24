@@ -3,7 +3,7 @@ namespace Mahjong {
 
     export class Hand {
         public owner: PlayerInfo[];
-        public tiles: Tile[];
+        public tiles: Tile[] = [];
         public openMelds: Meld[];
         public wind: Wind;
         public pond: TileId[];

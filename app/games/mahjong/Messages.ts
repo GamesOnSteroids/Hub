@@ -47,8 +47,6 @@ namespace Mahjong {
         North,
     }
 
-    export var WIND_SUCCESSION = new TileSuccession<Wind>([Wind.East, Wind.South, Wind.West, Wind.North], true);
-
     export class TileSuccession<T> {
 
         constructor(private list: T[], private circular: boolean) {}
@@ -83,6 +81,9 @@ namespace Mahjong {
         }
 
     }
+
+    export var WIND_SUCCESSION = new TileSuccession<Wind>([Wind.East, Wind.South, Wind.West, Wind.North], true);
+
 
     export enum MessageId {
         SMSG_DEAL_TILE = 1,
