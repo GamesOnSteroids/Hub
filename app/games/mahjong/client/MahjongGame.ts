@@ -215,7 +215,7 @@ namespace Mahjong.Client {
         private async load(): Promise<any> {
             this.assets = {};
 
-            let root = "games/mahjong/assets/";
+            let root = "app/games/mahjong/assets/";
 
             this.assets.tiles = [];
             this.assets.tiles[TileId.Pin1] = await this.loadAsset(`${root}images/pin-1.png`);
@@ -227,10 +227,29 @@ namespace Mahjong.Client {
             this.assets.tiles[TileId.Pin7] = await this.loadAsset(`${root}images/pin-7.png`);
             this.assets.tiles[TileId.Pin8] = await this.loadAsset(`${root}images/pin-8.png`);
             this.assets.tiles[TileId.Pin9] = await this.loadAsset(`${root}images/pin-9.png`);
+            this.assets.tiles[TileId.Man1] = await this.loadAsset(`${root}images/man-1.png`);
+            this.assets.tiles[TileId.Man2] = await this.loadAsset(`${root}images/man-2.png`);
+            this.assets.tiles[TileId.Man3] = await this.loadAsset(`${root}images/man-3.png`);
+            this.assets.tiles[TileId.Man4] = await this.loadAsset(`${root}images/man-4.png`);
+            this.assets.tiles[TileId.Man5] = await this.loadAsset(`${root}images/man-5.png`);
+            this.assets.tiles[TileId.Man6] = await this.loadAsset(`${root}images/man-6.png`);
+            this.assets.tiles[TileId.Man7] = await this.loadAsset(`${root}images/man-7.png`);
+            this.assets.tiles[TileId.Man8] = await this.loadAsset(`${root}images/man-8.png`);
+            this.assets.tiles[TileId.Man9] = await this.loadAsset(`${root}images/man-9.png`);
+            this.assets.tiles[TileId.Sou1] = await this.loadAsset(`${root}images/sou-1.png`);
+            this.assets.tiles[TileId.Sou2] = await this.loadAsset(`${root}images/sou-2.png`);
+            this.assets.tiles[TileId.Sou3] = await this.loadAsset(`${root}images/sou-3.png`);
+            this.assets.tiles[TileId.Sou4] = await this.loadAsset(`${root}images/sou-4.png`);
+            this.assets.tiles[TileId.Sou5] = await this.loadAsset(`${root}images/sou-5.png`);
+            this.assets.tiles[TileId.Sou6] = await this.loadAsset(`${root}images/sou-6.png`);
+            this.assets.tiles[TileId.Sou7] = await this.loadAsset(`${root}images/sou-7.png`);
+            this.assets.tiles[TileId.Sou8] = await this.loadAsset(`${root}images/sou-8.png`);
+            this.assets.tiles[TileId.Sou9] = await this.loadAsset(`${root}images/sou-9.png`);
 
             this.assets.back = await this.loadAsset(`${root}images/back.png`);
             this.assets.backdown = await this.loadAsset(`${root}images/back-down.png`);
             this.assets.backside = await this.loadAsset(`${root}images/back-side.png`);
+            this.assets.side = await this.loadAsset(`${root}images/side.png`);
 
 
         }

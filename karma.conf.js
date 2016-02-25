@@ -10,10 +10,6 @@ module.exports = function (config) {
                 pattern: '**/*.js.map',
                 included: false
             },
-            {
-                pattern: '**/*.ts',
-                included: false
-            },
             "https://cdnjs.cloudflare.com/ajax/libs/react/0.14.4/react.js",
             "https://cdnjs.cloudflare.com/ajax/libs/react/0.14.4/react-dom.js",
             "https://npmcdn.com/history/umd/History.js",

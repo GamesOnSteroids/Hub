@@ -129,7 +129,7 @@ namespace Tetrominoes.Client {
         }
 
         private load(): void {
-            let root = "games/tetrominoes/assets/";
+            let root = "app/games/tetrominoes/assets/";
 
             this.assets = {};
             this.assets.tiles = [];

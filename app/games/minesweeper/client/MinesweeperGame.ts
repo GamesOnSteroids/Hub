@@ -296,7 +296,7 @@ namespace Minesweeper.Client {
         private load(): void {
             this.assets = {};
 
-            let root = "games/minesweeper/assets/";
+            let root = "app/games/minesweeper/assets/";
 
             this.assets.hidden = new Image();
             this.assets.hidden.src = root + "images/hidden.png";
