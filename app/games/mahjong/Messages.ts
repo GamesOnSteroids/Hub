@@ -114,14 +114,26 @@ namespace Mahjong {
     export class Meld {
         public open: boolean;
 
-        constructor(public tiles: Tile[], public type: MeldType) {}
+        constructor(public tiles: Tiles, public type: MeldType) {}
 
         public getTileIds(): TileId[] {
-            return this.tiles.map(t => t.id);
+            return this.tiles.getTileIds();
+        }
+
+        public count(tile: Tile): number {
+            return this.tiles.count(tile);
+        }
+
+        public contains(tile: Tile): boolean {
+            return this.tiles.contains(tile);
+        }
+
+        public equals(other: Meld): boolean {
+            return this.tiles.equals(other.tiles);
         }
 
         public toString(): string {
-            return this.tiles.map(t => t.toString()).join("/");
+            return this.tiles.tiles.map(t => t.toString()).join("/") + "::" + MeldType[this.type];
         }
         // todo: closed kan
     }

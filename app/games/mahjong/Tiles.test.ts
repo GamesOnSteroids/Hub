@@ -11,6 +11,14 @@ namespace Mahjong.Test {
             Tile.MAN_1, Tile.MAN_1
         ]);
 
+        let difficultTiles = new Tiles([
+            Tile.MAN_1, Tile.MAN_2, Tile.MAN_3,
+            Tile.MAN_4, Tile.MAN_5, Tile.MAN_6,
+            Tile.MAN_5, Tile.MAN_5, Tile.MAN_5,
+            Tile.MAN_1, Tile.MAN_2, Tile.MAN_3,
+            Tile.MAN_2, Tile.MAN_2
+        ]);
+
         it("withoutTiles", () => {
             let tilesToRemove = [Tile.MAN_1, Tile.MAN_2, Tile.MAN_3];
             let reducedTiles = tiles.withoutTiles(tilesToRemove);
@@ -18,8 +26,24 @@ namespace Mahjong.Test {
         });
 
         it("grouping", () => {
-            let possibleGroupings = tiles.getPossibleGroupings();
-            console.log(possibleGroupings);
+            expect(tiles.getPossibleGroupings().length).toBe(2);
+            let possibleGroupings = difficultTiles.getPossibleGroupings();
+            expect(possibleGroupings.length).toBe(5);
+            for (let i = 0; i < possibleGroupings.length; i++) {
+                let g = possibleGroupings[i];
+                let sameGroupings = possibleGroupings.filter((pg, j) => i != j && pg.equals(g));
+                expect(sameGroupings.length).toBe(0);
+            }
+        });
+
+        it("getUniqueMelds", () => {
+            expect(tiles.getUniqueMelds().length).toBe(5);
+            expect(difficultTiles.getUniqueMelds().length).toBe(6);
+        });
+
+        it("getAmbiguousMelds", () => {
+            expect(tiles.getAmbiguousMelds(tiles.getUniqueMelds()).length).toBe(2);
+            expect(difficultTiles.getAmbiguousMelds(difficultTiles.getUniqueMelds()).length).toBe(6);
         });
 
     });
