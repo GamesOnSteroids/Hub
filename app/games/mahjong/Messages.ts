@@ -4,47 +4,47 @@ namespace Mahjong {
     import GameMessage = Play.GameMessage;
 
     export enum TileId {
-        Man1,
-        Man2,
-        Man3,
-        Man4,
-        Man5,
-        Man6,
-        Man7,
-        Man8,
-        Man9,
-        Pin1,
-        Pin2,
-        Pin3,
-        Pin4,
-        Pin5,
-        Pin6,
-        Pin7,
-        Pin8,
-        Pin9,
-        Sou1,
-        Sou2,
-        Sou3,
-        Sou4,
-        Sou5,
-        Sou6,
-        Sou7,
-        Sou8,
-        Sou9,
-        East,
-        South,
-        West,
-        North,
-        Red,
-        Green,
-        White
+        MAN_1,
+        MAN_2,
+        MAN_3,
+        MAN_4,
+        MAN_5,
+        MAN_6,
+        MAN_7,
+        MAN_8,
+        MAN_9,
+        PIN_1,
+        PIN_2,
+        PIN_3,
+        PIN_4,
+        PIN_5,
+        PIN_6,
+        PIN_7,
+        PIN_8,
+        PIN_9,
+        SOU_1,
+        SOU_2,
+        SOU_3,
+        SOU_4,
+        SOU_5,
+        SOU_6,
+        SOU_7,
+        SOU_8,
+        SOU_9,
+        EAST,
+        SOUTH,
+        WEST,
+        NORTH,
+        RED,
+        GREEN,
+        WHITE
     }
 
     export enum Wind {
-        East,
-        South,
-        West,
-        North,
+        EAST,
+        SOUTH,
+        WEST,
+        NORTH,
     }
 
     export class TileSuccession<T> {
@@ -92,22 +92,21 @@ namespace Mahjong {
         SMSG_SEAT_START = 4
     }
 
-
     export enum MoveType {
-        Chi,
-        Pon,
-        Richii,
-        ClosedKan,
-        OpenKan,
-        Ron,
-        Tsumo,
-        Pass,
-        Discard
+        CHI,
+        PON,
+        RIICHI,
+        CLOSED_KAN,
+        OPEN_KAN,
+        RON,
+        TSUMO,
+        PASS,
+        DISCARD
     }
 
     export class Move {
 
-        constructor(public type: MoveType, public tile: TileId) {
+        constructor(public type: MoveType, public tiles: TileId[]) {
         }
 
     }
@@ -117,26 +116,39 @@ namespace Mahjong {
 
         constructor(public tiles: Tile[], public type: MeldType) {}
 
+        public getTileIds(): TileId[] {
+            return this.tiles.map(t => t.id);
+        }
+
+        public toString(): string {
+            return this.tiles.map(t => t.toString()).join("/");
+        }
         // todo: closed kan
     }
 
+    export class MeldCollection {
+
+        constructor(public melds: Meld[]) {}
+
+    }
+
     export enum TileType {
-        Suit,
-        Dragon,
-        Wind,
+        NUMBER,
+        DRAGON,
+        WIND,
     }
 
     export enum Suit {
-        Pin,
-        Man,
-        Sou,
-        Honor
+        PIN,
+        MAN,
+        SOU,
+        HONOR
     }
 
     export enum MeldType {
-        Chi,
-        Pon,
-        Kan
+        CHI,
+        PON,
+        KAN
     }
 
     export class MoveRequestMessage extends GameMessage {

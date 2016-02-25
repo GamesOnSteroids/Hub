@@ -5,7 +5,8 @@ namespace Mahjong {
         public hands: Hand[];
         public currentTurn: Wind;
 
-        public getAvailableMoves(newTile: TileId, hand: Hand): Move[] {
+        public getAvailableMoves(newTileId: TileId, hand: Hand): Move[] {
+            let newTile = TILE_MAP.get(newTileId);
             if (this.isMyTurn(hand)) {
                 return this.getAvailableMovesOnYourTurn(newTile, hand);
             } else {
@@ -13,20 +14,23 @@ namespace Mahjong {
             }
         }
 
-        private getAvailableMovesOnYourTurn(newTile: TileId, hand: Hand): Move[] {
+        private getAvailableMovesOnYourTurn(newTile: Tile, hand: Hand): Move[] {
             return [];
         }
 
-        private getAvailableMovesOnOpponentsTurn(newTile: TileId, hand: Hand): Move[] {
-            let moves: Move[] = [];
-            if (this.isPreviousPlayerTurn(hand) && this.canCompleteRun(newTile, hand)) {
-                moves.push(new Move(MoveType.Chi, newTile));
+        private getAvailableMovesOnOpponentsTurn(newTile: Tile, hand: Hand): Move[] {
+            let moves: Move[] = [ new Move(MoveType.PASS, null) ];
+            if (this.isPreviousPlayerTurn(hand)) {
+                hand.getPossibleRuns(newTile).forEach(meld => moves.push(new Move(MoveType.CHI, meld.getTileIds())));
+            }
+            hand.getPossibleSets(newTile).forEach(meld => {
+                let moveType = meld.type == MeldType.KAN ? MoveType.OPEN_KAN : MoveType.PON;
+                moves.push(new Move(moveType, meld.getTileIds()));
+            });
+            if (hand.isTenpai()) {
+
             }
             return moves;
-        }
-
-        private canCompleteRun(tile: TileId, hand: Hand): boolean {
-            throw "Not implemented";
         }
 
         private isPreviousPlayerTurn(hand: Hand): boolean {

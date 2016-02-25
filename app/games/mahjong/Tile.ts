@@ -5,11 +5,50 @@ namespace Mahjong {
 
     export class Tile {
 
+        public static MAN_1: Tile = new Tile(TileId.MAN_1, TileType.NUMBER, Suit.MAN, 1);
+        public static MAN_2: Tile = new Tile(TileId.MAN_2, TileType.NUMBER, Suit.MAN, 2);
+        public static MAN_3: Tile = new Tile(TileId.MAN_3, TileType.NUMBER, Suit.MAN, 3);
+        public static MAN_4: Tile = new Tile(TileId.MAN_4, TileType.NUMBER, Suit.MAN, 4);
+        public static MAN_5: Tile = new Tile(TileId.MAN_5, TileType.NUMBER, Suit.MAN, 5);
+        public static MAN_6: Tile = new Tile(TileId.MAN_6, TileType.NUMBER, Suit.MAN, 6);
+        public static MAN_7: Tile = new Tile(TileId.MAN_7, TileType.NUMBER, Suit.MAN, 7);
+        public static MAN_8: Tile = new Tile(TileId.MAN_8, TileType.NUMBER, Suit.MAN, 8);
+        public static MAN_9: Tile = new Tile(TileId.MAN_9, TileType.NUMBER, Suit.MAN, 9);
+
+        public static SOU_1: Tile = new Tile(TileId.SOU_1, TileType.NUMBER, Suit.SOU, 1);
+        public static SOU_2: Tile = new Tile(TileId.SOU_2, TileType.NUMBER, Suit.SOU, 2);
+        public static SOU_3: Tile = new Tile(TileId.SOU_3, TileType.NUMBER, Suit.SOU, 3);
+        public static SOU_4: Tile = new Tile(TileId.SOU_4, TileType.NUMBER, Suit.SOU, 4);
+        public static SOU_5: Tile = new Tile(TileId.SOU_5, TileType.NUMBER, Suit.SOU, 5);
+        public static SOU_6: Tile = new Tile(TileId.SOU_6, TileType.NUMBER, Suit.SOU, 6);
+        public static SOU_7: Tile = new Tile(TileId.SOU_7, TileType.NUMBER, Suit.SOU, 7);
+        public static SOU_8: Tile = new Tile(TileId.SOU_8, TileType.NUMBER, Suit.SOU, 8);
+        public static SOU_9: Tile = new Tile(TileId.SOU_9, TileType.NUMBER, Suit.SOU, 9);
+
+        public static PIN_1: Tile = new Tile(TileId.PIN_1, TileType.NUMBER, Suit.PIN, 1);
+        public static PIN_2: Tile = new Tile(TileId.PIN_2, TileType.NUMBER, Suit.PIN, 2);
+        public static PIN_3: Tile = new Tile(TileId.PIN_3, TileType.NUMBER, Suit.PIN, 3);
+        public static PIN_4: Tile = new Tile(TileId.PIN_4, TileType.NUMBER, Suit.PIN, 4);
+        public static PIN_5: Tile = new Tile(TileId.PIN_5, TileType.NUMBER, Suit.PIN, 5);
+        public static PIN_6: Tile = new Tile(TileId.PIN_6, TileType.NUMBER, Suit.PIN, 6);
+        public static PIN_7: Tile = new Tile(TileId.PIN_7, TileType.NUMBER, Suit.PIN, 7);
+        public static PIN_8: Tile = new Tile(TileId.PIN_8, TileType.NUMBER, Suit.PIN, 8);
+        public static PIN_9: Tile = new Tile(TileId.PIN_9, TileType.NUMBER, Suit.PIN, 9);
+        
+        public static EAST: Tile = new Tile(TileId.EAST, TileType.WIND, Suit.HONOR, 1);
+        public static SOUTH: Tile = new Tile(TileId.SOUTH, TileType.WIND, Suit.HONOR, 2);
+        public static WEST: Tile = new Tile(TileId.WEST, TileType.WIND, Suit.HONOR, 3);
+        public static NORTH: Tile = new Tile(TileId.NORTH, TileType.WIND, Suit.HONOR, 4);
+        
+        public static RED: Tile = new Tile(TileId.RED, TileType.DRAGON, Suit.HONOR, 1);
+        public static GREEN: Tile = new Tile(TileId.GREEN, TileType.DRAGON, Suit.HONOR, 2);
+        public static WHITE: Tile = new Tile(TileId.WHITE, TileType.DRAGON, Suit.HONOR, 3);
+
         private get succession(): TileSuccession<Tile> {
             return new TileSuccession<Tile>(Tile.ofSuit(this.suit), false);
         }
 
-        constructor(public id: TileId, public type: TileType, public suit: Suit) {
+        constructor(public id: TileId, public type: TileType, public suit: Suit, public value: number) {
 
         }
 
@@ -37,47 +76,50 @@ namespace Mahjong {
             return this.succession.precedes(this, tile);
         }
 
+        public toString(): string {
+            return Suit[this.suit] + "." + this.value;
+        }
+
     }
 
-
     export var TILE_MAP: Map<TileId, Tile> = new Map<TileId, Tile>([
-        [TileId.Man1, new Tile(TileId.Man1, TileType.Suit, Suit.Man)],
-        [TileId.Man2, new Tile(TileId.Man2, TileType.Suit, Suit.Man)],
-        [TileId.Man3, new Tile(TileId.Man3, TileType.Suit, Suit.Man)],
-        [TileId.Man4, new Tile(TileId.Man4, TileType.Suit, Suit.Man)],
-        [TileId.Man5, new Tile(TileId.Man5, TileType.Suit, Suit.Man)],
-        [TileId.Man6, new Tile(TileId.Man6, TileType.Suit, Suit.Man)],
-        [TileId.Man7, new Tile(TileId.Man7, TileType.Suit, Suit.Man)],
-        [TileId.Man8, new Tile(TileId.Man8, TileType.Suit, Suit.Man)],
-        [TileId.Man9, new Tile(TileId.Man9, TileType.Suit, Suit.Man)],
+        [TileId.MAN_1, Tile.MAN_1],
+        [TileId.MAN_2, Tile.MAN_2],
+        [TileId.MAN_3, Tile.MAN_3],
+        [TileId.MAN_4, Tile.MAN_4],
+        [TileId.MAN_5, Tile.MAN_5],
+        [TileId.MAN_6, Tile.MAN_6],
+        [TileId.MAN_7, Tile.MAN_7],
+        [TileId.MAN_8, Tile.MAN_8],
+        [TileId.MAN_9, Tile.MAN_9],
 
-        [TileId.Sou1, new Tile(TileId.Sou1, TileType.Suit, Suit.Sou)],
-        [TileId.Sou2, new Tile(TileId.Sou2, TileType.Suit, Suit.Sou)],
-        [TileId.Sou3, new Tile(TileId.Sou3, TileType.Suit, Suit.Sou)],
-        [TileId.Sou4, new Tile(TileId.Sou4, TileType.Suit, Suit.Sou)],
-        [TileId.Sou5, new Tile(TileId.Sou5, TileType.Suit, Suit.Sou)],
-        [TileId.Sou6, new Tile(TileId.Sou6, TileType.Suit, Suit.Sou)],
-        [TileId.Sou7, new Tile(TileId.Sou7, TileType.Suit, Suit.Sou)],
-        [TileId.Sou8, new Tile(TileId.Sou8, TileType.Suit, Suit.Sou)],
-        [TileId.Sou9, new Tile(TileId.Sou9, TileType.Suit, Suit.Sou)],
+        [TileId.SOU_1, Tile.SOU_1],
+        [TileId.SOU_2, Tile.SOU_2],
+        [TileId.SOU_3, Tile.SOU_3],
+        [TileId.SOU_4, Tile.SOU_4],
+        [TileId.SOU_5, Tile.SOU_5],
+        [TileId.SOU_6, Tile.SOU_6],
+        [TileId.SOU_7, Tile.SOU_7],
+        [TileId.SOU_8, Tile.SOU_8],
+        [TileId.SOU_9, Tile.SOU_9],
 
-        [TileId.Pin1, new Tile(TileId.Pin1, TileType.Suit, Suit.Pin)],
-        [TileId.Pin2, new Tile(TileId.Pin2, TileType.Suit, Suit.Pin)],
-        [TileId.Pin3, new Tile(TileId.Pin3, TileType.Suit, Suit.Pin)],
-        [TileId.Pin4, new Tile(TileId.Pin4, TileType.Suit, Suit.Pin)],
-        [TileId.Pin5, new Tile(TileId.Pin5, TileType.Suit, Suit.Pin)],
-        [TileId.Pin6, new Tile(TileId.Pin6, TileType.Suit, Suit.Pin)],
-        [TileId.Pin7, new Tile(TileId.Pin7, TileType.Suit, Suit.Pin)],
-        [TileId.Pin8, new Tile(TileId.Pin8, TileType.Suit, Suit.Pin)],
-        [TileId.Pin9, new Tile(TileId.Pin9, TileType.Suit, Suit.Pin)],
+        [TileId.PIN_1, Tile.PIN_1],
+        [TileId.PIN_2, Tile.PIN_2],
+        [TileId.PIN_3, Tile.PIN_3],
+        [TileId.PIN_4, Tile.PIN_4],
+        [TileId.PIN_5, Tile.PIN_5],
+        [TileId.PIN_6, Tile.PIN_6],
+        [TileId.PIN_7, Tile.PIN_7],
+        [TileId.PIN_8, Tile.PIN_8],
+        [TileId.PIN_9, Tile.PIN_9],
 
-        [TileId.East, new Tile(TileId.East, TileType.Wind, Suit.Honor)],
-        [TileId.South, new Tile(TileId.South, TileType.Wind, Suit.Honor)],
-        [TileId.West, new Tile(TileId.West, TileType.Wind, Suit.Honor)],
-        [TileId.North, new Tile(TileId.North, TileType.Wind, Suit.Honor)],
+        [TileId.EAST, Tile.EAST],
+        [TileId.SOUTH, Tile.SOUTH],
+        [TileId.WEST, Tile.WEST],
+        [TileId.NORTH, Tile.NORTH],
 
-        [TileId.Red, new Tile(TileId.Red, TileType.Dragon, Suit.Honor)],
-        [TileId.Green, new Tile(TileId.Green, TileType.Dragon, Suit.Honor)],
-        [TileId.White, new Tile(TileId.White, TileType.Dragon, Suit.Honor)],
+        [TileId.RED, Tile.RED],
+        [TileId.GREEN, Tile.GREEN],
+        [TileId.WHITE, Tile.WHITE],
     ]);
 }

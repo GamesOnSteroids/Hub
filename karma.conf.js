@@ -29,7 +29,7 @@ module.exports = function (config) {
             'app/games/**/*.js',
             'app/**/*.test.js'
         ],
-        browsers: ['Chrome'],
+        browsers: ['ChromeCanary'],
 
     });
 }
