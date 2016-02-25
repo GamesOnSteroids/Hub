@@ -1,12 +1,19 @@
-module.exports = function(config) {
+module.exports = function (config) {
     config.set({
         basePath: '',
         frameworks: ['jasmine'],
         plugins: [
-            "karma-jasmine",
-            "karma-phantomjs-launcher"
+            "karma-jasmine"
         ],
         files: [
+            {
+                pattern: '**/*.js.map',
+                included: false
+            },
+            {
+                pattern: '**/*.ts',
+                included: false
+            },
             "https://cdnjs.cloudflare.com/ajax/libs/react/0.14.4/react.js",
             "https://cdnjs.cloudflare.com/ajax/libs/react/0.14.4/react-dom.js",
             "https://npmcdn.com/history/umd/History.js",
@@ -17,6 +24,7 @@ module.exports = function(config) {
             'app/play/Server/Client.js',
             'app/play/Server/Service.js',
             'app/play/**/*.js',
+            //'app/play/**/!*App.js',
             //'components/GameList.js',
             //'components/LobbyComponent.js',
             //'components/NoMatch.js',
@@ -28,4 +36,4 @@ module.exports = function(config) {
         browsers: ['Chrome'],
 
     });
-};
+}
