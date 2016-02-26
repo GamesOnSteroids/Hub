@@ -3,7 +3,8 @@ namespace Mahjong {
 
     export class Tiles {
 
-        constructor(public tiles: Tile[]) {}
+        constructor(public tiles: Tile[]) {
+        }
 
         public isEmpty(): boolean {
             return this.size() == 0;
@@ -11,6 +12,23 @@ namespace Mahjong {
 
         public size(): number {
             return this.tiles.length;
+        }
+
+        public getTileIds(): TileId[] {
+            return this.tiles.map(t => t.id);
+        }
+
+        public toString(): string {
+            return this.tiles.map(t => t.toString()).join(", ");
+        }
+
+        public equals(other: Tiles): boolean {
+            for (let tile of this.unique().tiles) {
+                if (this.count(tile) != other.count(tile)) {
+                    return false;
+                }
+            }
+            return this.tiles.length == other.tiles.length;
         }
 
         public withoutTile(tile: Tile): Tiles {
@@ -40,20 +58,20 @@ namespace Mahjong {
         }
 
         public getPossibleRuns(tile: Tile): Meld[] {
-            let runs: Tile[][] = [];
+            let runs: Tiles[] = [];
             if (tile.type == TileType.NUMBER) {
                 let previous = tile.getPrevious();
                 let next = tile.getNext();
                 if (this.contains(previous)) {
                     if (this.contains(next)) {
-                        runs.push([previous, tile, next]);
+                        runs.push(new Tiles([previous, tile, next]));
                     }
                     if (this.contains(previous.getPrevious())) {
-                        runs.push([previous.getPrevious(), previous, tile]);
+                        runs.push(new Tiles([previous.getPrevious(), previous, tile]));
                     }
                 }
                 if (this.contains(next) && this.contains(next.getNext())) {
-                    runs.push([tile, next, next.getNext()]);
+                    runs.push(new Tiles([tile, next, next.getNext()]));
                 }
             }
             return runs.map(tiles => new Meld(tiles, MeldType.CHI));
@@ -61,48 +79,46 @@ namespace Mahjong {
 
         public getPossibleSets(tile: Tile, includeKan: boolean = true): Meld[] {
             let sets: Meld[] = [];
-            if (this.containsAtLeast(tile, 2)) {
-                sets.push(new Meld([tile, tile, tile], MeldType.PON));
-                if (includeKan && this.containsAtLeast(tile, 3)) {
-                    sets.push(new Meld([tile, tile, tile, tile], MeldType.KAN));
+            if (this.count(tile) >= 2) {
+                sets.push(new Meld(new Tiles([tile, tile, tile]), MeldType.PON));
+                if (includeKan && this.count(tile) >= 3) {
+                    sets.push(new Meld(new Tiles([tile, tile, tile, tile]), MeldType.KAN));
                 }
             }
             return sets;
         }
 
-        public getPossibleMelds(tile: Tile, includeKan: boolean = true): Meld[] {
-            return this.getPossibleRuns(tile).concat(this.getPossibleSets(tile, includeKan));
-        }
-
         public contains(tile: Tile): boolean {
-            return this.containsAtLeast(tile, 1);
+            for (let t of this.tiles) {
+                if (t.id == tile.id) {
+                    return true;
+                }
+            }
+            return false;
         }
 
-        public containsAtLeast(tile: Tile, minimumCount: number): boolean {
+        public count(tile: Tile): number {
             if (tile == null) {
-                return false;
+                return 0;
             } else {
-                return this.tiles.filter(t => t.id == tile.id).length >= minimumCount;
+                return this.tiles.filter(t => t.id == tile.id).length;
             }
         }
 
-        public getAllMelds(): Meld[] {
+        public getUniqueMelds(): Meld[] {
             let melds: Meld[] = [];
-            this.tiles.forEach((tile, i) => {
-                if (this.tiles.length > i + 1) {
-                    let nextTile = this.tiles[i + 1];
-                    if (nextTile.id == tile.id) {
-                        if (this.tiles.length > i + 2) {
-                            let secondNextTile = this.tiles[i + 2];
-                            if (secondNextTile.id == tile.id) {
-                                melds.push(new Meld([tile, tile, tile], MeldType.PON));
-                            }
-                        }
-                    } else if (nextTile.succedes(tile)) {
-                        if (this.tiles.length > i + 2) {
-                            let secondNextTile = this.tiles[i + 2];
-                            if (secondNextTile.succedes(nextTile)) {
-                                melds.push(new Meld([tile, nextTile, secondNextTile], MeldType.CHI));
+            let uniqueTiles = this.unique().tiles;
+            uniqueTiles.forEach((tile, i) => {
+                if (this.count(tile) > 2) {
+                    melds.push(new Meld(new Tiles([tile, tile, tile]), MeldType.PON));
+                }
+                if (tile.type == TileType.NUMBER && uniqueTiles.length > i + 1) {
+                    let nextTile = uniqueTiles[i + 1];
+                    if (nextTile.isAfter(tile)) {
+                        if (uniqueTiles.length > i + 2) {
+                            let secondNextTile = uniqueTiles[i + 2];
+                            if (secondNextTile.isAfter(nextTile)) {
+                                melds.push(new Meld(new Tiles([tile, nextTile, secondNextTile]), MeldType.CHI));
                             }
                         }
                     }
@@ -111,63 +127,68 @@ namespace Mahjong {
             return melds;
         }
 
-        public getPossibleGroupings(): MeldGrouping[] {
-            this.sortTiles();
-            return this.findFinalGroupings(new MeldGrouping([], this));
-        }
-        //public getPossibleGroupings(): MeldGrouping[] {
-        //    this.sortTiles();
-        //    let finalGroupings: MeldGrouping[] = [];
-        //    this.findFinalMeldGroupings(new MeldGrouping([], this), finalGroupings);
-        //    return finalGroupings;
-        //}
-
-        public toString(): string {
-            return this.tiles.map(t => t.toString()).join(", ");
-        }
-
-        private findFinalGroupings(grouping: MeldGrouping): MeldGrouping[] {
-            let groupings: MeldGrouping[] = [];
-            for (let tile of grouping.remainingTiles.tiles) {
-                let remainingHand = grouping.remainingTiles.withoutTile(tile);
-                let melds = remainingHand.getPossibleMelds(tile);
-
-                if (grouping.remainingTiles.getAllMelds().length == 0) {
-                    console.log("current grouping: " + grouping.toString());
-                    return [grouping];
+        public unique(): Tiles {
+            let results: Tile[] = [];
+            for (let tile of this.tiles) {
+                if (results.findIndex(t => t.id == tile.id) < 0) {
+                    results.push(tile);
                 }
-                //if (melds.length > 1) {
-                for (let meld of melds) {
-                    let newMelds = grouping.melds.slice();
-                    newMelds.push(meld);
-                    for (let group of this.findFinalGroupings(new MeldGrouping(newMelds, grouping.remainingTiles.withoutTiles(meld.tiles)))) {
-                        groupings.push(group);
+            }
+            return new Tiles(results);
+        }
+
+        public getAmbiguousMelds(melds: Meld[]): Meld[] {
+            let ambiguous: Meld[] = [];
+            for (let tile of this.unique().tiles) {
+                let requiredCount = melds.map(m => m.count(tile)).reduce((a, b) => a + b, 0);
+                if (requiredCount > this.count(tile)) {
+                    for (let meld of melds.filter(m => m.contains(tile))) {
+                        if (ambiguous.findIndex(m => m.equals(meld)) < 0) {
+                            ambiguous.push(meld);
+                        }
                     }
                 }
-                //}
             }
-            return groupings;
+            return ambiguous;
         }
 
-        //private findFinalMeldGroupings(grouping: MeldGrouping, finalGroupings: MeldGrouping[]): boolean {
-        //    let remainingMelds = grouping.remainingTiles.getAllMelds();
-        //    if (remainingMelds.length == 0) {
-        //        console.log("found grouping without remaining melds: " + grouping.toString());
-        //        finalGroupings.push(grouping);
-        //        return true;
-        //    } else {
-        //        let hasFinalChild = false;
-        //        for (let meld of remainingMelds) {
-        //            let melds = grouping.melds.slice();
-        //            melds.push(meld);
-        //            let childGrouping = new MeldGrouping(melds, grouping.remainingTiles.withoutTiles(meld.tiles));
-        //            if (this.findFinalMeldGroupings(childGrouping, finalGroupings)) {
-        //                hasFinalChild = true;
-        //            }
-        //        }
-        //        return hasFinalChild;
-        //    }
-        //}
+        public getPossibleGroupings(): MeldGrouping[] {
+            this.sortTiles();
+            let finalGroupings: MeldGrouping[] = [];
+            this.findFinalMeldGroupings(new MeldGrouping([], this), finalGroupings);
+            return this.uniqueGroupings(finalGroupings);
+        }
+
+        private uniqueGroupings(groupings: MeldGrouping[]): MeldGrouping[] {
+            let result: MeldGrouping[] = [];
+            for (let grouping of groupings) {
+                if (result.findIndex(pg => pg.equals(grouping)) < 0) {
+                    result.push(grouping);
+                }
+            }
+            return result;
+        }
+
+        private findFinalMeldGroupings(grouping: MeldGrouping, finalGroupings: MeldGrouping[]): boolean {
+            let remainingMelds = grouping.remainingTiles.getUniqueMelds();
+            if (remainingMelds.length == 0) {
+                finalGroupings.push(grouping);
+                return true;
+            } else {
+                let hasFinalChild = false;
+                let nextMelds = grouping.remainingTiles.getAmbiguousMelds(remainingMelds);
+                if (nextMelds.length == 0) {
+                    nextMelds = [remainingMelds[0]];
+                }
+                for (let meld of nextMelds) {
+                    let childGrouping = grouping.withNewMeldFromRemainingTiles(meld);
+                    if (this.findFinalMeldGroupings(childGrouping, finalGroupings)) {
+                        hasFinalChild = true;
+                    }
+                }
+                return hasFinalChild;
+            }
+        }
 
         private sortTiles(): void {
             this.tiles = this.tiles.sort((a, b) => {

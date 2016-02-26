@@ -44,10 +44,6 @@ namespace Mahjong {
         public static GREEN: Tile = new Tile(TileId.GREEN, TileType.DRAGON, Suit.HONOR, 2);
         public static WHITE: Tile = new Tile(TileId.WHITE, TileType.DRAGON, Suit.HONOR, 3);
 
-        private get succession(): TileSuccession<Tile> {
-            return new TileSuccession<Tile>(Tile.ofSuit(this.suit), false);
-        }
-
         constructor(public id: TileId, public type: TileType, public suit: Suit, public value: number) {
 
         }
@@ -60,24 +56,46 @@ namespace Mahjong {
             return Array.from(TILE_MAP.values()).filter(tile => tile.type == type);
         }
 
+        public isAfter(other: Tile): boolean {
+            if (other == null) {
+                return false;
+            } else {
+                let next = other.getNext();
+                if (next == null) {
+                    return false;
+                } else {
+                    return this.id == next.id;
+                }
+            }
+        }
+
         public getPrevious(): Tile {
-            return this.succession.getPrevious(this);
+            if (this.value == 1) {
+                return null;
+            } else {
+                return TILE_MAP.get(this.id - 1);
+            }
         }
 
         public getNext(): Tile {
-            return this.succession.getNext(this);
+            let maxVal = this.getMaxTypeValue();
+            if (this.value == maxVal) {
+                return null;
+            } else {
+                return TILE_MAP.get(this.id + 1);
+            }
         }
 
-        public succedes(tile: Tile): boolean {
-            return this.succession.succedes(this, tile);
-        }
-
-        public precedes(tile: Tile): boolean {
-            return this.succession.precedes(this, tile);
+        private getMaxTypeValue(): number {
+            switch (this.type) {
+                case TileType.DRAGON: return 3;
+                case TileType.WIND: return 4;
+                default: return 9;
+            }
         }
 
         public toString(): string {
-            return Suit[this.suit] + "." + this.value;
+            return TileId[this.id];
         }
 
     }
