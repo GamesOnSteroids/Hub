@@ -7,7 +7,7 @@ namespace Mahjong {
         public openMelds: Meld[] = [];
         public closedKans: Meld[] = [];
         public wind: Wind;
-        public pond: TileId[];
+        public pond: TileId[] = [];
         public riichi: boolean;
 
         public hasCorrectForm(): boolean {

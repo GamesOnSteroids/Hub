@@ -17,6 +17,10 @@ namespace Mahjong.Client {
         private assets: any;
         private isLoaded = false;
 
+        private table: Table;
+        private hand: Hand;
+
+
         constructor(lobby: ClientLobby) {
             super(lobby);
 
@@ -31,6 +35,41 @@ namespace Mahjong.Client {
             // this.on(MessageId.SMSG_REVEAL, this.onReveal.bind(this));
             // this.on(MessageId.SMSG_FLAG, this.onFlag.bind(this));
             // this.on(MessageId.SMSG_SCORE, this.onScore.bind(this));
+            this.table = new Table();
+            this.table.currentTurn = Wind.EAST;
+            {
+                this.hand = new Hand();
+                this.hand.wind = Wind.EAST;
+                this.hand.tiles = new Tiles([
+                    Tile.MAN_1,
+                    Tile.MAN_1,
+                    Tile.MAN_2,
+                    //Tile.MAN_3,
+
+                    Tile.MAN_3,
+                    Tile.MAN_3,
+                    //Tile.MAN_5,
+
+                    Tile.SOU_1,
+                    Tile.SOU_2,
+                    Tile.SOU_3,
+
+                    Tile.EAST,
+                    Tile.EAST,
+                    Tile.EAST,
+
+                    Tile.PIN_1,
+                    Tile.PIN_1]);
+                this.table.hands.push(this.hand);
+            }
+            {
+                let hand = new Hand();
+                hand.wind = Wind.EAST;
+                hand.pond.push(TileId.MAN_3);
+                this.table.hands.push(hand);
+            }
+
+
 
         }
 
@@ -87,14 +126,14 @@ namespace Mahjong.Client {
 
             this.drawWalls(ctx);
 
-            let hand = new Hand();
-            hand.tiles = [];
-            for (let i = 0; i < 12; i++) {
-                let tile = TILE_MAP.get(TileId.Pin1);
-                hand.tiles.push(tile);
+
+
+            for (let tile of this.table.hands[1].pond) {
+                this.drawTile(ctx, tile, 20, 20);
             }
-            //
-            //this.drawHand(ctx, hand);
+
+
+            this.drawHand(ctx, this.hand);
             //{
             //    let x = 160;
             //    let y = 20;
@@ -199,16 +238,31 @@ namespace Mahjong.Client {
 
         private drawHand(ctx: CanvasRenderingContext2D, hand: Hand): void {
 
+            let moves = this.table.getAvailableMoves(TileId.MAN_3, this.hand);
+
             let x = 160;
             let y = 400;
-            for (let tile of hand.tiles) {
-                this.drawTile(ctx, tile, x, y);
+            for (let tile of hand.tiles.tiles) {
+                let drawn = false;
+                for (let move of moves) {
+                    if (move.type == MoveType.CHI) {
+                        if (move.tiles[0] == tile.id) {
+                            this.drawTile(ctx, tile.id, x, y - 20);
+                            drawn = true;
+                        }
+                    }
+                }
+                if (!drawn) {
+                    this.drawTile(ctx, tile.id, x, y);
+                }
                 x += 23;
             }
+
+
         }
 
-        private drawTile(ctx: CanvasRenderingContext2D, tile: Tile, x: number, y: number): void {
-            let image = this.assets.tiles[TileId.Pin2];
+        private drawTile(ctx: CanvasRenderingContext2D, tile: TileId, x: number, y: number): void {
+            let image = this.assets.tiles[tile];
             ctx.drawImage(image, 0, 0, image.width, image.height, x, y, image.width, image.height);
         }
 
@@ -218,33 +272,37 @@ namespace Mahjong.Client {
             let root = "app/games/mahjong/assets/";
 
             this.assets.tiles = [];
-            this.assets.tiles[TileId.Pin1] = await this.loadAsset(`${root}images/pin-1.png`);
-            this.assets.tiles[TileId.Pin2] = await this.loadAsset(`${root}images/pin-2.png`);
-            this.assets.tiles[TileId.Pin3] = await this.loadAsset(`${root}images/pin-3.png`);
-            this.assets.tiles[TileId.Pin4] = await this.loadAsset(`${root}images/pin-4.png`);
-            this.assets.tiles[TileId.Pin5] = await this.loadAsset(`${root}images/pin-5.png`);
-            this.assets.tiles[TileId.Pin6] = await this.loadAsset(`${root}images/pin-6.png`);
-            this.assets.tiles[TileId.Pin7] = await this.loadAsset(`${root}images/pin-7.png`);
-            this.assets.tiles[TileId.Pin8] = await this.loadAsset(`${root}images/pin-8.png`);
-            this.assets.tiles[TileId.Pin9] = await this.loadAsset(`${root}images/pin-9.png`);
-            this.assets.tiles[TileId.Man1] = await this.loadAsset(`${root}images/man-1.png`);
-            this.assets.tiles[TileId.Man2] = await this.loadAsset(`${root}images/man-2.png`);
-            this.assets.tiles[TileId.Man3] = await this.loadAsset(`${root}images/man-3.png`);
-            this.assets.tiles[TileId.Man4] = await this.loadAsset(`${root}images/man-4.png`);
-            this.assets.tiles[TileId.Man5] = await this.loadAsset(`${root}images/man-5.png`);
-            this.assets.tiles[TileId.Man6] = await this.loadAsset(`${root}images/man-6.png`);
-            this.assets.tiles[TileId.Man7] = await this.loadAsset(`${root}images/man-7.png`);
-            this.assets.tiles[TileId.Man8] = await this.loadAsset(`${root}images/man-8.png`);
-            this.assets.tiles[TileId.Man9] = await this.loadAsset(`${root}images/man-9.png`);
-            this.assets.tiles[TileId.Sou1] = await this.loadAsset(`${root}images/sou-1.png`);
-            this.assets.tiles[TileId.Sou2] = await this.loadAsset(`${root}images/sou-2.png`);
-            this.assets.tiles[TileId.Sou3] = await this.loadAsset(`${root}images/sou-3.png`);
-            this.assets.tiles[TileId.Sou4] = await this.loadAsset(`${root}images/sou-4.png`);
-            this.assets.tiles[TileId.Sou5] = await this.loadAsset(`${root}images/sou-5.png`);
-            this.assets.tiles[TileId.Sou6] = await this.loadAsset(`${root}images/sou-6.png`);
-            this.assets.tiles[TileId.Sou7] = await this.loadAsset(`${root}images/sou-7.png`);
-            this.assets.tiles[TileId.Sou8] = await this.loadAsset(`${root}images/sou-8.png`);
-            this.assets.tiles[TileId.Sou9] = await this.loadAsset(`${root}images/sou-9.png`);
+            this.assets.tiles[TileId.PIN_1] = await this.loadAsset(`${root}images/pin-1.png`);
+            this.assets.tiles[TileId.PIN_2] = await this.loadAsset(`${root}images/pin-2.png`);
+            this.assets.tiles[TileId.PIN_3] = await this.loadAsset(`${root}images/pin-3.png`);
+            this.assets.tiles[TileId.PIN_4] = await this.loadAsset(`${root}images/pin-4.png`);
+            this.assets.tiles[TileId.PIN_5] = await this.loadAsset(`${root}images/pin-5.png`);
+            this.assets.tiles[TileId.PIN_6] = await this.loadAsset(`${root}images/pin-6.png`);
+            this.assets.tiles[TileId.PIN_7] = await this.loadAsset(`${root}images/pin-7.png`);
+            this.assets.tiles[TileId.PIN_8] = await this.loadAsset(`${root}images/pin-8.png`);
+            this.assets.tiles[TileId.PIN_9] = await this.loadAsset(`${root}images/pin-9.png`);
+            this.assets.tiles[TileId.MAN_1] = await this.loadAsset(`${root}images/man-1.png`);
+            this.assets.tiles[TileId.MAN_2] = await this.loadAsset(`${root}images/man-2.png`);
+            this.assets.tiles[TileId.MAN_3] = await this.loadAsset(`${root}images/man-3.png`);
+            this.assets.tiles[TileId.MAN_4] = await this.loadAsset(`${root}images/man-4.png`);
+            this.assets.tiles[TileId.MAN_5] = await this.loadAsset(`${root}images/man-5.png`);
+            this.assets.tiles[TileId.MAN_6] = await this.loadAsset(`${root}images/man-6.png`);
+            this.assets.tiles[TileId.MAN_7] = await this.loadAsset(`${root}images/man-7.png`);
+            this.assets.tiles[TileId.MAN_8] = await this.loadAsset(`${root}images/man-8.png`);
+            this.assets.tiles[TileId.MAN_9] = await this.loadAsset(`${root}images/man-9.png`);
+            this.assets.tiles[TileId.SOU_1] = await this.loadAsset(`${root}images/sou-1.png`);
+            this.assets.tiles[TileId.SOU_2] = await this.loadAsset(`${root}images/sou-2.png`);
+            this.assets.tiles[TileId.SOU_3] = await this.loadAsset(`${root}images/sou-3.png`);
+            this.assets.tiles[TileId.SOU_4] = await this.loadAsset(`${root}images/sou-4.png`);
+            this.assets.tiles[TileId.SOU_5] = await this.loadAsset(`${root}images/sou-5.png`);
+            this.assets.tiles[TileId.SOU_6] = await this.loadAsset(`${root}images/sou-6.png`);
+            this.assets.tiles[TileId.SOU_7] = await this.loadAsset(`${root}images/sou-7.png`);
+            this.assets.tiles[TileId.SOU_8] = await this.loadAsset(`${root}images/sou-8.png`);
+            this.assets.tiles[TileId.SOU_9] = await this.loadAsset(`${root}images/sou-9.png`);
+            this.assets.tiles[TileId.EAST] = await this.loadAsset(`${root}images/east.png`);
+            this.assets.tiles[TileId.SOUTH] = await this.loadAsset(`${root}images/south.png`);
+            this.assets.tiles[TileId.WEST] = await this.loadAsset(`${root}images/west.png`);
+            this.assets.tiles[TileId.NORTH] = await this.loadAsset(`${root}images/north.png`);
 
             this.assets.back = await this.loadAsset(`${root}images/back.png`);
             this.assets.backdown = await this.loadAsset(`${root}images/back-down.png`);

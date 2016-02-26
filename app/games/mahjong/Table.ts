@@ -2,7 +2,7 @@ namespace Mahjong {
     "use strict";
 
     export class Table {
-        public hands: Hand[];
+        public hands: Hand[] = [];
         public currentTurn: Wind;
 
         public getAvailableMoves(newTileId: TileId, hand: Hand): Move[] {
@@ -15,21 +15,25 @@ namespace Mahjong {
         }
 
         private getAvailableMovesOnYourTurn(newTile: Tile, hand: Hand): Move[] {
-            return [];
+            let moves: Move[] = [
+                new Move(MoveType.CHI, [TileId.MAN_1, TileId.MAN_2, TileId.MAN_3]),
+                new Move(MoveType.PON, [TileId.MAN_3, TileId.MAN_3, TileId.MAN_3])
+            ];
+            return moves;
         }
 
         private getAvailableMovesOnOpponentsTurn(newTile: Tile, hand: Hand): Move[] {
             let moves: Move[] = [ new Move(MoveType.PASS, null) ];
-            if (this.isPreviousPlayerTurn(hand)) {
-                hand.getPossibleRuns(newTile).forEach(meld => moves.push(new Move(MoveType.CHI, meld.getTileIds())));
-            }
-            hand.getPossibleSets(newTile).forEach(meld => {
-                let moveType = meld.type == MeldType.KAN ? MoveType.OPEN_KAN : MoveType.PON;
-                moves.push(new Move(moveType, meld.getTileIds()));
-            });
-            if (hand.isTenpai()) {
-
-            }
+            //if (this.isPreviousPlayerTurn(hand)) {
+            //    hand.getPossibleRuns(newTile).forEach(meld => moves.push(new Move(MoveType.CHI, meld.getTileIds())));
+            //}
+            //hand.getPossibleSets(newTile).forEach(meld => {
+            //    let moveType = meld.type == MeldType.KAN ? MoveType.OPEN_KAN : MoveType.PON;
+            //    moves.push(new Move(moveType, meld.getTileIds()));
+            //});
+            //if (hand.isTenpai()) {
+            //
+            //}
             return moves;
         }
 
