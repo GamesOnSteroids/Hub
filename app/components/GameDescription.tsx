@@ -8,25 +8,34 @@ class GameDescription extends React.Component<any, any> {
     }
 
 
-
     public render(): JSX.Element {
         return (
-            <div>
-                <h3>{this.props.game.name}</h3>
+            <div style={{ padding: "5px"}}>
+                <h3 style={{backgroundColor: "#eee", padding:"0"}} className="text-center">{this.props.game.name}</h3>
                 <div>
-                    <img className="pull-right" width="128" src={"app/games/"+this.props.game.id+"/assets/images/logo.png"} />
-                    <p>{this.props.game.description}</p>
-                    <span>Currently playing: ? games</span>
+                    <div>
+                        <img  width="128"
+                             src={"app/games/" + this.props.game.id + "/assets/images/logo.png"}/>
+                    </div>
+                    <div className="pull-right">
+                        <div className="btn-group-vertical" role="group">
+                            { this.props.game.variants
+                                .filter((v: any) => v.development != true || environment == EnvironmentType.Development)
+                                .map( (variant: any) => (
+                            <button key={variant.id} type="button"
+                                    className={variant.id == "default" ? "btn btn-primary" : "btn btn-default"}
+                                    onClick={this.startGame.bind(this, variant)}>
+                                {variant.name}
+                            </button>)) }
+                        </div>
+                    </div>
                 </div>
-                <div className="btn-group-vertical" role="group">
-                    { this.props.game.variants
-                        .filter((v: any) => v.development != true || environment == EnvironmentType.Development)
-                        .map( (variant: any) => (
-                    <button key={variant.id} type="button"
-                            className={variant.id == "default" ? "btn btn-primary" : "btn btn-default"}
-                            onClick={this.startGame.bind(this, variant)}>
-                        {variant.name}
-                    </button>)) }
+                <div className="row">
+                    <div className="col-md-12">
+                        <p>{this.props.game.description}</p>
+                        <span>Currently playing: ? games</span>
+                    </div>
+
                 </div>
             </div>
         );
@@ -36,7 +45,7 @@ class GameDescription extends React.Component<any, any> {
     protected componentDidMount(): void {
         if (environment == EnvironmentType.Development) {
             if (this.props.game.id == "tetrominoes") {
-              //  this.startGame(this.props.game.variants[2]);
+                //  this.startGame(this.props.game.variants[2]);
             }
         }
     }

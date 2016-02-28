@@ -101,10 +101,10 @@ var gamesConfiguration: IGameConfiguration[] = [
                 id: "debug",
                 name: "debug",
                 development: true,
-                maxPlayers: 2,
-                width: 4,
-                height: 4,
-                mines: 3
+                maxPlayers: 1,
+                width: 10,
+                height: 10,
+                mines: 2
             },
         ]
     },
