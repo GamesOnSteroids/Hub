@@ -14,6 +14,7 @@ class GameDescription extends React.Component<any, any> {
             <div>
                 <h3>{this.props.game.name}</h3>
                 <div>
+                    <img className="pull-right" width="128" src={"app/games/"+this.props.game.id+"/assets/images/logo.png"} />
                     <p>{this.props.game.description}</p>
                     <span>Currently playing: ? games</span>
                 </div>

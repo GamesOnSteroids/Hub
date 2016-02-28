@@ -173,7 +173,7 @@ namespace Chess.Client {
         }
 
         private load(): void {
-            let root = "games/chess/assets/";
+            let root = "app/games/chess/assets/";
 
             for (let pieceType = 1; pieceType <= 6; pieceType++) {
                 this.assets[pieceType] = [];
