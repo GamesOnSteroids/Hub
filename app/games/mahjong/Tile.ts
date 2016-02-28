@@ -48,12 +48,53 @@ namespace Mahjong {
 
         }
 
+        public static findByValue(value: number, suit: Suit): Tile {
+            for (let tile of TILE_MAP.values()) {
+                if (tile.value == value && tile.suit == suit) {
+                    return tile;
+                }
+            }
+            return null;
+        }
+
         public static ofSuit(suit: Suit): Tile[] {
             return Array.from(TILE_MAP.values()).filter(tile => tile.suit == suit);
         }
 
         public static ofType(type: TileType): Tile[] {
             return Array.from(TILE_MAP.values()).filter(tile => tile.type == type);
+        }
+
+        public static terminals(): Tile[] {
+            return Array.from(TILE_MAP.values()).filter(tile => tile.isTerminal());
+        }
+
+        public ofDifferentSuit(suit: Suit): Tile {
+            if (this.type != TileType.NUMBER) {
+                throw new Error("Unable to find different suit for non-number tile");
+            }
+            if (suit == Suit.HONOR) {
+                throw new Error("Unable to find tile for non-number suit");
+            }
+            if (this.type == TileType.NUMBER) {
+                return Tile.ofSuit(suit).find(t => t.value == this.value);
+            }
+        }
+
+        public equals(other: Tile): boolean {
+            return this.id == other.id;
+        }
+
+        public isTerminal(): boolean {
+            return this.type == TileType.NUMBER && (this.value == 1 || this.value == 9);
+        }
+
+        public isHonor(): boolean {
+            return this.suit == Suit.HONOR;
+        }
+
+        public isTerminalOrHonor(): boolean {
+            return this.isTerminal() || this.isTerminalOrHonor();
         }
 
         public isAfter(other: Tile): boolean {

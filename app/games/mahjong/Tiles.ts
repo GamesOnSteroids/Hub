@@ -77,11 +77,11 @@ namespace Mahjong {
             return runs.map(tiles => new Meld(tiles, MeldType.CHI));
         }
 
-        public getPossibleSets(tile: Tile, includeKan?: boolean): Meld[] {
+        public getPossibleSets(tile: Tile): Meld[] {
             let sets: Meld[] = [];
             if (this.count(tile) >= 2) {
                 sets.push(new Meld(new Tiles([tile, tile, tile]), MeldType.PON));
-                if (includeKan && this.count(tile) >= 3) {
+                if (this.count(tile) >= 3) {
                     sets.push(new Meld(new Tiles([tile, tile, tile, tile]), MeldType.KAN));
                 }
             }
@@ -118,7 +118,7 @@ namespace Mahjong {
                         if (uniqueTiles.length > i + 2) {
                             let secondNextTile = uniqueTiles[i + 2];
                             if (secondNextTile.isAfter(nextTile)) {
-                                melds.push(new Meld(new Tiles([tile, nextTile, secondNextTile]), MeldType.CHI));
+                                melds.push(Meld.fromTileArray([tile, nextTile, secondNextTile], MeldType.CHI));
                             }
                         }
                     }
@@ -139,28 +139,37 @@ namespace Mahjong {
 
         public getAmbiguousMelds(melds: Meld[]): Meld[] {
             let ambiguous: Meld[] = [];
-            for (let tile of this.unique().tiles) {
-                let requiredCount = melds.map(m => m.count(tile)).reduce((a, b) => a + b, 0);
-                if (requiredCount > this.count(tile)) {
-                    for (let meld of melds.filter(m => m.contains(tile))) {
-                        if (ambiguous.findIndex(m => m.equals(meld)) < 0) {
-                            ambiguous.push(meld);
+            if (melds.length < 2) {
+                return ambiguous;
+            }
+            for (let i = 0; i < melds.length - 1; i++) {
+                let meld = melds[i];
+                if (ambiguous.findIndex(m => m.equals(meld)) < 0) {
+                    let foundAmbiguous = false;
+                    for (let j = i + 1; j < melds.length; j++) {
+                        let otherMeld = melds[j];
+                        if (meld.hasIntersection(otherMeld)) {
+                            ambiguous.push(otherMeld);
+                            foundAmbiguous = true;
                         }
+                    }
+                    if (foundAmbiguous) {
+                        ambiguous.push(meld);
                     }
                 }
             }
             return ambiguous;
         }
 
-        public getPossibleGroupings(): MeldGrouping[] {
+        public getPossibleGroupings(): HandForm[] {
             this.sortTiles();
-            let finalGroupings: MeldGrouping[] = [];
-            this.findFinalMeldGroupings(new MeldGrouping([], this), finalGroupings);
+            let finalGroupings: HandForm[] = [];
+            this.findFinalMeldGroupings(new HandForm([], this), finalGroupings);
             return this.uniqueGroupings(finalGroupings);
         }
 
-        private uniqueGroupings(groupings: MeldGrouping[]): MeldGrouping[] {
-            let result: MeldGrouping[] = [];
+        private uniqueGroupings(groupings: HandForm[]): HandForm[] {
+            let result: HandForm[] = [];
             for (let grouping of groupings) {
                 if (result.findIndex(pg => pg.equals(grouping)) < 0) {
                     result.push(grouping);
@@ -169,24 +178,19 @@ namespace Mahjong {
             return result;
         }
 
-        private findFinalMeldGroupings(grouping: MeldGrouping, finalGroupings: MeldGrouping[]): boolean {
+        private findFinalMeldGroupings(grouping: HandForm, finalGroupings: HandForm[]): void {
             let remainingMelds = grouping.remainingTiles.getUniqueMelds();
             if (remainingMelds.length == 0) {
                 finalGroupings.push(grouping);
-                return true;
             } else {
-                let hasFinalChild = false;
                 let nextMelds = grouping.remainingTiles.getAmbiguousMelds(remainingMelds);
                 if (nextMelds.length == 0) {
                     nextMelds = [remainingMelds[0]];
                 }
                 for (let meld of nextMelds) {
                     let childGrouping = grouping.withNewMeldFromRemainingTiles(meld);
-                    if (this.findFinalMeldGroupings(childGrouping, finalGroupings)) {
-                        hasFinalChild = true;
-                    }
+                    this.findFinalMeldGroupings(childGrouping, finalGroupings);
                 }
-                return hasFinalChild;
             }
         }
 
@@ -202,17 +206,59 @@ namespace Mahjong {
             });
         }
 
-        //private ofType(type: TileType): Tiles {
-        //    return new Tiles(this.tiles.filter(t => t.type == type));
-        //}
-        //
-        //private concat(otherTiles: Tiles): Tiles {
-        //    return new Tiles(this.tiles.concat(otherTiles.tiles));
-        //}
-        //
-        //private ofSuit(suit: Suit): Tiles {
-        //    return new Tiles(this.tiles.filter(t => t.suit == suit));
-        //}
+        public ofType(type: TileType): Tiles {
+            return new Tiles(this.tiles.filter(t => t.type == type));
+        }
+
+        public concat(otherTiles: Tiles): Tiles {
+            return new Tiles(this.tiles.concat(otherTiles.tiles));
+        }
+
+        public ofSuit(suit: Suit): Tiles {
+            return new Tiles(this.tiles.filter(t => t.suit == suit));
+        }
+
+        public first(): Tile {
+            return this.tiles[0];
+        }
+
+        public last(): Tile {
+            return this.tiles[this.tiles.length - 1];
+        }
+
+        public isAllSameSuit(): boolean {
+            let tile = this.first();
+            for (let t of this.tiles) {
+                if (t.suit != tile.suit) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        public hasHonors(): boolean {
+            return this.tiles.findIndex(t => t.isHonor()) > -1;
+        }
+
+        public hasTerminalsOrHonors(): boolean {
+            return this.tiles.findIndex(t => t.isTerminalOrHonor()) > -1;
+        }
+
+        public hasTerminals(): boolean {
+            return this.tiles.findIndex(t => t.isTerminal()) > -1;
+        }
+
+        public isAllTerminals(): boolean {
+            return this.tiles.findIndex(t => !t.isTerminal()) < 0;
+        }
+
+        public isAllHonors(): boolean {
+            return this.tiles.findIndex(t => !t.isHonor()) < 0;
+        }
+
+        public isAllTerminalsOrHonors(): boolean {
+            return this.tiles.findIndex(t => !t.isTerminalOrHonor()) < 0;
+        }
 
     }
 

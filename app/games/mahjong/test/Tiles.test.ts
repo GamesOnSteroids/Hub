@@ -19,6 +19,13 @@ namespace Mahjong.Test {
             Tile.MAN_2, Tile.MAN_2
         ]);
 
+        let ambiguousWinningTiles = new Tiles([
+            Tile.MAN_1, Tile.MAN_1, Tile.MAN_1, Tile.MAN_1,
+            Tile.MAN_2, Tile.MAN_2, Tile.MAN_2, Tile.MAN_2,
+            Tile.MAN_3, Tile.MAN_3, Tile.MAN_3, Tile.MAN_3,
+            Tile.RED, Tile.RED
+        ]);
+
         it("withoutTiles", () => {
             let tilesToRemove = [Tile.MAN_1, Tile.MAN_2, Tile.MAN_3];
             let reducedTiles = tiles.withoutTiles(tilesToRemove);
@@ -34,6 +41,7 @@ namespace Mahjong.Test {
                 let sameGroupings = possibleGroupings.filter((pg, j) => i != j && pg.equals(g));
                 expect(sameGroupings.length).toBe(0);
             }
+            expect(ambiguousWinningTiles.getPossibleGroupings().length).toBe(2);
         });
 
         it("getUniqueMelds", () => {

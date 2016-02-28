@@ -116,12 +116,60 @@ namespace Mahjong {
 
         constructor(public tiles: Tiles, public type: MeldType) {}
 
+        public static fromTileArray(tiles: Tile[], type: MeldType): Meld {
+            return new Meld(new Tiles(tiles), type);
+        }
+
+        public ofDifferentSuit(suit: Suit): Meld {
+            return Meld.fromTileArray(this.tiles.tiles.map(t => t.ofDifferentSuit(suit)), this.type);
+        }
+
         public getTileIds(): TileId[] {
             return this.tiles.getTileIds();
         }
 
         public count(tile: Tile): number {
             return this.tiles.count(tile);
+        }
+
+        public first(): Tile {
+            return this.tiles.first();
+        }
+
+        public startsWith(tile: Tile): boolean {
+            return this.tiles.first().id == tile.id;
+        }
+
+        public endsWith(tile: Tile): boolean {
+            return this.tiles.last().id == tile.id;
+        }
+
+        public wasOpenWait(tile: Tile): boolean {
+            if (!this.contains(tile)) {
+                throw new Error("Tile " + tile.toString() + " does not appear in meld " + this.toString());
+            }
+            if (this.type != MeldType.CHI) {
+                throw new Error("Open wait can be only determined on " + MeldType[MeldType.CHI] + " meld type");
+            }
+            let first = this.tiles.first();
+            if (tile.value == first.value + 1) {
+                return false;
+            } else if (first.value == 1 && tile.value == 3) {
+                return false;
+            } else if (first.id == tile.id && first.value == 7) {
+                return false;
+            } else {
+                return true;
+            }
+        }
+
+        public hasIntersection(other: Meld): boolean {
+            for (let tile of other.tiles.tiles) {
+                if (this.contains(tile)) {
+                    return true;
+                }
+            }
+            return false;
         }
 
         public contains(tile: Tile): boolean {
@@ -133,7 +181,7 @@ namespace Mahjong {
         }
 
         public toString(): string {
-            return this.tiles.tiles.map(t => t.toString()).join("/") + "::" + MeldType[this.type];
+            return this.tiles.tiles.map(t => t.toString()).join("/");
         }
         // todo: closed kan
     }
