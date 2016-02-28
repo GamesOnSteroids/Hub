@@ -5,7 +5,7 @@ class GameDescription extends React.Component {
         this.startGame = this.startGame.bind(this);
     }
     render() {
-        return (React.createElement("div", null, React.createElement("h3", null, this.props.game.name), React.createElement("div", null, React.createElement("p", null, this.props.game.description), React.createElement("span", null, "Currently playing: ? games")), React.createElement("div", {className: "btn-group-vertical", role: "group"}, this.props.game.variants
+        return (React.createElement("div", null, React.createElement("h3", null, this.props.game.name), React.createElement("div", null, React.createElement("img", {className: "pull-right", width: "128", src: "app/games/" + this.props.game.id + "/assets/images/logo.png"}), React.createElement("p", null, this.props.game.description), React.createElement("span", null, "Currently playing: ? games")), React.createElement("div", {className: "btn-group-vertical", role: "group"}, this.props.game.variants
             .filter((v) => v.development != true || environment == EnvironmentType.Development)
             .map((variant) => (React.createElement("button", {key: variant.id, type: "button", className: variant.id == "default" ? "btn btn-primary" : "btn btn-default", onClick: this.startGame.bind(this, variant)}, variant.name))))));
     }

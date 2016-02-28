@@ -138,7 +138,7 @@ var Chess;
                 this.emitChange();
             }
             load() {
-                let root = "games/chess/assets/";
+                let root = "app/games/chess/assets/";
                 for (let pieceType = 1; pieceType <= 6; pieceType++) {
                     this.assets[pieceType] = [];
                     for (let team = 0; team < 4; team++) {
