@@ -8,12 +8,14 @@ class GameDescription extends React.Component<any, any> {
     }
 
 
+    //TODO: generate gameconfig id based on selected settings, change player number to ocmbo box
+
     public render(): JSX.Element {
         return (
             <div style={{ padding: "5px"}}>
                 <h3 style={{backgroundColor: "#eee", padding:"0"}} className="text-center">{this.props.game.name}</h3>
                 <div>
-                    <div>
+                    <div className="pull-left">
                         <img  width="128"
                              src={"app/games/" + this.props.game.id + "/assets/images/logo.png"}/>
                     </div>

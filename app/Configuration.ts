@@ -195,6 +195,13 @@ var gamesConfiguration: IGameConfiguration[] = [
             "width": 10,
             "height": 20,
         },{
+            "id": "4players",
+            "name": "4 Player",
+            "maxPlayers": 4,
+            "gravity": 1 / 512,
+            "width": 16,
+            "height": 20,
+        },{
             "id": "debug",
             "name": "debug",
             "maxPlayers": 1,
