@@ -3,32 +3,13 @@
 
 <body>
 
-<script type="text/javascript">
-
-    function keyCharAt(key, i) {
-        return key.charCodeAt( Math.floor(i % key.length) );
-    }
-
-    function xor_encrypt(key, data) {
-        return data.map( function(c, i) {
-            return (c ^ keyCharAt(key, i));
-        });
-    }
-
-    function xor_decrypt(key, data) {
-        return data.map( function(c, i) {
-            return c ^ keyCharAt(key, i);
-        });
-    }
-
-    var a1 = xor_encrypt("alice", [123, 666, 777]);
-    console.log(a1);
-    var a2 = xor_encrypt("bob", a1);
-    console.log(a2);
-    var a3 = xor_decrypt("alice", a2);
-    console.log(a3);
-    var a4 = xor_decrypt("bob", a3);
-    console.log(a4);
-</script>
+<div class="col">
+    <div class="col-md-6">
+        <iframe src="/index.html"></iframe>
+    </div>
+    <div class="col-md-6">
+        <iframe src="/index.html"></iframe>
+    </div>
+</div>
 </body>
 </html>

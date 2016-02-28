@@ -1,6 +1,7 @@
 node_modules/
 typings/
 .dist
+.publish
 .idea
 *.iml
 app/**/*.js

@@ -34,8 +34,8 @@ class GameDescription extends React.Component<any, any> {
     // todo: DEBUG ONLY
     protected componentDidMount(): void {
         if (environment == EnvironmentType.Development) {
-            if (this.props.game.id == "mahjong") {
-                this.startGame(this.props.game.variants[0]);
+            if (this.props.game.id == "tetrominoes") {
+              //  this.startGame(this.props.game.variants[2]);
             }
         }
     }

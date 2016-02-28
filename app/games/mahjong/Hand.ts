@@ -12,7 +12,7 @@ namespace Mahjong {
 
         public hasCorrectForm(): boolean {
             let remainingMelds = 4 - this.openMelds.length - this.closedKans.length;
-
+            throw "Not implemented";
         }
 
     }

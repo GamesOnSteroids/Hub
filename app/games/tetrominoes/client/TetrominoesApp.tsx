@@ -17,7 +17,7 @@ namespace Tetrominoes.Client {
             };
         }
 
-        protected componentDidMount() {
+        protected componentDidMount(): void {
             console.log("TetrominoesApp.componentDidMount");
 
             let game = ClientLobby.current.game as TetrominoesGame;
@@ -42,10 +42,10 @@ namespace Tetrominoes.Client {
                 <div style={{position: "relative", textAlign: "center"}}>
                     <div className="row">
                         <div className="col-xs-12 col-md-8">
-                            <canvas id="game-canvas"/>
+                            <canvas id="game-canvas" style={{borderImage: 'url("/app/games/tetrominoes/assets/images/border.png") 16 16 repeat' }}/>
                         </div>
                         <div className="col-xs-12 col-md-4">
-
+                            <TetrominoesScore players={this.state.players} />
                         </div>
                         <div className="col-xs-12 col-md-4">
                             <Chat/>

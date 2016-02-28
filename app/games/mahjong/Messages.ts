@@ -82,7 +82,7 @@ namespace Mahjong {
 
     }
 
-    export var WIND_SUCCESSION = new TileSuccession<Wind>([Wind.East, Wind.South, Wind.West, Wind.North], true);
+    export var WIND_SUCCESSION = new TileSuccession<Wind>([Wind.EAST, Wind.SOUTH, Wind.WEST, Wind.NORTH], true);
 
 
     export enum MessageId {

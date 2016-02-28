@@ -34,7 +34,6 @@ namespace Chess.Server {
 
             this.on(MessageId.CMSG_MOVE_PIECE_REQUEST, this.onMovePieceRequest.bind(this));
 
-            window.requestAnimationFrame(this.tick);
         }
 
         public start(): void {
@@ -43,6 +42,7 @@ namespace Chess.Server {
                 this.createPiece(piece);
             }
 
+            window.requestAnimationFrame(this.tick);
         }
 
         protected update(delta: number): void {

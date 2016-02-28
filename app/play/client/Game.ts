@@ -2,8 +2,6 @@ namespace Play.Client {
 
     "use strict";
 
-    import GameConfiguration = Minesweeper.GameConfiguration;
-
     export class Mouse {
         public static button: number = 0;
         public static x: number = 0;
@@ -28,7 +26,7 @@ namespace Play.Client {
             return this.lobby.localPlayer;
         }
 
-        get configuration(): GameConfiguration {
+        get configuration(): any {
             return this.lobby.configuration.gameConfiguration;
         }
 

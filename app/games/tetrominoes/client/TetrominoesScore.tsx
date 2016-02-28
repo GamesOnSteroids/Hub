@@ -1,7 +1,7 @@
-namespace Chess.Client {
+namespace Tetrominoes.Client {
     "use strict";
 
-    export class ChessScore extends React.Component<{players: PlayerInfo[]}, any> {
+    export class TetrominoesScore extends React.Component<{players: PlayerInfo[]}, any> {
         public render(): JSX.Element {
             return (
                 <div>
@@ -13,17 +13,19 @@ namespace Chess.Client {
                                         <th>#</th>
                                         <th>Nickname</th>
                                         <th>Score</th>
-                                        <th>Pieces</th>
+                                        <th>Lines</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {this.props.players.sort((a,b)=>b.gameData.score - a.gameData.score).map( (p, index) =>{
+                                    {this.props.players.sort((a, b) => b.gameData.score - a.gameData.score).map( (p, index) => {
                                         return (
                                         <tr key={p.id}>
-                                            <th scope="row"><img width="32" height="32" src={"/app/games/chess/assets/images/1-"+p.team+".png"} /></th>
+                                            <th scope="row">
+                                                <img src={"/app/games/tetrominoes/assets/images/" + p.team + ".png"}/>
+                                            </th>
                                             <td>{p.name}</td>
                                             <td>{p.gameData.score}</td>
-                                            <td>{p.gameData.pieces}</td>
+                                            <td>{p.gameData.lines}</td>
                                         </tr>)
                                         })}
                                 </tbody>

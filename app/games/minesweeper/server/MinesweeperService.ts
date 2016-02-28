@@ -26,10 +26,9 @@ namespace Minesweeper.Server {
             this.on(MessageId.CMSG_FLAG_REQUEST, this.onFlagRequest.bind(this));
             this.on(MessageId.CMSG_MASS_REVEAL_REQUEST, this.onMassRevealRequest.bind(this));
 
-            let configuration = this.lobby.configuration.gameConfiguration;
 
-            this.minefield = new Minefield(configuration.width, configuration.height);
-            this.mines = configuration.mines;
+            this.minefield = new Minefield(this.configuration.width, this.configuration.height);
+            this.mines = this.configuration.mines;
         }
 
         private checkGameOver(): void {

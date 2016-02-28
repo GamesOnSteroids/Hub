@@ -22,8 +22,12 @@ namespace Play.Server {
             // nothing to do
         }
 
-        protected get players(): Client[] {
+        protected get players(): PlayerInfo[] {
             return this.lobby.clients;
+        }
+
+        protected get configuration(): any {
+            return this.lobby.configuration.gameConfiguration;
         }
 
         /**
@@ -49,7 +53,9 @@ namespace Play.Server {
             this.update(delta);
 
             this.lastFrame = time;
-            window.requestAnimationFrame(this.tick);
+            if (this.lobby.state == LobbyState.GAME_RUNNING) {
+                window.requestAnimationFrame(this.tick);
+            }
         }
 
     }

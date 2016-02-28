@@ -77,7 +77,7 @@ namespace Mahjong {
             return runs.map(tiles => new Meld(tiles, MeldType.CHI));
         }
 
-        public getPossibleSets(tile: Tile, includeKan: boolean = true): Meld[] {
+        public getPossibleSets(tile: Tile, includeKan?: boolean): Meld[] {
             let sets: Meld[] = [];
             if (this.count(tile) >= 2) {
                 sets.push(new Meld(new Tiles([tile, tile, tile]), MeldType.PON));

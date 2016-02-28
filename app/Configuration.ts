@@ -180,11 +180,27 @@ var gamesConfiguration: IGameConfiguration[] = [
         "appClass": "Tetrominoes.Client.TetrominoesApp",
         "gameClass": "Tetrominoes.Client.TetrominoesGame",
         "serviceClass": "Tetrominoes.Server.TetrominoesService",
-        development: true,
         "variants": [{
+            "id": "default",
+            "name": "2 Players",
+            "maxPlayers": 2,
+            "gravity": 1 / 512,
+            "width": 10,
+            "height": 20,
+        },{
+            "id": "1player",
+            "name": "1 Player",
+            "maxPlayers": 1,
+            "gravity": 1 / 512,
+            "width": 10,
+            "height": 20,
+        },{
             "id": "debug",
             "name": "debug",
             "maxPlayers": 1,
+            "gravity": 1 / 512,
+            "width": 6,
+            "height": 10,
             development: true,
         }]
     }

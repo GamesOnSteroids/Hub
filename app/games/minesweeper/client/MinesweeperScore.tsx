@@ -12,10 +12,10 @@ namespace Minesweeper.Client {
                 <div>
                     <div className="row">
                         <div className="col-xs-6">
-                            <img src="/games/minesweeper/assets/images/flag-0.png"/>: {totalFlags}
+                            <img src="/app/games/minesweeper/assets/images/flag-0.png"/>: {totalFlags}
                         </div>
                         <div className="col-xs-6">
-                            <img src="/games/minesweeper/assets/images/mine-0.png"/>: {this.props.remainingMines}
+                            <img src="/app/games/minesweeper/assets/images/mine-0.png"/>: {this.props.remainingMines}
                         </div>
                     </div>
                     <div className="row">
@@ -35,7 +35,7 @@ namespace Minesweeper.Client {
                                         return (
                                         <tr key={p.id}>
                                             <th scope="row">
-                                                <img src={"/games/minesweeper/assets/images/flag-" + p.team + ".png"}/>
+                                                <img src={"/app/games/minesweeper/assets/images/flag-" + p.team + ".png"}/>
                                             </th>
                                             <td>{p.name}</td>
                                             <td>{p.gameData.score}</td>
@@ -47,7 +47,7 @@ namespace Minesweeper.Client {
                             </table>
                         </div>
                     </div>
-                </div>)
+                </div>);
         }
     }
 
