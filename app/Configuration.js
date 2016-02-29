@@ -178,8 +178,8 @@ var gamesConfiguration = [
                 "name": "debug",
                 "maxPlayers": 1,
                 "gravity": 1 / 512,
-                "width": 6,
-                "height": 10,
+                "width": 10,
+                "height": 20,
                 development: true,
             }]
     }

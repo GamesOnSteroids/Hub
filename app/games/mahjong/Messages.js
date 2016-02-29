@@ -110,11 +110,55 @@ var Mahjong;
             this.tiles = tiles;
             this.type = type;
         }
+        static fromTileArray(tiles, type) {
+            return new Meld(new Mahjong.Tiles(tiles), type);
+        }
+        ofDifferentSuit(suit) {
+            return Meld.fromTileArray(this.tiles.tiles.map(t => t.ofDifferentSuit(suit)), this.type);
+        }
         getTileIds() {
             return this.tiles.getTileIds();
         }
         count(tile) {
             return this.tiles.count(tile);
+        }
+        first() {
+            return this.tiles.first();
+        }
+        startsWith(tile) {
+            return this.tiles.first().id == tile.id;
+        }
+        endsWith(tile) {
+            return this.tiles.last().id == tile.id;
+        }
+        wasOpenWait(tile) {
+            if (!this.contains(tile)) {
+                throw new Error("Tile " + tile.toString() + " does not appear in meld " + this.toString());
+            }
+            if (this.type != MeldType.CHI) {
+                throw new Error("Open wait can be only determined on " + MeldType[MeldType.CHI] + " meld type");
+            }
+            let first = this.tiles.first();
+            if (tile.value == first.value + 1) {
+                return false;
+            }
+            else if (first.value == 1 && tile.value == 3) {
+                return false;
+            }
+            else if (first.id == tile.id && first.value == 7) {
+                return false;
+            }
+            else {
+                return true;
+            }
+        }
+        hasIntersection(other) {
+            for (let tile of other.tiles.tiles) {
+                if (this.contains(tile)) {
+                    return true;
+                }
+            }
+            return false;
         }
         contains(tile) {
             return this.tiles.contains(tile);
@@ -123,7 +167,7 @@ var Mahjong;
             return this.tiles.equals(other.tiles);
         }
         toString() {
-            return this.tiles.tiles.map(t => t.toString()).join("/") + "::" + MeldType[this.type];
+            return this.tiles.tiles.map(t => t.toString()).join("/");
         }
     }
     Mahjong.Meld = Meld;

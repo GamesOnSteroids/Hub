@@ -8,11 +8,45 @@ var Mahjong;
             this.suit = suit;
             this.value = value;
         }
+        static findByValue(value, suit) {
+            for (let tile of Mahjong.TILE_MAP.values()) {
+                if (tile.value == value && tile.suit == suit) {
+                    return tile;
+                }
+            }
+            return null;
+        }
         static ofSuit(suit) {
             return Array.from(Mahjong.TILE_MAP.values()).filter(tile => tile.suit == suit);
         }
         static ofType(type) {
             return Array.from(Mahjong.TILE_MAP.values()).filter(tile => tile.type == type);
+        }
+        static terminals() {
+            return Array.from(Mahjong.TILE_MAP.values()).filter(tile => tile.isTerminal());
+        }
+        ofDifferentSuit(suit) {
+            if (this.type != Mahjong.TileType.NUMBER) {
+                throw new Error("Unable to find different suit for non-number tile");
+            }
+            if (suit == Mahjong.Suit.HONOR) {
+                throw new Error("Unable to find tile for non-number suit");
+            }
+            if (this.type == Mahjong.TileType.NUMBER) {
+                return Tile.ofSuit(suit).find(t => t.value == this.value);
+            }
+        }
+        equals(other) {
+            return this.id == other.id;
+        }
+        isTerminal() {
+            return this.type == Mahjong.TileType.NUMBER && (this.value == 1 || this.value == 9);
+        }
+        isHonor() {
+            return this.suit == Mahjong.Suit.HONOR;
+        }
+        isTerminalOrHonor() {
+            return this.isTerminal() || this.isTerminalOrHonor();
         }
         isAfter(other) {
             if (other == null) {

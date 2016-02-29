@@ -61,6 +61,7 @@ var Tetrominoes;
             this.y = y;
             this.orientation = orientation;
             this.timer = 0;
+            this.gravity = 0;
         }
         getShape() {
             return Tetromino.SHAPES.get(this.type)[this.orientation];

@@ -12,6 +12,7 @@ class GameDescription extends React.Component {
     componentDidMount() {
         if (environment == EnvironmentType.Development) {
             if (this.props.game.id == "tetrominoes") {
+                this.startGame(this.props.game.variants.find((v) => v.development == true));
             }
         }
     }

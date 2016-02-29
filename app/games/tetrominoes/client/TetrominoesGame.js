@@ -3,6 +3,7 @@ var Tetrominoes;
     var Client;
     (function (Client) {
         "use strict";
+        var Action = Play.Client.Action;
         var Camera = Play.Client.Camera;
         var Game = Play.Client.Game;
         const TILE_SIZE = 32;
@@ -40,16 +41,17 @@ var Tetrominoes;
                     tetromino.orientation = (tetromino.orientation + 1) % 4;
                 }
             }
-            onKeyDown(e) {
-                if (e.keyCode == 37) {
+            onAction(action) {
+                if (action == Action.LEFT) {
                     this.send(new Tetrominoes.MoveRequestMessage(Tetrominoes.MoveType.Left));
                 }
-                else if (e.keyCode == 39) {
+                else if (action == Action.RIGHT) {
                     this.send(new Tetrominoes.MoveRequestMessage(Tetrominoes.MoveType.Right));
                 }
-                else if (e.keyCode == 40) {
+                else if (action == Action.DOWN) {
+                    this.send(new Tetrominoes.MoveRequestMessage(Tetrominoes.MoveType.Drop));
                 }
-                else if (e.keyCode == 38) {
+                else if (action == Action.CLICK || action == Action.UP) {
                     this.send(new Tetrominoes.MoveRequestMessage(Tetrominoes.MoveType.RotateClockwise));
                 }
             }

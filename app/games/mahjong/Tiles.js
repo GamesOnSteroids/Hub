@@ -68,11 +68,11 @@ var Mahjong;
             }
             return runs.map(tiles => new Mahjong.Meld(tiles, Mahjong.MeldType.CHI));
         }
-        getPossibleSets(tile, includeKan) {
+        getPossibleSets(tile) {
             let sets = [];
             if (this.count(tile) >= 2) {
                 sets.push(new Mahjong.Meld(new Tiles([tile, tile, tile]), Mahjong.MeldType.PON));
-                if (includeKan && this.count(tile) >= 3) {
+                if (this.count(tile) >= 3) {
                     sets.push(new Mahjong.Meld(new Tiles([tile, tile, tile, tile]), Mahjong.MeldType.KAN));
                 }
             }
@@ -107,7 +107,7 @@ var Mahjong;
                         if (uniqueTiles.length > i + 2) {
                             let secondNextTile = uniqueTiles[i + 2];
                             if (secondNextTile.isAfter(nextTile)) {
-                                melds.push(new Mahjong.Meld(new Tiles([tile, nextTile, secondNextTile]), Mahjong.MeldType.CHI));
+                                melds.push(Mahjong.Meld.fromTileArray([tile, nextTile, secondNextTile], Mahjong.MeldType.CHI));
                             }
                         }
                     }
@@ -126,13 +126,22 @@ var Mahjong;
         }
         getAmbiguousMelds(melds) {
             let ambiguous = [];
-            for (let tile of this.unique().tiles) {
-                let requiredCount = melds.map(m => m.count(tile)).reduce((a, b) => a + b, 0);
-                if (requiredCount > this.count(tile)) {
-                    for (let meld of melds.filter(m => m.contains(tile))) {
-                        if (ambiguous.findIndex(m => m.equals(meld)) < 0) {
-                            ambiguous.push(meld);
+            if (melds.length < 2) {
+                return ambiguous;
+            }
+            for (let i = 0; i < melds.length - 1; i++) {
+                let meld = melds[i];
+                if (ambiguous.findIndex(m => m.equals(meld)) < 0) {
+                    let foundAmbiguous = false;
+                    for (let j = i + 1; j < melds.length; j++) {
+                        let otherMeld = melds[j];
+                        if (meld.hasIntersection(otherMeld)) {
+                            ambiguous.push(otherMeld);
+                            foundAmbiguous = true;
                         }
+                    }
+                    if (foundAmbiguous) {
+                        ambiguous.push(meld);
                     }
                 }
             }
@@ -141,7 +150,7 @@ var Mahjong;
         getPossibleGroupings() {
             this.sortTiles();
             let finalGroupings = [];
-            this.findFinalMeldGroupings(new Mahjong.MeldGrouping([], this), finalGroupings);
+            this.findFinalMeldGroupings(new Mahjong.HandForm([], this), finalGroupings);
             return this.uniqueGroupings(finalGroupings);
         }
         uniqueGroupings(groupings) {
@@ -157,21 +166,16 @@ var Mahjong;
             let remainingMelds = grouping.remainingTiles.getUniqueMelds();
             if (remainingMelds.length == 0) {
                 finalGroupings.push(grouping);
-                return true;
             }
             else {
-                let hasFinalChild = false;
                 let nextMelds = grouping.remainingTiles.getAmbiguousMelds(remainingMelds);
                 if (nextMelds.length == 0) {
                     nextMelds = [remainingMelds[0]];
                 }
                 for (let meld of nextMelds) {
                     let childGrouping = grouping.withNewMeldFromRemainingTiles(meld);
-                    if (this.findFinalMeldGroupings(childGrouping, finalGroupings)) {
-                        hasFinalChild = true;
-                    }
+                    this.findFinalMeldGroupings(childGrouping, finalGroupings);
                 }
-                return hasFinalChild;
             }
         }
         sortTiles() {
@@ -186,6 +190,48 @@ var Mahjong;
                     return a.id - b.id;
                 }
             });
+        }
+        ofType(type) {
+            return new Tiles(this.tiles.filter(t => t.type == type));
+        }
+        concat(otherTiles) {
+            return new Tiles(this.tiles.concat(otherTiles.tiles));
+        }
+        ofSuit(suit) {
+            return new Tiles(this.tiles.filter(t => t.suit == suit));
+        }
+        first() {
+            return this.tiles[0];
+        }
+        last() {
+            return this.tiles[this.tiles.length - 1];
+        }
+        isAllSameSuit() {
+            let tile = this.first();
+            for (let t of this.tiles) {
+                if (t.suit != tile.suit) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        hasHonors() {
+            return this.tiles.findIndex(t => t.isHonor()) > -1;
+        }
+        hasTerminalsOrHonors() {
+            return this.tiles.findIndex(t => t.isTerminalOrHonor()) > -1;
+        }
+        hasTerminals() {
+            return this.tiles.findIndex(t => t.isTerminal()) > -1;
+        }
+        isAllTerminals() {
+            return this.tiles.findIndex(t => !t.isTerminal()) < 0;
+        }
+        isAllHonors() {
+            return this.tiles.findIndex(t => !t.isHonor()) < 0;
+        }
+        isAllTerminalsOrHonors() {
+            return this.tiles.findIndex(t => !t.isTerminalOrHonor()) < 0;
         }
     }
     Mahjong.Tiles = Tiles;
