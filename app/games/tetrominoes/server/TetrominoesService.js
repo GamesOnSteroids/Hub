@@ -8,7 +8,7 @@ var Tetrominoes;
             constructor(lobby) {
                 super(lobby);
                 this.on(Tetrominoes.MessageId.CMSG_MOVE_REQUEST, this.onMoveRequest.bind(this));
-                this.playfield = new Tetrominoes.Playfield(this.configuration.width, this.configuration.height);
+                this.playfield = new Tetrominoes.Playfield(this.configuration.width, this.configuration.height, this.configuration.gravity);
                 for (let player of this.players) {
                     player.gameData = {
                         lines: 0
@@ -20,6 +20,9 @@ var Tetrominoes;
             }
             onMoveRequest(player, message) {
                 let tetromino = this.playfield.tetrominoes.find(t => t.owner.id == player.id);
+                if (tetromino == null) {
+                    return;
+                }
                 let moveType = message.type;
                 if (moveType == Tetrominoes.MoveType.Left) {
                     if (!this.playfield.collides(tetromino.x - 1, tetromino.y, tetromino.orientation, tetromino.type)) {
@@ -39,6 +42,10 @@ var Tetrominoes;
                         this.lobby.broadcast(new Tetrominoes.MoveMessage(player.id, moveType));
                     }
                 }
+                else if (moveType == Tetrominoes.MoveType.Drop) {
+                    tetromino.gravity = Tetrominoes.DROP_GRAVITY;
+                    this.lobby.broadcast(new Tetrominoes.MoveMessage(player.id, moveType));
+                }
             }
             generateTetromino(player) {
                 let type = Math.floor(Math.random() * 7);
@@ -47,7 +54,7 @@ var Tetrominoes;
                     x = this.players.indexOf(player) * Math.round(this.playfield.width / (this.players.length - 1));
                     x = Math.max(0, Math.min(x, x - Tetrominoes.Tetromino.SHAPES.get(type)[0][0].length));
                 }
-                let tetromino = new Tetrominoes.Tetromino(type, player, x, 0, 0);
+                let tetromino = new Tetrominoes.Tetromino(type, player, x, 0, 0, this.playfield.gravity);
                 return tetromino;
             }
             updateBoard() {
@@ -76,7 +83,7 @@ var Tetrominoes;
                 let i = this.playfield.tetrominoes.length;
                 while (i-- != 0) {
                     let tetromino = this.playfield.tetrominoes[i];
-                    tetromino.timer += this.configuration.gravity * delta;
+                    tetromino.timer += tetromino.gravity * delta;
                     while (tetromino.timer > 1) {
                         tetromino.timer -= 1;
                         let collision = this.playfield.collides(tetromino.x, tetromino.y + 1, tetromino.orientation, tetromino.type);
@@ -114,6 +121,10 @@ var Tetrominoes;
                         }
                         if (lineComplete) {
                             for (let x = 0; x < this.playfield.width; x++) {
+                                {
+                                    let cell = this.playfield.board[x + y * this.playfield.width];
+                                    this.lobby.broadcast(new Tetrominoes.ScoreMessage(cell.owner.id, 100));
+                                }
                                 for (let _y = y; _y > 0; _y--) {
                                     let cell1 = this.playfield.board[x + _y * this.playfield.width];
                                     let cell2 = this.playfield.board[x + (_y - 1) * this.playfield.width];

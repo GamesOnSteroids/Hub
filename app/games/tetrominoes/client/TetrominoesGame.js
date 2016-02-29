@@ -11,11 +11,18 @@ var Tetrominoes;
             constructor(lobby) {
                 super(lobby);
                 this.load();
-                this.playfield = new Tetrominoes.Playfield(this.configuration.width, this.configuration.height);
+                this.playfield = new Tetrominoes.Playfield(this.configuration.width, this.configuration.height, this.configuration.gravity);
                 this.on(Tetrominoes.MessageId.SMSG_CREATE_TETROMINO, this.onCreateTetromino.bind(this));
                 this.on(Tetrominoes.MessageId.SMSG_DESTROY_TETROMINO, this.onDestroyTetromino.bind(this));
                 this.on(Tetrominoes.MessageId.SMSG_UPDATE_BOARD, this.onUpdateBoard.bind(this));
                 this.on(Tetrominoes.MessageId.SMSG_MOVE, this.onMove.bind(this));
+                this.on(Tetrominoes.MessageId.SMSG_SCORE, this.onScore.bind(this));
+                this.on(Tetrominoes.MessageId.SMSG_LEVEL_UP, this.onLevelUp.bind(this));
+                for (let player of this.players) {
+                    player.gameData = {
+                        score: 0,
+                    };
+                }
             }
             initialize() {
                 super.initialize();
@@ -26,6 +33,16 @@ var Tetrominoes;
                 this.camera = new Camera(this.canvas);
                 this.camera.translateX = 0;
                 this.camera.translateY = 0;
+                this.emitChange();
+            }
+            onScore(message) {
+                let player = this.players.find(p => p.id == message.playerId);
+                player.gameData.score += message.score;
+                this.emitChange();
+            }
+            onLevelUp(message) {
+                this.playfield.level++;
+                this.playfield.gravity = message.gravity;
                 this.emitChange();
             }
             onMove(message) {
@@ -39,6 +56,9 @@ var Tetrominoes;
                 }
                 else if (message.type == Tetrominoes.MoveType.RotateClockwise) {
                     tetromino.orientation = (tetromino.orientation + 1) % 4;
+                }
+                else if (message.type == Tetrominoes.MoveType.Drop) {
+                    tetromino.gravity = Tetrominoes.DROP_GRAVITY;
                 }
             }
             onAction(action) {
@@ -71,12 +91,12 @@ var Tetrominoes;
             }
             onCreateTetromino(message) {
                 let player = this.players.find(p => p.id == message.playerId);
-                this.playfield.tetrominoes.push(new Tetrominoes.Tetromino(message.type, player, message.x, 0, 0));
+                this.playfield.tetrominoes.push(new Tetrominoes.Tetromino(message.type, player, message.x, 0, 0, this.playfield.gravity));
             }
             update(delta) {
                 this.camera.update(delta);
                 for (let tetromino of this.playfield.tetrominoes) {
-                    tetromino.timer += this.configuration.gravity * delta;
+                    tetromino.timer += tetromino.gravity * delta;
                     if (tetromino.timer > 1) {
                         tetromino.timer -= 1;
                         tetromino.y++;

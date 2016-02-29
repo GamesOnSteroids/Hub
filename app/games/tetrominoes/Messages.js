@@ -2,6 +2,7 @@ var Tetrominoes;
 (function (Tetrominoes) {
     "use strict";
     var GameMessage = Play.GameMessage;
+    Tetrominoes.DROP_GRAVITY = 1 / 16;
     (function (CellType) {
         CellType[CellType["Empty"] = 0] = "Empty";
         CellType[CellType["Full"] = 1] = "Full";
@@ -16,11 +17,13 @@ var Tetrominoes;
     }
     Tetrominoes.Cell = Cell;
     class Playfield {
-        constructor(width, height) {
-            this.tetrominoes = [];
-            this.board = [];
+        constructor(width, height, gravity) {
             this.width = width;
             this.height = height;
+            this.gravity = gravity;
+            this.tetrominoes = [];
+            this.board = [];
+            this.level = 1;
             for (let i = 0; i < this.width * this.height; i++) {
                 this.board[i] = new Cell();
             }
@@ -54,14 +57,14 @@ var Tetrominoes;
     })(Tetrominoes.TetrominoType || (Tetrominoes.TetrominoType = {}));
     var TetrominoType = Tetrominoes.TetrominoType;
     class Tetromino {
-        constructor(type, owner, x, y, orientation) {
+        constructor(type, owner, x, y, orientation, gravity) {
             this.type = type;
             this.owner = owner;
             this.x = x;
             this.y = y;
             this.orientation = orientation;
+            this.gravity = gravity;
             this.timer = 0;
-            this.gravity = 0;
         }
         getShape() {
             return Tetromino.SHAPES.get(this.type)[this.orientation];
@@ -258,8 +261,25 @@ var Tetrominoes;
         MessageId[MessageId["SMSG_MOVE"] = 2] = "SMSG_MOVE";
         MessageId[MessageId["SMSG_DESTROY_TETROMINO"] = 3] = "SMSG_DESTROY_TETROMINO";
         MessageId[MessageId["SMSG_UPDATE_BOARD"] = 4] = "SMSG_UPDATE_BOARD";
+        MessageId[MessageId["SMSG_SCORE"] = 5] = "SMSG_SCORE";
+        MessageId[MessageId["SMSG_LEVEL_UP"] = 6] = "SMSG_LEVEL_UP";
     })(Tetrominoes.MessageId || (Tetrominoes.MessageId = {}));
     var MessageId = Tetrominoes.MessageId;
+    class LevelUpMessage extends GameMessage {
+        constructor(gravity) {
+            super(MessageId.SMSG_LEVEL_UP);
+            this.gravity = gravity;
+        }
+    }
+    Tetrominoes.LevelUpMessage = LevelUpMessage;
+    class ScoreMessage extends GameMessage {
+        constructor(playerId, score) {
+            super(MessageId.SMSG_SCORE);
+            this.playerId = playerId;
+            this.score = score;
+        }
+    }
+    Tetrominoes.ScoreMessage = ScoreMessage;
     class MoveMessage extends GameMessage {
         constructor(playerId, type) {
             super(MessageId.SMSG_MOVE);

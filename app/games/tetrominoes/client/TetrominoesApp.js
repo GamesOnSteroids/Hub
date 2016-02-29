@@ -7,8 +7,10 @@ var Tetrominoes;
         class TetrominoesApp extends React.Component {
             constructor() {
                 super();
+                let game = ClientLobby.current.game;
                 this.state = {
                     players: ClientLobby.current.players,
+                    level: game.playfield.level
                 };
             }
             componentDidMount() {
@@ -18,7 +20,8 @@ var Tetrominoes;
                 this.stateChangeToken = game.changeListener.register((g) => {
                     console.log("TetrominoesApp.changeListener");
                     this.setState({
-                        players: ClientLobby.current.players
+                        players: ClientLobby.current.players,
+                        level: game.playfield.level
                     });
                 });
             }
@@ -27,7 +30,7 @@ var Tetrominoes;
                 game.changeListener.unregister(this.stateChangeToken);
             }
             render() {
-                return (React.createElement("div", {style: { position: "relative", textAlign: "center" }}, React.createElement("div", {className: "row"}, React.createElement("div", {className: "col-xs-12 col-md-8"}, React.createElement("canvas", {id: "game-canvas", style: { borderImage: 'url("/app/games/tetrominoes/assets/images/border.png") 16 16 repeat' }})), React.createElement("div", {className: "col-xs-12 col-md-4"}, React.createElement(Client.TetrominoesScore, {players: this.state.players})), React.createElement("div", {className: "col-xs-12 col-md-4"}, React.createElement(Chat, null)))));
+                return (React.createElement("div", {style: { position: "relative", textAlign: "center" }}, React.createElement("div", {className: "row"}, React.createElement("div", {className: "col-xs-12 col-md-8"}, React.createElement("canvas", {id: "game-canvas", style: { borderImage: 'url("/app/games/tetrominoes/assets/images/border.png") 16 16 repeat' }})), React.createElement("div", {className: "col-xs-12 col-md-4"}, React.createElement(Client.TetrominoesScore, {players: this.state.players, level: this.state.level})), React.createElement("div", {className: "col-xs-12 col-md-4"}, React.createElement(Chat, null)))));
             }
         }
         Client.TetrominoesApp = TetrominoesApp;

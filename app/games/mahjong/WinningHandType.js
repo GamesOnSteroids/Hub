@@ -37,7 +37,7 @@ var Mahjong;
     })(Mahjong.WinningHandTypeId || (Mahjong.WinningHandTypeId = {}));
     var WinningHandTypeId = Mahjong.WinningHandTypeId;
     class WinningHandType {
-        constructor(id, value, closedBonus = false) {
+        constructor(id, value, closedBonus) {
             this.id = id;
             this.value = value;
             this.closedBonus = closedBonus;
