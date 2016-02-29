@@ -16,7 +16,7 @@ namespace Tetrominoes.Client {
         private camera: Camera;
         private assets: any;
 
-        private playfield: Playfield;
+        public playfield: Playfield;
 
         constructor(lobby: ClientLobby) {
             super(lobby);
@@ -24,12 +24,20 @@ namespace Tetrominoes.Client {
 
             this.load();
 
-            this.playfield = new Playfield(this.configuration.width, this.configuration.height);
+            this.playfield = new Playfield(this.configuration.width, this.configuration.height, this.configuration.gravity);
 
             this.on(MessageId.SMSG_CREATE_TETROMINO, this.onCreateTetromino.bind(this));
             this.on(MessageId.SMSG_DESTROY_TETROMINO, this.onDestroyTetromino.bind(this));
             this.on(MessageId.SMSG_UPDATE_BOARD, this.onUpdateBoard.bind(this));
             this.on(MessageId.SMSG_MOVE, this.onMove.bind(this));
+            this.on(MessageId.SMSG_SCORE, this.onScore.bind(this));
+            this.on(MessageId.SMSG_LEVEL_UP, this.onLevelUp.bind(this));
+
+            for (let player of this.players) {
+                player.gameData = {
+                    score: 0,
+                };
+            }
 
             // this.on(MessageId.SMSG_FLAG, this.onFlag.bind(this));
             // this.on(MessageId.SMSG_SCORE, this.onScore.bind(this));
@@ -55,8 +63,20 @@ namespace Tetrominoes.Client {
 
         }
 
+        private onScore(message: ScoreMessage): void {
+            let player = this.players.find(p => p.id == message.playerId);
+            player.gameData.score += message.score;
+            this.emitChange();
+        }
+
+        private onLevelUp(message: LevelUpMessage): void {
+            this.playfield.level++;
+            this.playfield.gravity = message.gravity;
+            this.emitChange();
+        }
+
         private onMove(message: MoveMessage): void {
-            let player = this.players.find( p => p.id == message.playerId);
+            let player = this.players.find(p => p.id == message.playerId);
             let tetromino = this.playfield.tetrominoes.find(t => t.owner.id == player.id);
             if (message.type == MoveType.Left) {
                 tetromino.x--;
@@ -64,17 +84,19 @@ namespace Tetrominoes.Client {
                 tetromino.x++;
             } else if (message.type == MoveType.RotateClockwise) {
                 tetromino.orientation = (tetromino.orientation + 1) % 4;
+            } else if (message.type == MoveType.Drop) {
+                tetromino.gravity = Tetrominoes.DROP_GRAVITY;
             }
         }
 
         protected onAction(action: Action): void {
             if (action == Action.LEFT) {
                 this.send(new MoveRequestMessage(MoveType.Left));
-            } else  if (action == Action.RIGHT) {
+            } else if (action == Action.RIGHT) {
                 this.send(new MoveRequestMessage(MoveType.Right));
-            } else  if (action == Action.DOWN) {
+            } else if (action == Action.DOWN) {
                 this.send(new MoveRequestMessage(MoveType.Drop));
-            } else  if (action == Action.CLICK || action == Action.UP) {
+            } else if (action == Action.CLICK || action == Action.UP) {
                 this.send(new MoveRequestMessage(MoveType.RotateClockwise));
             }
         }
@@ -100,7 +122,7 @@ namespace Tetrominoes.Client {
         private onCreateTetromino(message: CreateTetrominoMessage): void {
             let player = this.players.find(p => p.id == message.playerId);
 
-            this.playfield.tetrominoes.push(new Tetromino(message.type, player, message.x, 0, 0));
+            this.playfield.tetrominoes.push(new Tetromino(message.type, player, message.x, 0, 0, this.playfield.gravity));
         }
 
         protected update(delta: number): void {
@@ -108,7 +130,7 @@ namespace Tetrominoes.Client {
 
 
             for (let tetromino of this.playfield.tetrominoes) {
-                tetromino.timer += this.configuration.gravity * delta;
+                tetromino.timer += tetromino.gravity * delta;
                 if (tetromino.timer > 1) {
                     tetromino.timer -= 1;
 

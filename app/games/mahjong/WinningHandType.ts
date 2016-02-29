@@ -71,7 +71,7 @@ namespace Mahjong {
         public static LITTLE_FOUR_WINDS = new WinningHandType(WinningHandTypeId.LITTLE_FOUR_WINDS, 13);
         public static BIG_FOUR_WINDS = new WinningHandType(WinningHandTypeId.LITTLE_FOUR_WINDS, 26);
 
-        constructor(public id: WinningHandTypeId, public value: number, public closedBonus: boolean = false) {}
+        constructor(public id: WinningHandTypeId, public value: number, public closedBonus?: boolean) {}
 
     }
 

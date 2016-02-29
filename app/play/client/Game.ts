@@ -55,9 +55,11 @@ namespace Play.Client {
 
         public initialize(): void {
             this.canvas = <HTMLCanvasElement>document.getElementById("game-canvas");
+
             this.context = this.canvas.getContext("2d");
 
             this.canvas.tabIndex = 1000;
+            this.canvas.focus();
 
             this.canvas.ontouchstart = this.onTouchStart;
             this.canvas.ontouchend = this.onTouchEnd;
@@ -167,10 +169,10 @@ namespace Play.Client {
         protected onMouseDown(e: MouseEvent): void {
             console.log("Game.onMouseDown", e);
             if (e.buttons == 1) {
-                let treshold = this.canvas.width / 3;
-                if (e.clientX < treshold) {
+                let treshold = this.canvas.width / 4;
+                if (e.offsetX < treshold) {
                     this.onAction(Action.LEFT);
-                } else if (e.clientX > this.canvas.width - treshold) {
+                } else if (e.offsetX > this.canvas.width - treshold) {
                     this.onAction(Action.RIGHT);
                 } else {
                     this.onAction(Action.CLICK);

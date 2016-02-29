@@ -1,10 +1,15 @@
 namespace Tetrominoes.Client {
     "use strict";
 
-    export class TetrominoesScore extends React.Component<{players: PlayerInfo[]}, any> {
+    export class TetrominoesScore extends React.Component<{players: PlayerInfo[], level: number}, any> {
         public render(): JSX.Element {
             return (
                 <div>
+                    <div className="row">
+                        <div className="col-xs-12">
+                            <span>Level: <b>{this.props.level}</b></span>
+                        </div>
+                    </div>
                     <div className="row">
                         <div className="col-xs-12">
                             <table className="table" style={{textAlign: "left"}}>
@@ -13,7 +18,6 @@ namespace Tetrominoes.Client {
                                         <th>#</th>
                                         <th>Nickname</th>
                                         <th>Score</th>
-                                        <th>Lines</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -25,8 +29,7 @@ namespace Tetrominoes.Client {
                                             </th>
                                             <td>{p.name}</td>
                                             <td>{p.gameData.score}</td>
-                                            <td>{p.gameData.lines}</td>
-                                        </tr>)
+                                        </tr>);
                                         })}
                                 </tbody>
                             </table>

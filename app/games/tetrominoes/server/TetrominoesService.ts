@@ -17,7 +17,7 @@ namespace Tetrominoes.Server {
 
             // let configuration = this.lobby.configuration.gameConfiguration;
 
-            this.playfield = new Playfield(this.configuration.width, this.configuration.height);
+            this.playfield = new Playfield(this.configuration.width, this.configuration.height, this.configuration.gravity);
             for (let player of this.players) {
                 player.gameData = {
                     lines: 0
@@ -32,7 +32,10 @@ namespace Tetrominoes.Server {
 
 
         private onMoveRequest(player: PlayerInfo, message: MoveRequestMessage): void {
-            let tetromino = this.playfield.tetrominoes.find(t => t.owner.id == player.id);
+            let tetromino: Tetromino = this.playfield.tetrominoes.find(t => t.owner.id == player.id);
+            if (tetromino == null) { // Can not move without active tetromino
+                return;
+            }
             let moveType = message.type;
             if (moveType == MoveType.Left) {
                 if (!this.playfield.collides(tetromino.x - 1, tetromino.y, tetromino.orientation, tetromino.type)) {
@@ -51,6 +54,9 @@ namespace Tetrominoes.Server {
                     tetromino.orientation = (tetromino.orientation + 1) % 4;
                     this.lobby.broadcast(new MoveMessage(player.id, moveType));
                 }
+            } else if (moveType == MoveType.Drop) {
+                tetromino.gravity = Tetrominoes.DROP_GRAVITY;
+                this.lobby.broadcast(new MoveMessage(player.id, moveType));
             }
         }
 
@@ -63,7 +69,7 @@ namespace Tetrominoes.Server {
                 x = this.players.indexOf(player) * Math.round(this.playfield.width / (this.players.length - 1));
                 x = Math.max(0, Math.min(x, x - Tetromino.SHAPES.get(type)[0][0].length));
             }
-            let tetromino = new Tetromino(type, player, x, 0, 0);
+            let tetromino = new Tetromino(type, player, x, 0, 0, this.playfield.gravity);
 
             return tetromino;
         }
@@ -97,7 +103,7 @@ namespace Tetrominoes.Server {
             let i = this.playfield.tetrominoes.length;
             while (i-- != 0) {
                 let tetromino = this.playfield.tetrominoes[i];
-                tetromino.timer += this.configuration.gravity * delta;
+                tetromino.timer += tetromino.gravity * delta;
                 while (tetromino.timer > 1) {
                     tetromino.timer -= 1;
 
@@ -143,6 +149,10 @@ namespace Tetrominoes.Server {
                     }
                     if (lineComplete) {
                         for (let x = 0; x < this.playfield.width; x++) {
+                            {
+                                let cell = this.playfield.board[x + y * this.playfield.width];
+                                this.lobby.broadcast(new ScoreMessage(cell.owner.id, 100));
+                            }
                             for (let _y = y; _y > 0; _y--) {
                                 let cell1 = this.playfield.board[x + _y * this.playfield.width];
                                 let cell2 = this.playfield.board[x + (_y - 1) * this.playfield.width];

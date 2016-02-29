@@ -3,6 +3,7 @@ namespace Tetrominoes {
 
     import GameMessage = Play.GameMessage;
 
+    export var DROP_GRAVITY = 1 / 16;
 
     export enum CellType {
         Empty,
@@ -18,13 +19,9 @@ namespace Tetrominoes {
     export class Playfield {
         public tetrominoes: Tetromino[] = [];
         public board: Cell[] = [];
+        public level: number = 1;
 
-        public width: number;
-        public height: number;
-
-        constructor(width: number, height: number) {
-            this.width = width;
-            this.height = height;
+        constructor(public width: number, public height: number, public gravity: number) {
 
             for (let i = 0; i < this.width * this.height; i++) {
                 this.board[i] = new Cell();
@@ -244,9 +241,8 @@ namespace Tetrominoes {
         );
 
         public timer: number = 0;
-        public gravity: number = 0;
 
-        constructor(public type: TetrominoType, public owner: PlayerInfo, public x: number, public y: number, public orientation: number) {
+        constructor(public type: TetrominoType, public owner: PlayerInfo, public x: number, public y: number, public orientation: number, public gravity: number) {
 
         }
 
@@ -271,6 +267,20 @@ namespace Tetrominoes {
         SMSG_MOVE,
         SMSG_DESTROY_TETROMINO,
         SMSG_UPDATE_BOARD,
+        SMSG_SCORE,
+        SMSG_LEVEL_UP,
+    }
+
+    export class LevelUpMessage extends GameMessage {
+        constructor(public gravity: number) {
+            super(MessageId.SMSG_LEVEL_UP);
+        }
+    }
+
+    export class ScoreMessage extends GameMessage {
+        constructor(public playerId: string, public score: number) {
+            super(MessageId.SMSG_SCORE);
+        }
     }
 
     export class MoveMessage extends GameMessage {
