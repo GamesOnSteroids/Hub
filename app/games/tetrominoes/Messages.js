@@ -24,6 +24,7 @@ var Tetrominoes;
             this.tetrominoes = [];
             this.board = [];
             this.level = 1;
+            this.lines = 0;
             for (let i = 0; i < this.width * this.height; i++) {
                 this.board[i] = new Cell();
             }
