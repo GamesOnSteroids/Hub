@@ -20,6 +20,7 @@ namespace Tetrominoes {
         public tetrominoes: Tetromino[] = [];
         public board: Cell[] = [];
         public level: number = 1;
+        public lines: number = 0;
 
         constructor(public width: number, public height: number, public gravity: number) {
 

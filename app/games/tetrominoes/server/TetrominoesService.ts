@@ -102,6 +102,9 @@ namespace Tetrominoes.Server {
             }
 
             let boardUpdated = false;
+
+            let collidingPlayers: PlayerInfo[] = [];
+
             let i = this.playfield.tetrominoes.length;
             while (i-- != 0) {
                 let tetromino = this.playfield.tetrominoes[i];
@@ -114,7 +117,7 @@ namespace Tetrominoes.Server {
 
                     if (collision) {
                         let player = tetromino.owner;
-
+                        collidingPlayers.push(player);
                         this.playfield.tetrominoes.splice(i, 1);
                         console.log("TetrominoesService.destroyTetromino", player.id);
                         this.lobby.broadcast(new DestroyTetrominoMessage(player.id));
@@ -141,6 +144,7 @@ namespace Tetrominoes.Server {
                 }
             }
 
+            let lines = 0;
             if (boardUpdated) {
                 for (let y = 0; y < this.playfield.height; y++) {
                     let lineComplete = true;
@@ -152,11 +156,8 @@ namespace Tetrominoes.Server {
                         }
                     }
                     if (lineComplete) {
+                        lines++;
                         for (let x = 0; x < this.playfield.width; x++) {
-                            {
-                                let cell = this.playfield.board[x + y * this.playfield.width];
-                                this.lobby.broadcast(new ScoreMessage(cell.owner.id, 100));
-                            }
                             for (let _y = y; _y > 0; _y--) {
                                 let cell1 = this.playfield.board[x + _y * this.playfield.width];
                                 let cell2 = this.playfield.board[x + (_y - 1) * this.playfield.width];
@@ -172,6 +173,30 @@ namespace Tetrominoes.Server {
 
                     }
                 }
+            }
+
+            if (lines > 0) {
+                let baseScore = 40;
+                if (lines == 2) {
+                    baseScore = 100;
+                } else if (lines == 3) {
+                    baseScore = 300;
+                } else if (lines == 4) {
+                    baseScore = 1200;
+                }
+                let score = baseScore * this.playfield.level;
+                for (let player of collidingPlayers) {
+                    this.lobby.broadcast(new ScoreMessage(player.id, score));
+                }
+
+                this.playfield.lines += lines;
+                let level = Math.ceil(this.playfield.lines / 4);
+                if (level != this.playfield.level) {
+                    this.playfield.level = level;
+                    this.playfield.gravity = level / 512;
+                    this.lobby.broadcast(new LevelUpMessage(this.playfield.gravity));
+                }
+
             }
 
             // test if there is full line
