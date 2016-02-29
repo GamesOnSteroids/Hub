@@ -6,4 +6,5 @@ body {
 
 canvas {
   outline: none;
+  user-select: none;
 }

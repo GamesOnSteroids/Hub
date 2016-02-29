@@ -16,7 +16,7 @@ class GameDescription extends React.Component<any, any> {
                 <h3 style={{backgroundColor: "#eee", padding:"0"}} className="text-center">{this.props.game.name}</h3>
                 <div>
                     <div className="pull-left">
-                        <img  width="128"
+                        <img width="128"
                              src={"app/games/" + this.props.game.id + "/assets/images/logo.png"}/>
                     </div>
                     <div className="pull-right">
@@ -47,7 +47,7 @@ class GameDescription extends React.Component<any, any> {
     protected componentDidMount(): void {
         if (environment == EnvironmentType.Development) {
             if (this.props.game.id == "tetrominoes") {
-                //  this.startGame(this.props.game.variants[2]);
+                this.startGame(this.props.game.variants.find((v: any) => v.development == true));
             }
         }
     }

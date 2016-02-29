@@ -1,7 +1,7 @@
 namespace Tetrominoes.Client {
     "use strict";
 
-
+    import Action = Play.Client.Action;
     import EventDispatcher = Play.Client.EventDispatcher;
     import Camera = Play.Client.Camera;
     import Game = Play.Client.Game;
@@ -33,8 +33,6 @@ namespace Tetrominoes.Client {
 
             // this.on(MessageId.SMSG_FLAG, this.onFlag.bind(this));
             // this.on(MessageId.SMSG_SCORE, this.onScore.bind(this));
-
-
         }
 
         public initialize(): void {
@@ -68,14 +66,15 @@ namespace Tetrominoes.Client {
                 tetromino.orientation = (tetromino.orientation + 1) % 4;
             }
         }
-        protected onKeyDown(e: KeyboardEvent): void {
-            if (e.keyCode == 37) { // left
-                this.send(new MoveRequestMessage(MoveType.Left));
-            } else if (e.keyCode == 39) { // right
-                this.send(new MoveRequestMessage(MoveType.Right));
-            } else if (e.keyCode == 40) { // down
 
-            } else if (e.keyCode == 38) { // up
+        protected onAction(action: Action): void {
+            if (action == Action.LEFT) {
+                this.send(new MoveRequestMessage(MoveType.Left));
+            } else  if (action == Action.RIGHT) {
+                this.send(new MoveRequestMessage(MoveType.Right));
+            } else  if (action == Action.DOWN) {
+                this.send(new MoveRequestMessage(MoveType.Drop));
+            } else  if (action == Action.CLICK || action == Action.UP) {
                 this.send(new MoveRequestMessage(MoveType.RotateClockwise));
             }
         }

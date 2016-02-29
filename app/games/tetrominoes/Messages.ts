@@ -63,12 +63,6 @@ namespace Tetrominoes {
     }
 
     export class Tetromino {
-        public timer: number = 0;
-
-        constructor(public type: TetrominoType, public owner: PlayerInfo, public x: number, public y: number, public orientation: number) {
-
-        }
-
         public static SHAPES = new Map<TetrominoType, boolean[][][]>(
             [
                 [
@@ -248,6 +242,13 @@ namespace Tetrominoes {
                 ]
             ]
         );
+
+        public timer: number = 0;
+        public gravity: number = 0;
+
+        constructor(public type: TetrominoType, public owner: PlayerInfo, public x: number, public y: number, public orientation: number) {
+
+        }
 
         public getShape(): boolean[][] {
             return Tetromino.SHAPES.get(this.type)[this.orientation];

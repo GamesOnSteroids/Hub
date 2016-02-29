@@ -8,6 +8,21 @@ namespace Play.Client {
         public static y: number = 0;
     }
 
+    export class Touch {
+        public static touching: boolean = false;
+        public static startX: number = 0;
+        public static startY: number = 0;
+        public static endX: number = 0;
+        public static endY: number = 0;
+    }
+
+    export enum Action {
+        LEFT,
+        UP,
+        DOWN,
+        RIGHT,
+        CLICK
+    }
 
     export class Game {
         public changeListener = new EventDispatcher<this>();
@@ -41,9 +56,28 @@ namespace Play.Client {
         public initialize(): void {
             this.canvas = <HTMLCanvasElement>document.getElementById("game-canvas");
             this.context = this.canvas.getContext("2d");
-            this.canvas.onkeypress = this.onKeyPress.bind(this);
-            this.canvas.onkeydown = this.onKeyDown.bind(this);
+
             this.canvas.tabIndex = 1000;
+
+            this.canvas.ontouchstart = this.onTouchStart;
+            this.canvas.ontouchend = this.onTouchEnd;
+            this.canvas.ontouchmove = (e) => {
+                this.onTouchMove(e);
+                e.preventDefault();
+            };
+            this.canvas.onkeypress = (e) => {
+                this.onKeyPress(e);
+                e.preventDefault();
+            };
+            this.canvas.onkeydown = (e) => {
+                this.onKeyDown(e);
+                e.preventDefault();
+            };
+
+            this.canvas.onclick = (e) => {
+                e.preventDefault();
+                return false;
+            };
             this.canvas.onmousemove = (e) => {
                 Mouse.x = e.offsetX;
                 Mouse.y = e.offsetY;
@@ -62,12 +96,20 @@ namespace Play.Client {
                 this.onMouseDown(e);
             };
             this.canvas.oncontextmenu = (e) => {
+                if (e && e.preventDefault) { e.preventDefault(); }
+                if (e && e.stopPropagation) { e.stopPropagation(); }
                 return false;
             };
             this.canvas.onselectstart = (e) => {
+                if (e && e.preventDefault) { e.preventDefault(); }
+                if (e && e.stopPropagation) { e.stopPropagation(); }
                 return false;
             };
-
+            this.canvas.ondragstart  = (e) => {
+                if (e && e.preventDefault) { e.preventDefault(); }
+                if (e && e.stopPropagation) { e.stopPropagation(); }
+                return false;
+            };
             this.tick = this.tick.bind(this);
             this.lastFrame = performance.now();
             window.requestAnimationFrame(this.tick);
@@ -82,14 +124,78 @@ namespace Play.Client {
         protected onMouseUp(e: MouseEvent): void {
         }
 
+        protected onTouchMove(e: TouchEvent): void {
+
+        }
+        protected onTouchStart(e: TouchEvent): void {
+            console.log("Game.onTouchStart", e);
+            Touch.startX = e.changedTouches[0].pageX;
+            Touch.startY = e.changedTouches[0].pageY;
+            Touch.touching = true;
+        }
+
+        protected onTouchEnd(e: TouchEvent): void {
+            console.log("Game.onTouchEnd", e);
+            Touch.touching = false;
+            Touch.endX = e.changedTouches[0].pageX;
+            Touch.endY = e.changedTouches[0].pageY;
+
+            let dirX = Touch.endX - Touch.startX;
+            let dirY = Touch.endY - Touch.startY;
+
+            let treshold = 20;
+
+            if (Math.abs(dirX) > Math.abs(dirY)) {
+                if (Math.abs(dirX) > treshold) {
+                    if (dirX > 0) {
+                        // swipe right
+                    } else {
+
+                    }
+                }
+            } else {
+                if (Math.abs(dirY) > treshold) {
+                    if (dirY > 0) {
+
+                    } else {
+
+                    }
+                }
+            }
+        }
+
         protected onMouseDown(e: MouseEvent): void {
+            console.log("Game.onMouseDown", e);
+            if (e.buttons == 1) {
+                let treshold = this.canvas.width / 3;
+                if (e.clientX < treshold) {
+                    this.onAction(Action.LEFT);
+                } else if (e.clientX > this.canvas.width - treshold) {
+                    this.onAction(Action.RIGHT);
+                } else {
+                    this.onAction(Action.CLICK);
+                }
+            }
+
         }
 
         protected onKeyDown(e: KeyboardEvent): void {
-
+            if (e.keyCode == 37) { // left
+                this.onAction(Action.LEFT);
+            } else if (e.keyCode == 39) { // right
+                this.onAction(Action.RIGHT);
+            } else if (e.keyCode == 40) { // down
+                this.onAction(Action.DOWN);
+            } else if (e.keyCode == 38) { // up
+                this.onAction(Action.UP);
+            }
         }
 
         protected onKeyPress(e: KeyboardEvent): void {
+
+        }
+
+        protected onAction(action: Action): void {
 
         }
 

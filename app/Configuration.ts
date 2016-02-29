@@ -5,6 +5,26 @@ enum EnvironmentType {
     Development
 }
 
+//document.body.ontouchstart = function (e) {
+//    if (e && e.preventDefault) {
+//        e.preventDefault();
+//    }
+//    if (e && e.stopPropagation) {
+//        e.stopPropagation();
+//    }
+//    return false;
+//};
+//
+//document.body.ontouchmove = function (e) {
+//    if (e && e.preventDefault) {
+//        e.preventDefault();
+//    }
+//    if (e && e.stopPropagation) {
+//        e.stopPropagation();
+//    }
+//    return false;
+//};
+
 var environment: EnvironmentType = EnvironmentType.Production;
 
 
@@ -187,27 +207,27 @@ var gamesConfiguration: IGameConfiguration[] = [
             "gravity": 1 / 512,
             "width": 10,
             "height": 20,
-        },{
+        }, {
             "id": "1player",
             "name": "1 Player",
             "maxPlayers": 1,
             "gravity": 1 / 512,
             "width": 10,
             "height": 20,
-        },{
+        }, {
             "id": "4players",
             "name": "4 Player",
             "maxPlayers": 4,
             "gravity": 1 / 512,
             "width": 16,
             "height": 20,
-        },{
+        }, {
             "id": "debug",
             "name": "debug",
             "maxPlayers": 1,
             "gravity": 1 / 512,
-            "width": 6,
-            "height": 10,
+            "width": 10,
+            "height": 20,
             development: true,
         }]
     }
