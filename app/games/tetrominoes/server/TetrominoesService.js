@@ -19,6 +19,7 @@ var Tetrominoes;
                 window.requestAnimationFrame(this.tick);
             }
             onMoveRequest(player, message) {
+                console.log("TetrominoesService.onMoveRequest", player.id, message.type);
                 let tetromino = this.playfield.tetrominoes.find(t => t.owner.id == player.id);
                 if (tetromino == null) {
                     return;
@@ -76,6 +77,7 @@ var Tetrominoes;
                     if (tetromino == null) {
                         let tetromino = this.generateTetromino(player);
                         this.playfield.tetrominoes.push(tetromino);
+                        console.log("TetrominoesService.createTetromino", tetromino.owner.id);
                         this.lobby.broadcast(new Tetrominoes.CreateTetrominoMessage(tetromino.owner.id, tetromino.type, tetromino.x));
                     }
                 }
@@ -89,7 +91,8 @@ var Tetrominoes;
                         let collision = this.playfield.collides(tetromino.x, tetromino.y + 1, tetromino.orientation, tetromino.type);
                         if (collision) {
                             let player = tetromino.owner;
-                            this.playfield.tetrominoes.splice(this.playfield.tetrominoes.indexOf(tetromino), 1);
+                            this.playfield.tetrominoes.splice(i, 1);
+                            console.log("TetrominoesService.destroyTetromino", player.id);
                             this.lobby.broadcast(new Tetrominoes.DestroyTetrominoMessage(player.id));
                             let shape = tetromino.getShape();
                             for (let y = 0; y < shape.length; y++) {
@@ -103,6 +106,7 @@ var Tetrominoes;
                                 this.lobby.gameOver();
                             }
                             boardUpdated = true;
+                            break;
                         }
                         else {
                             tetromino.y++;

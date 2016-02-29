@@ -85,11 +85,13 @@ var Tetrominoes;
                 }
             }
             onDestroyTetromino(message) {
+                console.log("TetrominoesGame.onDestroyTetromino", message.playerId);
                 let player = this.players.find(p => p.id == message.playerId);
-                let tetromino = this.playfield.tetrominoes.find(t => t.owner.id == player.id);
-                this.playfield.tetrominoes.splice(this.playfield.tetrominoes.indexOf(tetromino), 1);
+                let index = this.playfield.tetrominoes.findIndex(t => t.owner.id == player.id);
+                this.playfield.tetrominoes.splice(index, 1);
             }
             onCreateTetromino(message) {
+                console.log("TetrominoesGame.onCreateTetromino", message.playerId);
                 let player = this.players.find(p => p.id == message.playerId);
                 this.playfield.tetrominoes.push(new Tetrominoes.Tetromino(message.type, player, message.x, 0, 0, this.playfield.gravity));
             }
