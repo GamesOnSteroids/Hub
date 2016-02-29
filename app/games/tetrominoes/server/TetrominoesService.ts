@@ -32,6 +32,7 @@ namespace Tetrominoes.Server {
 
 
         private onMoveRequest(player: PlayerInfo, message: MoveRequestMessage): void {
+            console.log("TetrominoesService.onMoveRequest", player.id, message.type);
             let tetromino: Tetromino = this.playfield.tetrominoes.find(t => t.owner.id == player.id);
             if (tetromino == null) { // Can not move without active tetromino
                 return;
@@ -95,6 +96,7 @@ namespace Tetrominoes.Server {
                 if (tetromino == null) {
                     let tetromino = this.generateTetromino(player);
                     this.playfield.tetrominoes.push(tetromino);
+                    console.log("TetrominoesService.createTetromino", tetromino.owner.id);
                     this.lobby.broadcast(new CreateTetrominoMessage(tetromino.owner.id, tetromino.type, tetromino.x));
                 }
             }
@@ -113,7 +115,8 @@ namespace Tetrominoes.Server {
                     if (collision) {
                         let player = tetromino.owner;
 
-                        this.playfield.tetrominoes.splice(this.playfield.tetrominoes.indexOf(tetromino), 1);
+                        this.playfield.tetrominoes.splice(i, 1);
+                        console.log("TetrominoesService.destroyTetromino", player.id);
                         this.lobby.broadcast(new DestroyTetrominoMessage(player.id));
 
                         let shape = tetromino.getShape();
@@ -129,6 +132,7 @@ namespace Tetrominoes.Server {
                         }
 
                         boardUpdated = true;
+                        break; // If this tetromino was deleted no need to update timer
                     } else {
                         tetromino.y++;
                     }
