@@ -43,7 +43,7 @@ namespace Play {
                         let lobbyRef: Firebase = undefined;
                         let found = snapshot.forEach((lobbySnapshot) => {
                             let value = lobbySnapshot.val();
-                            if (value.playerCount < value.maxPlayers && value.gameId == configuration.gameId && value.gameVariant == configuration.gameConfiguration.id) {
+                            if (value.playerCount < value.maxPlayers && value.gameId == configuration.gameConfiguration.id && value.gameVariant == configuration.variant.id) {
                                 lobbyRef = lobbySnapshot.ref();
                                 return true;
                             }
@@ -52,10 +52,10 @@ namespace Play {
 
                             let lobbyDescription = {
                                 playerCount: 0,
-                                maxPlayers: configuration.maxPlayers,
-                                gameId: configuration.gameId,
+                                maxPlayers: configuration.variant.maxPlayers,
+                                gameId: configuration.gameConfiguration.id,
                                 createdAt: new Date(),
-                                gameVariant: configuration.gameConfiguration.id,
+                                gameVariant: configuration.variant.id,
                             };
 
                             let lobbyRef = lobbiesRef.push();
@@ -75,7 +75,7 @@ namespace Play {
                                 let serverLobby = new ServerLobby(lobbyId, configuration);
 
                                 let signalingService = new SignalingService();
-                                var ref = new Firebase(config.get(environment).firebaseURL).child("lobby").child(serverLobby.lobbyId).child("sdp");
+                                let ref = new Firebase(config.get(environment).firebaseURL).child("lobby").child(serverLobby.lobbyId).child("sdp");
                                 signalingService.createSignalingServer(serverLobby, new FirebaseSignalingChannel(ref));
 
 

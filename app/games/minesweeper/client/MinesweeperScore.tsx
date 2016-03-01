@@ -35,7 +35,7 @@ namespace Minesweeper.Client {
                                         return (
                                         <tr key={p.id}>
                                             <th scope="row">
-                                                <img src={"/app/games/minesweeper/assets/images/flag-" + p.team + ".png"}/>
+                                                <img src={"/app/games/minesweeper/assets/images/teams/" + p.team + ".png"}/>
                                             </th>
                                             <td>{p.name}</td>
                                             <td>{p.gameData.score}</td>

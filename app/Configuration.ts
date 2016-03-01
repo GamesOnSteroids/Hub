@@ -86,6 +86,15 @@ var gamesConfiguration: IGameConfiguration[] = [
                 mines: 40
             },
             {
+                id: "team2player",
+                name: "2 Players (Team Game)",
+                maxPlayers: 2,
+                width: 16,
+                height: 16,
+                mines: 40,
+                teamCount: 1
+            },
+            {
                 id: "3players",
                 name: "3 Players",
                 maxPlayers: 3,
@@ -207,6 +216,14 @@ var gamesConfiguration: IGameConfiguration[] = [
             "gravity": 1 / 512,
             "width": 10,
             "height": 20,
+        },{
+            "id": "2playerteam",
+            "name": "2 Players (Team Game)",
+            "maxPlayers": 2,
+            "gravity": 1 / 512,
+            "width": 10,
+            "height": 20,
+            teamCount: 1
         }, {
             "id": "1player",
             "name": "1 Player",
@@ -230,6 +247,10 @@ var gamesConfiguration: IGameConfiguration[] = [
             "height": 20,
             development: true,
         }]
+    }, {
+        "id": "runner",
+        "name": "Runner",
+        "variants": [],
     }
 
 ];

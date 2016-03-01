@@ -24,7 +24,7 @@ namespace Play.Client {
         CLICK
     }
 
-    export class Game {
+    export class Game<TVariant extends IGameVariant>{
         public changeListener = new EventDispatcher<this>();
 
         protected canvas: HTMLCanvasElement;
@@ -41,8 +41,8 @@ namespace Play.Client {
             return this.lobby.localPlayer;
         }
 
-        get configuration(): any {
-            return this.lobby.configuration.gameConfiguration;
+        get variant(): TVariant {
+            return <TVariant>this.lobby.configuration.variant;
         }
 
         protected emitChange(): void {

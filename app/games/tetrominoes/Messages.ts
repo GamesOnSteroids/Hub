@@ -2,6 +2,13 @@ namespace Tetrominoes {
     "use strict";
 
     import GameMessage = Play.GameMessage;
+    import IGameVariant = Play.IGameVariant;
+
+    export interface ITetrominoesVariant extends IGameVariant {
+        width: number;
+        height: number;
+        gravity: number;
+    }
 
     export var DROP_GRAVITY = 1 / 16;
 

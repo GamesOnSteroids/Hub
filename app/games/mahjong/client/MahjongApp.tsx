@@ -17,7 +17,7 @@ namespace Mahjong.Client {
             };
         }
 
-        protected componentDidMount() {
+        protected componentDidMount(): void {
             console.log("MahjongApp.componentDidMount");
 
             let game = ClientLobby.current.game as MahjongGame;

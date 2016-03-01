@@ -25,7 +25,7 @@ namespace Play.Client {
     export class ClientLobby {
         public static current: ClientLobby;
 
-        public game: Game;
+        public game: Game<IGameVariant>;
 
         public clientGUID: string;
         public localPlayer: PlayerInfo;
@@ -116,10 +116,14 @@ namespace Play.Client {
             console.log("ClientLobby.onPlayerReady");
             let player = this.players.find(p => p.id == message.playerId);
             player.isReady = true;
+            this.emitChange();
         }
 
         private onGameOver(message: GameOverMessage): void {
             console.log("ClientLobby.onGameOver");
+            for (let player of this.players) {
+                player.isReady = false;
+            }
             this.messageHandlers.get(ServiceType.Game).clear();
             this.state = LobbyState.GAME_OVER;
             this.emitChange();
@@ -129,7 +133,7 @@ namespace Play.Client {
             console.log("ClientLobby.onGameStart");
 
 
-            this.game = new this.configuration.gameClass(this);
+            this.game = new (ClassUtils.resolveClass<Game<IGameVariant>>(this.configuration.gameConfiguration.gameClass))(this);
 
             this.state = LobbyState.GAME_RUNNING;
             this.emitChange();

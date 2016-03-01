@@ -1,29 +1,24 @@
 namespace Play {
     "use strict";
 
+
+
+    export interface IGameVariant {
+        id: number;
+        maxPlayers: number;
+        teamCount?: number;
+    }
+
     export class LobbyConfiguration {
         public lobbyId: string;
-        public gameId: string;
 
-        /**
-         * Class representic react component for this game
-         */
-        public appClass: any;
-        /**
-         * Class containing client side game logic
-         */
-        public gameClass: any;
-        /**
-         * Class containing server side game logic
-         */
-        public serviceClass: any;
 
-        public maxPlayers: number;
-
+        public gameConfiguration: IGameConfiguration;
         /**
          * Configuration specific to this game and game variant
          */
-        public gameConfiguration: any;
+        public variant: IGameVariant;
+
     }
 
     export enum ServiceType {

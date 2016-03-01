@@ -1,4 +1,5 @@
 namespace Chess.Client {
+    import IChessVariant = Chess.Server.IChessVariant;
     "use strict";
 
     import Camera = Play.Client.Camera;
@@ -11,7 +12,7 @@ namespace Chess.Client {
     const TILE_HEIGHT: number = 42;
 
 
-    export class ChessGame extends Game {
+    export class ChessGame extends Game<IChessVariant> {
 
         private camera: Camera;
 
@@ -38,7 +39,7 @@ namespace Chess.Client {
                     score: 0,
                 };
             }
-            if (lobby.configuration.gameConfiguration.boardType == "4player") {
+            if (this.variant.boardType == "4player") {
                 this.chessBoard = new FourPlayerChessBoard();
             } else {
                 this.chessBoard = new TwoPlayerChessBoard();

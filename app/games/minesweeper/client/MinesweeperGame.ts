@@ -10,19 +10,39 @@ namespace Minesweeper.Client {
 
     const TILE_SIZE = 30;
 
-    export class MinesweeperGame extends Game {
+    export class MinesweeperAssets {
+        public hidden: HTMLImageElement;
+        public over: HTMLImageElement;
+
+        public reveal: HTMLImageElement[];
+        public mines: HTMLImageElement[];
+        public flags: HTMLImageElement[];
+
+
+        public numbers: HTMLImageElement[];
+
+        public explosion: HTMLImageElement;
+
+        public boom: HTMLAudioElement;
+        public tilesingle: HTMLAudioElement;
+        public tilemultiple: HTMLAudioElement;
+        public start: HTMLAudioElement;
+        public invalidmove: HTMLAudioElement;
+    }
+
+    export class MinesweeperGame extends Game<IMinesweeperVariant> {
         public remainingMines: number;
 
         private camera: Camera;
         private minefield: Minefield;
-        private assets: any;
+        private assets: MinesweeperAssets;
 
         private sprites: Sprite[];
 
         constructor(lobby: ClientLobby) {
             super(lobby);
 
-            this.remainingMines = this.configuration.mines;
+            this.remainingMines = this.variant.mines;
 
             for (let player of this.players) {
                 player.gameData = {
@@ -32,7 +52,7 @@ namespace Minesweeper.Client {
                 };
             }
 
-            this.minefield = new Minefield(this.configuration.width, this.configuration.height);
+            this.minefield = new Minefield(this.variant.width, this.variant.height);
 
             for (let i = 0; i < this.minefield.width * this.minefield.height; i++) {
                 let field: Field = new Field();
@@ -294,7 +314,7 @@ namespace Minesweeper.Client {
         }
 
         private load(): void {
-            this.assets = {};
+            this.assets = new MinesweeperAssets();
 
             let root = "app/games/minesweeper/assets/";
 

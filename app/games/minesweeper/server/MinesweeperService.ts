@@ -6,7 +6,8 @@ namespace Minesweeper.Server {
     import ServerLobby = Play.Server.ServerLobby;
     import IPlayerInfo = Play.IPlayerInfo;
 
-    export class MinesweeperService extends GameService {
+
+    export class MinesweeperService extends GameService<IMinesweeperVariant> {
 
         private static SCORE_INCORRECT_FLAG = -500;
         private static SCORE_CORRECT_FLAG = 250;
@@ -27,8 +28,8 @@ namespace Minesweeper.Server {
             this.on(MessageId.CMSG_MASS_REVEAL_REQUEST, this.onMassRevealRequest.bind(this));
 
 
-            this.minefield = new Minefield(this.configuration.width, this.configuration.height);
-            this.mines = this.configuration.mines;
+            this.minefield = new Minefield(this.variant.width, this.variant.height);
+            this.mines = this.variant.mines;
         }
 
         private checkGameOver(): void {

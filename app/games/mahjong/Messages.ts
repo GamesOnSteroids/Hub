@@ -2,6 +2,11 @@ namespace Mahjong {
     "use strict";
 
     import GameMessage = Play.GameMessage;
+    import IGameVariant = Play.IGameVariant;
+
+    export interface IMahjongVariant extends IGameVariant{
+
+    }
 
     export enum TileId {
         MAN_1,

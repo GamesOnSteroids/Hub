@@ -6,7 +6,7 @@ import ClientLobby = Play.Client.ClientLobby;
 
 class GameOver extends React.Component<any, any> {
 
-    render() {
+    public render(): JSX.Element {
         var overlayStyle = {
             position: "absolute",
             right: 0,
@@ -30,22 +30,46 @@ class GameOver extends React.Component<any, any> {
                     </button>
                 </div>
             </div>
-        )
+        );
     }
 }
 
-class PlayerInfoComponent extends React.Component<{key:string, player:PlayerInfo}, any> {
-    render() {
-        return <div>{this.props.player.name}</div>
+class PlayerInfoComponent extends React.Component<{key: string, player: PlayerInfo}, any> {
+    public render(): JSX.Element {
+        let teamIcon = `app/games/${ClientLobby.current.configuration.gameConfiguration.id}/assets/images/teams/${this.props.player.team}.png`;
+        return (
+            <tr>
+                <td>
+                    <img src={teamIcon}/>
+                </td>
+                <td>{this.props.player.name}</td>
+                <td>{this.props.player.isReady ? <span className="glyphicon glyphicon-ok"/> : ""}</td>
+            </tr>
+        );
     }
 }
 class PlayerList extends React.Component<{players: PlayerInfo[]}, any> {
-    render() {
-        return <div>
-            {this.props.players.map( (player: PlayerInfo) => {
-                return <PlayerInfoComponent key={player.id} player={player}/>
-                })}
-        </div>
+    public render(): JSX.Element {
+        return (
+            <div className="row">
+                <div className="col-xs-12">
+                    <table className="table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Nickname</th>
+                                <th>Ready?</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {this.props.players.map( (player: PlayerInfo) => {
+                                return <PlayerInfoComponent key={player.id} player={player}/>;
+                                })}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        );
     }
 }
 
@@ -56,7 +80,7 @@ class LobbyComponent extends React.Component<any, {state: LobbyState, players: P
     constructor() {
         super();
         console.log("LobbyComponent.constructor");
-        var lobby = ClientLobby.current;
+        let lobby = ClientLobby.current;
         this.state = {state: lobby.state, players: lobby.players};
 
         this.changeListenerToken = lobby.changeListener.register((lobby, completed) => {
@@ -67,7 +91,7 @@ class LobbyComponent extends React.Component<any, {state: LobbyState, players: P
 
     protected componentWillUnmount(): void {
         console.log("LobbyComponent.componentWillUnmount");
-        var lobby = ClientLobby.current;
+        let lobby = ClientLobby.current;
         lobby.changeListener.unregister(this.changeListenerToken);
     }
 
@@ -106,13 +130,15 @@ class LobbyComponent extends React.Component<any, {state: LobbyState, players: P
                     </div>
 
                 </div>
-            )
+            );
         } else if (this.state.state == LobbyState.GAME_RUNNING || this.state.state == LobbyState.GAME_OVER) {
-            var app = React.createElement(ClientLobby.current.configuration.appClass);
-            return (<div>
-                {app}
-                {this.state.state == LobbyState.GAME_OVER?<GameOver onBackToLobby={this.backToLobby}/>:""}
-            </div>)
+            var app = React.createElement(ClassUtils.resolveClass<React.Component<any, any>>(ClientLobby.current.configuration.gameConfiguration.appClass));
+            return (
+                <div>
+                    {app}
+                    {this.state.state == LobbyState.GAME_OVER ? <GameOver onBackToLobby={this.backToLobby}/> : ""}
+                </div>
+            );
         } else {
             throw "Unknown state";
         }

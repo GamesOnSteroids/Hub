@@ -6,7 +6,8 @@ namespace Tetrominoes.Server {
     import ServerLobby = Play.Server.ServerLobby;
     // import IPlayerInfo = Play.IPlayerInfo;
 
-    export class TetrominoesService extends GameService { //  extends GameService<TetrominoesConfiguration, TetrominoesPlayerInfo> {
+
+    export class TetrominoesService extends GameService<ITetrominoesVariant> { //  extends GameService<TetrominoesConfiguration, TetrominoesPlayerInfo> {
 
         private playfield: Playfield;
 
@@ -17,7 +18,7 @@ namespace Tetrominoes.Server {
 
             // let configuration = this.lobby.configuration.gameConfiguration;
 
-            this.playfield = new Playfield(this.configuration.width, this.configuration.height, this.configuration.gravity);
+            this.playfield = new Playfield(this.variant.width, this.variant.height, this.variant.gravity);
             for (let player of this.players) {
                 player.gameData = {
                     lines: 0
@@ -190,7 +191,7 @@ namespace Tetrominoes.Server {
                 }
 
                 this.playfield.lines += lines;
-                let level = Math.ceil(this.playfield.lines / 4);
+                let level = Math.ceil(this.playfield.lines / 8);
                 if (level != this.playfield.level) {
                     this.playfield.level = level;
                     this.playfield.gravity = level / 512;
@@ -198,9 +199,6 @@ namespace Tetrominoes.Server {
                 }
 
             }
-
-            // test if there is full line
-            // if yes, remove line,
 
             if (boardUpdated) {
                 this.updateBoard();

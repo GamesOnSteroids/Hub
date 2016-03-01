@@ -10,14 +10,13 @@ namespace Anagrams.Client {
         constructor() {
             super();
 
-            let game = ClientLobby.current.game as AnagramsGame;
 
             this.state = {
                 players: ClientLobby.current.players,
-            }
+            };
         }
 
-        componentDidMount() {
+        protected componentDidMount(): void {
             console.log("AnagramsApp.componentDidMount");
 
             let game = ClientLobby.current.game as AnagramsGame;

@@ -20,7 +20,7 @@ namespace Play.Server {
         public configuration: LobbyConfiguration;
         public lobbyId: string;
         public state: LobbyState = LobbyState.IN_LOBBY;
-        public gameService: GameService;
+        public gameService: GameService<IGameVariant>;
 
         private messageHandlers = new Map<ServiceType, Map<number, (client: Client, msg: Message) => void>>([
             [ServiceType.Lobby, new Map<number, (client: Client, msg: Message) => void>()],
@@ -74,7 +74,7 @@ namespace Play.Server {
 
 
         public startGame(): void {
-            this.gameService = new this.configuration.serviceClass(this);
+            this.gameService = new (ClassUtils.resolveClass<GameService<IGameVariant>>(this.configuration.gameConfiguration.serviceClass))(this);
             this.state = LobbyState.GAME_RUNNING;
             this.broadcast(new GameStartMessage());
             this.gameService.start();
@@ -92,6 +92,8 @@ namespace Play.Server {
             }
             client.isReady = true;
 
+            this.broadcast(new PlayerReadyMessage(client.id));
+
             let readyCount = 0;
             for (let c of this.clients) {
                 if (c.isReady) {
@@ -99,7 +101,7 @@ namespace Play.Server {
                 }
             }
 
-            if (readyCount == this.configuration.maxPlayers) {
+            if (readyCount == this.configuration.variant.maxPlayers) {
                 this.startGame();
             }
         }
@@ -109,8 +111,12 @@ namespace Play.Server {
             // todo: if the game is already running, disconnect client
 
             client.name = msg.name;
-            client.team = this.clients.indexOf(client);
 
+            let teamCount = this.configuration.variant.teamCount;
+            if (teamCount == null) {
+                teamCount = this.configuration.variant.maxPlayers;
+            }
+            client.team = Math.floor(this.clients.indexOf(client) % teamCount);
             client.isConnected = true;
 
             for (let other of this.clients) {

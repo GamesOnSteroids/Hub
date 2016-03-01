@@ -8,7 +8,7 @@
 }
 
 class ClassUtils {
-    public static resolveClass(name: string): void {
+    public static resolveClass<T>(name: string): new(_: any) => T {
         let result: any = window;
         for (let part of name.split(".")) {
             result = result[part];

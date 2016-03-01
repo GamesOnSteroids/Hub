@@ -4,7 +4,7 @@ namespace Play.Server {
     import GameMessage = Play.GameMessage;
 
 
-    export abstract class GameService extends Service {
+    export abstract class GameService<TVariant extends IGameVariant> extends Service {
 
         private lastFrame: number;
 
@@ -26,8 +26,8 @@ namespace Play.Server {
             return this.lobby.clients;
         }
 
-        protected get configuration(): any {
-            return this.lobby.configuration.gameConfiguration;
+        protected get variant(): TVariant {
+            return <TVariant>this.lobby.configuration.variant;
         }
 
         /**

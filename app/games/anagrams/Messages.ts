@@ -1,8 +1,12 @@
 namespace Anagrams {
     "use strict";
 
+    import IGameVariant = Play.IGameVariant;
     import GameMessage = Play.GameMessage;
 
+    export interface IAnagramsVariant extends IGameVariant{
+
+    }
 
     export enum MessageId {
         CMSG_WORD_GUESS = 1,

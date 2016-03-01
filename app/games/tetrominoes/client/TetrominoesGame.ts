@@ -11,7 +11,7 @@ namespace Tetrominoes.Client {
     const TILE_SIZE = 32;
 
 
-    export class TetrominoesGame extends Game {
+    export class TetrominoesGame extends Game<ITetrominoesVariant> {
 
         private camera: Camera;
         private assets: any;
@@ -24,7 +24,7 @@ namespace Tetrominoes.Client {
 
             this.load();
 
-            this.playfield = new Playfield(this.configuration.width, this.configuration.height, this.configuration.gravity);
+            this.playfield = new Playfield(this.variant.width, this.variant.height, this.variant.gravity);
 
             this.on(MessageId.SMSG_CREATE_TETROMINO, this.onCreateTetromino.bind(this));
             this.on(MessageId.SMSG_DESTROY_TETROMINO, this.onDestroyTetromino.bind(this));
@@ -46,8 +46,8 @@ namespace Tetrominoes.Client {
         public initialize(): void {
             super.initialize();
 
-            this.canvas.width = this.configuration.width * TILE_SIZE;
-            this.canvas.height = this.configuration.height * TILE_SIZE;
+            this.canvas.width = this.variant.width * TILE_SIZE;
+            this.canvas.height = this.variant.height * TILE_SIZE;
             (this.context as any).imageSmoothingEnabled = false;
 
 

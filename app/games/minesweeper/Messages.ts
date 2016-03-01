@@ -1,6 +1,14 @@
 namespace Minesweeper {
     "use strict";
+
     import GameMessage = Play.GameMessage;
+    import IGameVariant = Play.IGameVariant;
+
+    export interface IMinesweeperVariant extends IGameVariant {
+        width: number;
+        height: number;
+        mines: number;
+    }
 
     export enum MessageId {
         CMSG_REVEAL_REQUEST = 1,

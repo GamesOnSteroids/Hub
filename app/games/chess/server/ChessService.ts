@@ -1,14 +1,18 @@
 namespace Chess.Server {
     "use strict";
 
+    import IGameVariant = Play.IGameVariant;
     import GameService = Play.Server.GameService;
     import ServerLobby = Play.Server.ServerLobby;
     import MessageId = Chess.MessageId;
     import CreatePieceMessage = Chess.CreatePieceMessage;
     import Client = Play.Server.Client;
 
+    export interface IChessVariant extends IGameVariant {
+        boardType: string;
+    }
 
-    export class ChessService extends GameService {
+    export class ChessService extends GameService<IChessVariant> {
 
         private static scores = new Map<PieceType, number>(
             [
@@ -26,7 +30,7 @@ namespace Chess.Server {
         constructor(lobby: ServerLobby) {
             super(lobby);
 
-            if (lobby.configuration.gameConfiguration.boardType == "4player") {
+            if (this.variant.boardType == "4player") {
                 this.chessBoard = new FourPlayerChessBoard();
             } else {
                 this.chessBoard = new TwoPlayerChessBoard();

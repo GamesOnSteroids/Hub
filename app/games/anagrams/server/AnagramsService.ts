@@ -5,20 +5,21 @@ namespace Anagrams.Server {
     import ServerLobby = Play.Server.ServerLobby;
     import Client = Play.Server.Client;
 
-    export class AnagramsService extends GameService {
 
-        constructor(lobby:ServerLobby) {
+    export class AnagramsService extends GameService<IAnagramsVariant> {
+
+        constructor(lobby: ServerLobby) {
             super(lobby);
 
             this.on(MessageId.CMSG_WORD_GUESS, this.onWordGuess.bind(this));
         }
 
-        private onWordGuess(player:Client, message:WordGuessMessage): void {
+        private onWordGuess(player: Client, message: WordGuessMessage): void {
             // todo: implement
         }
 
         private randomChar(value: string): string {
-            return value[(Math.random() * value.length) | 0];
+            return value[Math.floor(Math.random() * value.length)];
         }
 
         private generateLetters(): void {

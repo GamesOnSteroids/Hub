@@ -5,7 +5,7 @@ namespace Anagrams.Client {
     import Game = Play.Client.Game;
     import ClientLobby = Play.Client.ClientLobby;
 
-    export class AnagramsGame extends Game {
+    export class AnagramsGame extends Game<IAnagramsVariant> {
 
         private camera: Camera;
 
