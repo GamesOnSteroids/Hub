@@ -33,7 +33,6 @@ class GameDescription extends React.Component<{ gameConfiguration: IGameConfigur
                             </div>
                             <div className="col-md-12">
                                 <span><b>{gameCount}</b> being played</span>
-
                             </div>
                         </div>
                     </div>
