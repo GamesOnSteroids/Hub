@@ -20,6 +20,18 @@ var Play;
                 }
             }, true);
         }
+        getLobbyList() {
+            return new Promise((resolve, reject) => {
+                let lobbiesRef = new Firebase(config.get(environment).firebaseURL).child("lobby");
+                lobbiesRef.once("value", (snapshot) => {
+                    let result = [];
+                    snapshot.forEach((lobbySnapshot) => {
+                        result.push(lobbySnapshot.val());
+                    });
+                    resolve(result);
+                });
+            });
+        }
         findLobby(configuration) {
             return new Promise((resolve, reject) => {
                 let lobbiesRef = new Firebase(config.get(environment).firebaseURL).child("lobby");
