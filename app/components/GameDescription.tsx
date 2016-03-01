@@ -12,7 +12,7 @@ class GameDescription extends React.Component<{ gameConfiguration: IGameConfigur
 
     public render(): JSX.Element {
 
-        let gameCount: JSX.Element;
+        let gameCount: string;
         if (this.props.gameCount == null) {
             gameCount = "No games";
         } else if (this.props.gameCount == 1) {
