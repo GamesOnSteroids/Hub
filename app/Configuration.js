@@ -203,5 +203,6 @@ var gamesConfiguration = [
         "id": "runner",
         "name": "Runner",
         "variants": [],
+        development: true
     }
 ];
