@@ -1,6 +1,6 @@
 "use strict";
 
-class GameDescription extends React.Component<{ gameConfiguration: IGameConfiguration }, any> {
+class GameDescription extends React.Component<{ gameConfiguration: IGameConfiguration, gameCount: number }, any> {
 
     constructor() {
         super();
@@ -11,15 +11,33 @@ class GameDescription extends React.Component<{ gameConfiguration: IGameConfigur
     //TODO: generate gameconfig id based on selected settings, change player number to ocmbo box
 
     public render(): JSX.Element {
+
+        let gameCount: JSX.Element;
+        if (this.props.gameCount == null) {
+            gameCount = "No games";
+        } else if (this.props.gameCount == 1) {
+            gameCount = "1 game";
+        } else {
+            gameCount = `${this.props.gameCount} games`;
+        }
+
         return (
             <div style={{ padding: "5px"}}>
                 <h3 style={{backgroundColor: "#eee", padding:"0"}} className="text-center">{this.props.gameConfiguration.name}</h3>
-                <div>
-                    <div className="pull-left">
-                        <img width="128"
-                             src={"app/games/" + this.props.gameConfiguration.id + "/assets/images/logo.png"}/>
+                <div className="row">
+                    <div className="col-md-4">
+                        <div className="row">
+                            <div className="col-md-12">
+                                <img className="img-responsive img-thumbnail"
+                                     src={"app/games/" + this.props.gameConfiguration.id + "/assets/images/logo.png"}/>
+                            </div>
+                            <div className="col-md-12">
+                                <span><b>{gameCount}</b> being played</span>
+
+                            </div>
+                        </div>
                     </div>
-                    <div className="pull-right">
+                    <div className="col-md-6">
                         <div className="btn-group-vertical" role="group">
                             { this.props.gameConfiguration.variants
                                 .filter((v: any) => v.development != true || environment == EnvironmentType.Development)
@@ -32,11 +50,7 @@ class GameDescription extends React.Component<{ gameConfiguration: IGameConfigur
                         </div>
                     </div>
                 </div>
-                <div className="row">
-                    <div className="col-md-12">
-                        <span>Currently playing: ? games</span>
-                    </div>
-                </div>
+
             </div>
         );
     }

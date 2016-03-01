@@ -12,6 +12,14 @@ namespace Play {
         onClientJoined(lobby: ServerLobby, client: Client): void;
     }
 
+    export interface ILobbyDescription {
+        playerCount: number;
+        maxPlayers: number;
+        gameId: string;
+        createdAt: Date;
+        gameVariant: string;
+    }
+
     export class FirebaseLobbyService implements ILobbyService {
 
         public onClientJoined(lobby: ServerLobby, client: Client): void {
@@ -29,6 +37,19 @@ namespace Play {
                     console.error(error);
                 }
             }, true);
+        }
+
+        public getLobbyList(): Promise<ILobbyDescription[]> {
+            return new Promise<ILobbyDescription[]>((resolve, reject) => {
+                let lobbiesRef = new Firebase(config.get(environment).firebaseURL).child("lobby");
+                lobbiesRef.once("value", (snapshot) => {
+                    let result: ILobbyDescription[] = [];
+                    snapshot.forEach( (lobbySnapshot) => {
+                        result.push(lobbySnapshot.val());
+                    });
+                    resolve(result);
+                });
+            });
         }
 
         public findLobby(configuration: LobbyConfiguration): Promise<ClientLobby> {

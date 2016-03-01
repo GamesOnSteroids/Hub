@@ -1,12 +1,36 @@
 "use strict";
 
-class GameList extends React.Component<any, any> {
+import FirebaseLobbyService = Play.FirebaseLobbyService;
+import ILobbyDescription = Play.ILobbyDescription;
+
+class GameList extends React.Component<any, {lobbies: ILobbyDescription[]}> {
 
     constructor() {
         super();
+
+        let lobbyService = new FirebaseLobbyService();
+        lobbyService.getLobbyList().then( (lobbies) => {
+           this.setState({
+               lobbies: lobbies
+           });
+        });
+        this.state = {
+            lobbies: []
+        };
     }
 
     public render(): JSX.Element {
+
+        let gameCounts = new Map<string, number>();
+        for (let lobby of this.state.lobbies) {
+            let count = gameCounts.get(lobby.gameId);
+            if (count == null) {
+                count = 1;
+            } else {
+                count++;
+            }
+            gameCounts.set(lobby.gameId, count);
+        }
 
         return (
             <div className="row">
@@ -18,7 +42,7 @@ class GameList extends React.Component<any, any> {
 
                     result.push(
                     <div className="col-lg-3 col-md-4 col-sm-6 col-xs-12">
-                        <GameDescription gameConfiguration={gameConfiguration}/>
+                        <GameDescription gameConfiguration={gameConfiguration} gameCount={gameCounts.get(gameConfiguration.id)}/>
                     </div>);
                     if (index % 4 == 0) {
                         result.push(<div className="visible-lg clearfix divider"></div>);
