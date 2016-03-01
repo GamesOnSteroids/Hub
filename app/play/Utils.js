@@ -12,7 +12,7 @@ class ClassUtils {
         for (let part of name.split(".")) {
             result = result[part];
         }
-        if (result == undefined) {
+        if (result == null) {
             throw `Class: ${name} not found`;
         }
         return result;

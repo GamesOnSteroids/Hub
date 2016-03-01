@@ -26,7 +26,7 @@ var Chess;
             }
             update(delta) {
                 for (let piece of this.chessBoard.pieces) {
-                    if (piece.goal != undefined) {
+                    if (piece.goal != null) {
                         let length = MathUtils.length(piece.start.x, piece.start.y, piece.goal.x, piece.goal.y);
                         piece.movementProgress += (delta * Chess.MOVEMENT_SPEED) / length;
                         if (piece.movementProgress > 1) {
@@ -36,15 +36,15 @@ var Chess;
                         piece.y = Math.round(MathUtils.lerp(piece.start.y, piece.goal.y, piece.movementProgress));
                         if (piece.type != Chess.PieceType.Knight || piece.movementProgress == 1) {
                             let collision = this.chessBoard.pieces.find(p => p.x == piece.x && p.y == piece.y && p.id != piece.id);
-                            if (collision != undefined) {
+                            if (collision != null) {
                                 this.destroyPiece(collision);
                                 let score = ChessService.scores.get(piece.type);
                                 this.lobby.broadcast(new Chess.ScoreMessage(piece.owner.id, score));
                             }
                         }
                         if (piece.movementProgress == 1) {
-                            piece.goal = undefined;
-                            piece.start = undefined;
+                            piece.goal = null;
+                            piece.start = null;
                             piece.movementProgress = 0;
                             piece.timer = Chess.LOCK_TIMER;
                         }
@@ -66,7 +66,7 @@ var Chess;
             }
             onMovePieceRequest(player, message) {
                 let piece = this.chessBoard.pieces.find(p => p.id == message.pieceId);
-                if (piece != undefined) {
+                if (piece != null) {
                     piece.goTo(message.x, message.y);
                     this.lobby.broadcast(new Chess.MovePieceMessage(piece.id, message.x, message.y));
                 }

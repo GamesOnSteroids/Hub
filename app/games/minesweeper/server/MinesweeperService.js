@@ -52,7 +52,7 @@ var Minesweeper;
                     }
                 }
                 else {
-                    field.owner = undefined;
+                    field.owner = null;
                     this.lobby.broadcast(new Minesweeper.FlagMessage(client.id, fieldId, false));
                     if (field.hasMine) {
                         this.flaggedMines--;
@@ -150,7 +150,7 @@ var Minesweeper;
                 for (let i = 0; i < result.width * result.height; i++) {
                     let field = new Minesweeper.Field();
                     field.hasMine = false;
-                    field.owner = undefined;
+                    field.owner = null;
                     result.fields.push(field);
                 }
                 let safePosition = { x: (safeFieldId % result.width) | 0, y: (safeFieldId / result.width) | 0 };

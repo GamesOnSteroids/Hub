@@ -43,7 +43,7 @@ var Play;
             }
             onMessage(msg) {
                 let handler = this.messageHandlers.get(msg.service).get(msg.id);
-                if (handler != undefined) {
+                if (handler != null) {
                     handler(msg);
                 }
             }

@@ -26,7 +26,7 @@ var Minesweeper;
                 for (let i = 0; i < this.minefield.width * this.minefield.height; i++) {
                     let field = new Minesweeper.Field();
                     field.hasMine = false;
-                    field.owner = undefined;
+                    field.owner = null;
                     this.minefield.fields.push(field);
                 }
                 this.load();
@@ -129,7 +129,7 @@ var Minesweeper;
                 if (field.isRevealed) {
                     return;
                 }
-                if (field.owner != undefined) {
+                if (field.owner != null) {
                     if (field.owner.id == this.localPlayer.id) {
                         this.send(new Minesweeper.FlagRequestMessage(x + y * this.minefield.width, false));
                     }
@@ -192,7 +192,7 @@ var Minesweeper;
                     field.hasFlag = true;
                 }
                 else {
-                    field.owner = undefined;
+                    field.owner = null;
                     field.hasFlag = false;
                 }
                 this.emitChange();
@@ -206,7 +206,7 @@ var Minesweeper;
                 field.adjacentMines = msg.adjacentMines;
                 field.hasMine = msg.hasMine;
                 field.hasFlag = false;
-                if (oldOwner != undefined) {
+                if (oldOwner != null) {
                     oldOwner.gameData.flags--;
                     this.emitChange();
                 }
