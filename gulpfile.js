@@ -1,6 +1,7 @@
 var gulp = require('gulp');
 var ts = require('gulp-typescript');
 var ghPages = require('gulp-gh-pages');
+var del = require('del');
 
 gulp.task("default", ["compile-typescript", "copy-files"], function () {
     return gulp.src('.dist/**/*')

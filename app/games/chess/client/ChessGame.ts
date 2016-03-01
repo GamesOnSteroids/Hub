@@ -66,7 +66,7 @@ namespace Chess.Client {
             this.camera.update(delta);
 
             for (let piece of this.chessBoard.pieces) {
-                if (piece.goal != undefined) {
+                if (piece.goal != null) {
                     let length = MathUtils.length(piece.start.x, piece.start.y, piece.goal.x, piece.goal.y);
                     piece.movementProgress += (delta * MOVEMENT_SPEED) / length;
                     if (piece.movementProgress > 1) {
@@ -78,8 +78,8 @@ namespace Chess.Client {
                     if (piece.movementProgress == 1) {
                         piece.x = piece.goal.x;
                         piece.y = piece.goal.y;
-                        piece.goal = undefined;
-                        piece.start = undefined;
+                        piece.goal = null;
+                        piece.start = null;
                         piece.movementProgress = 0;
                         piece.timer = LOCK_TIMER;
                     }
@@ -117,7 +117,7 @@ namespace Chess.Client {
                     }
                 }
             }
-            if (this.selectedPiece != undefined) {
+            if (this.selectedPiece != null) {
                 ctx.fillStyle = "#FFCC00";
                 ctx.fillRect(this.selectedPiece.x * TILE_WIDTH, this.selectedPiece.y * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT);
 
@@ -148,22 +148,22 @@ namespace Chess.Client {
 
             if (Mouse.button == 1) {
                 let piece = this.chessBoard.pieces.find(p => p.x == x && p.y == y);
-                if (piece != undefined && piece.timer <= 0 && piece.movementProgress == 0 && piece.owner.id == this.localPlayer.id) {
+                if (piece != null && piece.timer <= 0 && piece.movementProgress == 0 && piece.owner.id == this.localPlayer.id) {
 
                     console.log("Select", PieceType[piece.type], x, y);
                     this.selectedPiece = piece;
-                } else if (this.selectedPiece != undefined) {
+                } else if (this.selectedPiece != null) {
                     console.log("MoveTo", PieceType[this.selectedPiece.type], x, y);
                     let validMoves = this.selectedPiece.getValidMoves(this.chessBoard);
-                    if (validMoves.find(m => m.x == x && m.y == y) != undefined) {
+                    if (validMoves.find(m => m.x == x && m.y == y) != null) {
                         this.movePiece(this.selectedPiece, x, y);
-                        this.selectedPiece = undefined;
+                        this.selectedPiece = null;
                     }
 
                 }
             } else if (Mouse.button == 2) {
                 console.log("Deselect");
-                this.selectedPiece = undefined;
+                this.selectedPiece = null;
             }
         }
 
@@ -196,7 +196,7 @@ namespace Chess.Client {
             console.log("ChessGame.onDestroyPiece", message);
             let piece = this.chessBoard.pieces.find(p => p.id == message.pieceId);
             if (this.selectedPiece == piece) {
-                this.selectedPiece = undefined;
+                this.selectedPiece = null;
             }
             this.chessBoard.pieces.splice(this.chessBoard.pieces.indexOf(piece), 1);
             piece.owner.gameData.pieces--;
@@ -234,7 +234,7 @@ namespace Chess.Client {
 
             let x: number;
             let y: number;
-            if (piece.goal != undefined) {
+            if (piece.goal != null) {
                 x = MathUtils.lerp(piece.start.x, piece.goal.x, piece.movementProgress) * TILE_WIDTH;
                 y = MathUtils.lerp(piece.start.y, piece.goal.y, piece.movementProgress) * TILE_HEIGHT;
             } else {

@@ -20,12 +20,12 @@ namespace Play {
             let lobbyRef = firebase.child("lobby").child(lobby.lobbyId);
 
             lobbyRef.transaction((data) => {
-                if (data != undefined) {
+                if (data != null) {
                     data.playerCount += 1;
                 }
                 return data;
             }, (error, commited, snapshot) => {
-                if (error != undefined) {
+                if (error != null) {
                     console.error(error);
                 }
             }, true);
@@ -36,11 +36,11 @@ namespace Play {
                 let lobbiesRef = new Firebase(config.get(environment).firebaseURL).child("lobby");
 
                 // no desired game
-                if (configuration.lobbyId == undefined) {
+                if (configuration.lobbyId == null) {
 
                     // try to find relevant games
                     lobbiesRef.once("value", (snapshot) => {
-                        let lobbyRef: Firebase = undefined;
+                        let lobbyRef: Firebase = null;
                         let found = snapshot.forEach((lobbySnapshot) => {
                             let value = lobbySnapshot.val();
                             if (value.playerCount < value.maxPlayers && value.gameId == configuration.gameConfiguration.id && value.gameVariant == configuration.variant.id) {
@@ -60,6 +60,7 @@ namespace Play {
 
                             let lobbyRef = lobbiesRef.push();
                             lobbyRef.set(lobbyDescription, () => {
+                                lobbyRef.onDisconnect().remove()
 
                                 let lobbyId = lobbyRef.key();
 

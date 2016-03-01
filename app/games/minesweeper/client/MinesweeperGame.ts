@@ -57,7 +57,7 @@ namespace Minesweeper.Client {
             for (let i = 0; i < this.minefield.width * this.minefield.height; i++) {
                 let field: Field = new Field();
                 field.hasMine = false;
-                field.owner = undefined;
+                field.owner = null;
 
                 this.minefield.fields.push(field);
             }
@@ -193,7 +193,7 @@ namespace Minesweeper.Client {
                 return;
             }
 
-            if (field.owner != undefined) {
+            if (field.owner != null) {
                 if (field.owner.id == this.localPlayer.id) {
                     this.send(new FlagRequestMessage(x + y * this.minefield.width, false));
                 }
@@ -264,7 +264,7 @@ namespace Minesweeper.Client {
                 field.owner = player;
                 field.hasFlag = true;
             } else {
-                field.owner = undefined;
+                field.owner = null;
                 field.hasFlag = false;
             }
 
@@ -283,7 +283,7 @@ namespace Minesweeper.Client {
             field.adjacentMines = msg.adjacentMines;
             field.hasMine = msg.hasMine;
             field.hasFlag = false;
-            if (oldOwner != undefined) {
+            if (oldOwner != null) {
                 oldOwner.gameData.flags--;
                 this.emitChange();
             }

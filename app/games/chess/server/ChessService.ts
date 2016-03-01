@@ -51,7 +51,7 @@ namespace Chess.Server {
 
         protected update(delta: number): void {
             for (let piece of this.chessBoard.pieces) {
-                if (piece.goal != undefined) {
+                if (piece.goal != null) {
 
                     let length = MathUtils.length(piece.start.x, piece.start.y, piece.goal.x, piece.goal.y);
                     piece.movementProgress += (delta * MOVEMENT_SPEED) / length;
@@ -65,7 +65,7 @@ namespace Chess.Server {
                     if (piece.type != PieceType.Knight || piece.movementProgress == 1) {
                         let collision = this.chessBoard.pieces.find(p => p.x == piece.x && p.y == piece.y && p.id != piece.id);
 
-                        if (collision != undefined) {
+                        if (collision != null) {
                             this.destroyPiece(collision);
 
                             let score = ChessService.scores.get(piece.type);
@@ -74,8 +74,8 @@ namespace Chess.Server {
                     }
 
                     if (piece.movementProgress == 1) {
-                        piece.goal = undefined;
-                        piece.start = undefined;
+                        piece.goal = null;
+                        piece.start = null;
                         piece.movementProgress = 0;
                         piece.timer = LOCK_TIMER;
 
@@ -103,7 +103,7 @@ namespace Chess.Server {
 
         private onMovePieceRequest(player: Client, message: MovePieceRequestMessage): void {
             let piece = this.chessBoard.pieces.find(p => p.id == message.pieceId);
-            if (piece != undefined) {
+            if (piece != null) {
                 // todo: check if move is valid
                 piece.goTo(message.x, message.y);
                 this.lobby.broadcast(new MovePieceMessage(piece.id, message.x, message.y));

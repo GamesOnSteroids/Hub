@@ -73,7 +73,7 @@ namespace Minesweeper.Server {
                     this.checkGameOver();
                 }
             } else {
-                field.owner = undefined;
+                field.owner = null;
                 this.lobby.broadcast(new FlagMessage(client.id, fieldId, false));
                 if (field.hasMine) {
                     this.flaggedMines--;
@@ -195,7 +195,7 @@ namespace Minesweeper.Server {
             for (let i = 0; i < result.width * result.height; i++) {
                 let field: Field = new Field();
                 field.hasMine = false;
-                field.owner = undefined;
+                field.owner = null;
 
                 result.fields.push(field);
             }

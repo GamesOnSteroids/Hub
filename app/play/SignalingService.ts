@@ -56,7 +56,7 @@ namespace Play {
 
 
                 pc.onicecandidate = (event) => {
-                    if (event.candidate != undefined) {
+                    if (event.candidate != null) {
                         channel.send({
                             candidate: JSON.stringify(event.candidate),
                             target: value.source,
@@ -116,7 +116,7 @@ namespace Play {
                 (<Peer2PeerConnection>lobby.serverConnection).peerConnection.setRemoteDescription(answer);
                 return true;
 
-            } else if (value.type == "candidate" && (value.target != undefined && value.target == lobby.clientGUID)) {
+            } else if (value.type == "candidate" && (value.target != null && value.target == lobby.clientGUID)) {
                 let candidate = new RTCIceCandidate(JSON.parse(value.candidate));
                 (<Peer2PeerConnection>lobby.serverConnection).peerConnection.addIceCandidate(candidate, () => {
                 }, console.error);
@@ -154,7 +154,7 @@ namespace Play {
             };
 
             pc.onicecandidate = (event) => {
-                if (event.candidate != undefined) {
+                if (event.candidate != null) {
                     channel.send({
                         type: "candidate",
                         source: lobby.clientGUID,

@@ -9,11 +9,12 @@
     "react-dom": "^0.14.7"
   },
   "devDependencies": {
-    "karma": "^0.13.21",
+    "del": "^2.2.0",
     "gulp": "^3.9.1",
     "gulp-gh-pages": "^0.5.4",
     "gulp-typescript": "^2.12.0",
     "jasmine-core": "^2.4.1",
+    "karma": "^0.13.21",
     "karma-jasmine": "^0.3.7"
   },
   "scripts": {

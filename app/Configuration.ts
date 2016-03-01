@@ -251,6 +251,7 @@ var gamesConfiguration: IGameConfiguration[] = [
         "id": "runner",
         "name": "Runner",
         "variants": [],
+        development: true
     }
 
 ];
