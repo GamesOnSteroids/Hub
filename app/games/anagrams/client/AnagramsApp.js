@@ -7,7 +7,6 @@ var Anagrams;
         class AnagramsApp extends React.Component {
             constructor() {
                 super();
-                let game = ClientLobby.current.game;
                 this.state = {
                     players: ClientLobby.current.players,
                 };

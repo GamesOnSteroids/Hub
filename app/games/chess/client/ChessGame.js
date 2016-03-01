@@ -24,7 +24,7 @@ var Chess;
                         score: 0,
                     };
                 }
-                if (lobby.configuration.gameConfiguration.boardType == "4player") {
+                if (this.variant.boardType == "4player") {
                     this.chessBoard = new Chess.FourPlayerChessBoard();
                 }
                 else {

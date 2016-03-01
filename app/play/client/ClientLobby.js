@@ -81,16 +81,20 @@ var Play;
                 console.log("ClientLobby.onPlayerReady");
                 let player = this.players.find(p => p.id == message.playerId);
                 player.isReady = true;
+                this.emitChange();
             }
             onGameOver(message) {
                 console.log("ClientLobby.onGameOver");
+                for (let player of this.players) {
+                    player.isReady = false;
+                }
                 this.messageHandlers.get(Play.ServiceType.Game).clear();
                 this.state = LobbyState.GAME_OVER;
                 this.emitChange();
             }
             onGameStart(message) {
                 console.log("ClientLobby.onGameStart");
-                this.game = new this.configuration.gameClass(this);
+                this.game = new (ClassUtils.resolveClass(this.configuration.gameConfiguration.gameClass))(this);
                 this.state = LobbyState.GAME_RUNNING;
                 this.emitChange();
             }

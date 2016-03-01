@@ -36,8 +36,8 @@ var Play;
             get localPlayer() {
                 return this.lobby.localPlayer;
             }
-            get configuration() {
-                return this.lobby.configuration.gameConfiguration;
+            get variant() {
+                return this.lobby.configuration.variant;
             }
             emitChange() {
                 this.changeListener.dispatch(this);

@@ -12,7 +12,7 @@ var Anagrams;
             onWordGuess(player, message) {
             }
             randomChar(value) {
-                return value[(Math.random() * value.length) | 0];
+                return value[Math.floor(Math.random() * value.length)];
             }
             generateLetters() {
                 let vowels = "aeiouy";

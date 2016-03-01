@@ -6,10 +6,10 @@ class GameList extends React.Component {
     render() {
         return (React.createElement("div", {className: "row"}, gamesConfiguration
             .filter(g => g.development != true || environment == EnvironmentType.Development)
-            .map((game, index) => {
+            .map((gameConfiguration, index) => {
             let result = [];
             index++;
-            result.push(React.createElement("div", {className: "col-lg-3 col-md-4 col-sm-6 col-xs-12"}, React.createElement(GameDescription, {game: game})));
+            result.push(React.createElement("div", {className: "col-lg-3 col-md-4 col-sm-6 col-xs-12"}, React.createElement(GameDescription, {gameConfiguration: gameConfiguration})));
             if (index % 4 == 0) {
                 result.push(React.createElement("div", {className: "visible-lg clearfix divider"}));
             }

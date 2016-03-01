@@ -14,8 +14,8 @@ var Play;
             get players() {
                 return this.lobby.clients;
             }
-            get configuration() {
-                return this.lobby.configuration.gameConfiguration;
+            get variant() {
+                return this.lobby.configuration.variant;
             }
             on(id, handler) {
                 this.lobby.on(Play.ServiceType.Game, id, handler);

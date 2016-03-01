@@ -11,7 +11,7 @@ var Tetrominoes;
             constructor(lobby) {
                 super(lobby);
                 this.load();
-                this.playfield = new Tetrominoes.Playfield(this.configuration.width, this.configuration.height, this.configuration.gravity);
+                this.playfield = new Tetrominoes.Playfield(this.variant.width, this.variant.height, this.variant.gravity);
                 this.on(Tetrominoes.MessageId.SMSG_CREATE_TETROMINO, this.onCreateTetromino.bind(this));
                 this.on(Tetrominoes.MessageId.SMSG_DESTROY_TETROMINO, this.onDestroyTetromino.bind(this));
                 this.on(Tetrominoes.MessageId.SMSG_UPDATE_BOARD, this.onUpdateBoard.bind(this));
@@ -26,8 +26,8 @@ var Tetrominoes;
             }
             initialize() {
                 super.initialize();
-                this.canvas.width = this.configuration.width * TILE_SIZE;
-                this.canvas.height = this.configuration.height * TILE_SIZE;
+                this.canvas.width = this.variant.width * TILE_SIZE;
+                this.canvas.height = this.variant.height * TILE_SIZE;
                 this.context.imageSmoothingEnabled = false;
                 this.canvas.style.cursor = "pointer";
                 this.camera = new Camera(this.canvas);

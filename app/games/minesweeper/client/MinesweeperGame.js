@@ -8,10 +8,13 @@ var Minesweeper;
         var Mouse = Play.Client.Mouse;
         var Sprite = Play.Client.Sprite;
         const TILE_SIZE = 30;
+        class MinesweeperAssets {
+        }
+        Client.MinesweeperAssets = MinesweeperAssets;
         class MinesweeperGame extends Game {
             constructor(lobby) {
                 super(lobby);
-                this.remainingMines = this.configuration.mines;
+                this.remainingMines = this.variant.mines;
                 for (let player of this.players) {
                     player.gameData = {
                         flags: 0,
@@ -19,7 +22,7 @@ var Minesweeper;
                         score: 0,
                     };
                 }
-                this.minefield = new Minesweeper.Minefield(this.configuration.width, this.configuration.height);
+                this.minefield = new Minesweeper.Minefield(this.variant.width, this.variant.height);
                 for (let i = 0; i < this.minefield.width * this.minefield.height; i++) {
                     let field = new Minesweeper.Field();
                     field.hasMine = false;
@@ -227,7 +230,7 @@ var Minesweeper;
                 sound.play();
             }
             load() {
-                this.assets = {};
+                this.assets = new MinesweeperAssets();
                 let root = "app/games/minesweeper/assets/";
                 this.assets.hidden = new Image();
                 this.assets.hidden.src = root + "images/hidden.png";

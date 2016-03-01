@@ -8,7 +8,7 @@ var Tetrominoes;
             constructor(lobby) {
                 super(lobby);
                 this.on(Tetrominoes.MessageId.CMSG_MOVE_REQUEST, this.onMoveRequest.bind(this));
-                this.playfield = new Tetrominoes.Playfield(this.configuration.width, this.configuration.height, this.configuration.gravity);
+                this.playfield = new Tetrominoes.Playfield(this.variant.width, this.variant.height, this.variant.gravity);
                 for (let player of this.players) {
                     player.gameData = {
                         lines: 0
@@ -160,7 +160,7 @@ var Tetrominoes;
                         this.lobby.broadcast(new Tetrominoes.ScoreMessage(player.id, score));
                     }
                     this.playfield.lines += lines;
-                    let level = Math.ceil(this.playfield.lines / 4);
+                    let level = Math.ceil(this.playfield.lines / 8);
                     if (level != this.playfield.level) {
                         this.playfield.level = level;
                         this.playfield.gravity = level / 512;

@@ -9,7 +9,7 @@ var Chess;
         class ChessService extends GameService {
             constructor(lobby) {
                 super(lobby);
-                if (lobby.configuration.gameConfiguration.boardType == "4player") {
+                if (this.variant.boardType == "4player") {
                     this.chessBoard = new Chess.FourPlayerChessBoard();
                 }
                 else {

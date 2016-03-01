@@ -48,7 +48,7 @@ var Play;
                 this.messageHandlers.get(Play.ServiceType.Game).clear();
             }
             startGame() {
-                this.gameService = new this.configuration.serviceClass(this);
+                this.gameService = new (ClassUtils.resolveClass(this.configuration.gameConfiguration.serviceClass))(this);
                 this.state = LobbyState.GAME_RUNNING;
                 this.broadcast(new Play.GameStartMessage());
                 this.gameService.start();
@@ -62,20 +62,25 @@ var Play;
                     return;
                 }
                 client.isReady = true;
+                this.broadcast(new Play.PlayerReadyMessage(client.id));
                 let readyCount = 0;
                 for (let c of this.clients) {
                     if (c.isReady) {
                         readyCount++;
                     }
                 }
-                if (readyCount == this.configuration.maxPlayers) {
+                if (readyCount == this.configuration.variant.maxPlayers) {
                     this.startGame();
                 }
             }
             onJoinRequest(client, msg) {
                 console.log("ServerLobby.onJoinRequest", msg);
                 client.name = msg.name;
-                client.team = this.clients.indexOf(client);
+                let teamCount = this.configuration.variant.teamCount;
+                if (teamCount == null) {
+                    teamCount = this.configuration.variant.maxPlayers;
+                }
+                client.team = Math.floor(this.clients.indexOf(client) % teamCount);
                 client.isConnected = true;
                 for (let other of this.clients) {
                     if (other.id == client.id) {

@@ -12,8 +12,8 @@ var Minesweeper;
                 this.on(Minesweeper.MessageId.CMSG_REVEAL_REQUEST, this.onRevealRequest.bind(this));
                 this.on(Minesweeper.MessageId.CMSG_FLAG_REQUEST, this.onFlagRequest.bind(this));
                 this.on(Minesweeper.MessageId.CMSG_MASS_REVEAL_REQUEST, this.onMassRevealRequest.bind(this));
-                this.minefield = new Minesweeper.Minefield(this.configuration.width, this.configuration.height);
-                this.mines = this.configuration.mines;
+                this.minefield = new Minesweeper.Minefield(this.variant.width, this.variant.height);
+                this.mines = this.variant.mines;
             }
             checkGameOver() {
                 if (this.flaggedMines == this.mines) {
