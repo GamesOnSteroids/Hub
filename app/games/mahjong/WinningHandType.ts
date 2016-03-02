@@ -18,7 +18,7 @@ namespace Mahjong {
         THREE_KANS,
         TOI_TOI,
         HALF_FLUSH,
-        SHOU_SANGEN,
+        LITTLE_THREE_DRAGONS,
         ALL_TERMINALS_AND_HONORS,
         TERMINALS_IN_ALL_MELDS,
         TWICE_PURE_DOUBLE_RUN,
@@ -27,10 +27,11 @@ namespace Mahjong {
         KOKUSHI_MUSOU,
         NINE_GATES,
         FOUR_CONCEALED_PONS,
+        FOUR_KANS,
         ALL_GREEEN,
         ALL_TERMINALS,
         ALL_HONORS,
-        DAI_SANGEN,
+        BIG_THREE_DRAGONS,
         BIG_SEVEN_PAIRS,
         LITTLE_FOUR_WINDS,
         BIG_FOUR_WINDS
@@ -54,7 +55,7 @@ namespace Mahjong {
         public static THREE_KANS = new WinningHandType(WinningHandTypeId.THREE_KANS, 2);
         public static TOI_TOI = new WinningHandType(WinningHandTypeId.TOI_TOI, 2);
         public static HALF_FLUSH = new WinningHandType(WinningHandTypeId.HALF_FLUSH, 2, true);
-        public static SHOU_SANGEN = new WinningHandType(WinningHandTypeId.SHOU_SANGEN, 2);
+        public static LITTLE_THREE_DRAGONS = new WinningHandType(WinningHandTypeId.LITTLE_THREE_DRAGONS, 2);
         public static ALL_TERMINALS_AND_HONORS = new WinningHandType(WinningHandTypeId.ALL_TERMINALS_AND_HONORS, 2);
         public static TERMINALS_IN_ALL_MELDS = new WinningHandType(WinningHandTypeId.TERMINALS_IN_ALL_MELDS, 2, true);
         public static TWICE_PURE_DOUBLE_RUN = new WinningHandType(WinningHandTypeId.TWICE_PURE_DOUBLE_RUN, 3);
@@ -63,13 +64,14 @@ namespace Mahjong {
         public static KOKUSHI_MUSOU = new WinningHandType(WinningHandTypeId.KOKUSHI_MUSOU, 13);
         public static NINE_GATES = new WinningHandType(WinningHandTypeId.NINE_GATES, 13);
         public static FOUR_CONCEALED_PONS = new WinningHandType(WinningHandTypeId.FOUR_CONCEALED_PONS, 13);
+        public static FOUR_KANS = new WinningHandType(WinningHandTypeId.FOUR_KANS, 13);
         public static ALL_GREEEN = new WinningHandType(WinningHandTypeId.ALL_GREEEN, 13);
         public static ALL_TERMINALS = new WinningHandType(WinningHandTypeId.ALL_TERMINALS, 13);
         public static ALL_HONORS = new WinningHandType(WinningHandTypeId.ALL_HONORS, 13);
-        public static DAI_SANGEN = new WinningHandType(WinningHandTypeId.DAI_SANGEN, 13);
+        public static BIG_THREE_DRAGONS = new WinningHandType(WinningHandTypeId.BIG_THREE_DRAGONS, 13);
         public static BIG_SEVEN_PAIRS = new WinningHandType(WinningHandTypeId.BIG_SEVEN_PAIRS, 13);
         public static LITTLE_FOUR_WINDS = new WinningHandType(WinningHandTypeId.LITTLE_FOUR_WINDS, 13);
-        public static BIG_FOUR_WINDS = new WinningHandType(WinningHandTypeId.LITTLE_FOUR_WINDS, 26);
+        public static BIG_FOUR_WINDS = new WinningHandType(WinningHandTypeId.BIG_FOUR_WINDS, 26);
 
         constructor(public id: WinningHandTypeId, public value: number, public closedBonus?: boolean) {}
 

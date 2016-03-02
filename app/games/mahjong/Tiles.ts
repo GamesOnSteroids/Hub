@@ -6,6 +6,41 @@ namespace Mahjong {
         constructor(public tiles: Tile[]) {
         }
 
+        public static parse(tilesStr: string): Tiles {
+            let suit = null;
+            let tiles: Tile[] = [];
+            for (let i = 0; i < tilesStr.length; i++) {
+                let c = tilesStr.charAt(i);
+                let nextIsNumber = tilesStr.length > i + 1 && /[0-9]/.test(tilesStr.charAt(i + 1));
+                if ((c == "M" || c == "S" || c == "P") && nextIsNumber) {
+                    if (c == "M") {
+                        suit = Suit.MAN;
+                    } else if (c == "S") {
+                        suit = Suit.SOU;
+                    } else {
+                        suit = Suit.PIN;
+                    }
+                } else {
+                    if (/[0-9]/.test(c) && suit != null) {
+                        tiles.push(Tile.findByValue(parseInt(c, 10), suit));
+                    } else {
+                        suit = null;
+                        switch (c) {
+                            case "E": tiles.push(Tile.EAST); break;
+                            case "S": tiles.push(Tile.SOUTH); break;
+                            case "W": tiles.push(Tile.WEST); break;
+                            case "N": tiles.push(Tile.NORTH); break;
+                            case "R": tiles.push(Tile.RED); break;
+                            case "G": tiles.push(Tile.GREEN); break;
+                            case " ": tiles.push(Tile.WHITE); break;
+                            default: throw new Error("Unknown tile code - " + c);
+                        }
+                    }
+                }
+            }
+            return new Tiles(tiles);
+        }
+
         public isEmpty(): boolean {
             return this.size() == 0;
         }
@@ -103,6 +138,10 @@ namespace Mahjong {
             } else {
                 return this.tiles.filter(t => t.id == tile.id).length;
             }
+        }
+
+        public countValue(tileValue: number): number {
+            return this.tiles.filter(t => t.value == tileValue).length;
         }
 
         public getUniqueMelds(): Meld[] {

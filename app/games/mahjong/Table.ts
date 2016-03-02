@@ -33,8 +33,8 @@ namespace Mahjong {
                 //}
 
             }
-            let winningHandTypes = this.winningLogic.getWinningHandTypes(newTile, hand);
-            if (winningHandTypes.length > 0) {
+            let winningHands = this.winningLogic.getWinningHands(newTile, hand);
+            if (winningHands.length > 0) {
                 moves.push(new Move(MoveType.TSUMO, [newTile.id]));
             }
             return moves;
@@ -51,7 +51,7 @@ namespace Mahjong {
                     moves.push(new Move(moveType, meld.getTileIds()));
                 });
             }
-            let winningHandTypes = this.winningLogic.getWinningHandTypes(newTile, hand);
+            let winningHandTypes = this.winningLogic.getWinningHands(newTile, hand);
             if (winningHandTypes.length > 0) {
                 moves.push(new Move(MoveType.RON, [newTile.id]));
             }

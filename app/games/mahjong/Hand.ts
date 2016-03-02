@@ -22,6 +22,14 @@ namespace Mahjong {
             return hand;
         }
 
+        public getAllTiles(): Tiles { //TODO: maybe as an attribute?
+            let all = this.tiles.tiles.slice();
+            for (let meld of this.openMelds.concat(this.closedKans)) {
+                all = all.concat(meld.tiles.tiles);
+            }
+            return new Tiles(all);
+        }
+
         public createCloneWithNewTile(tile: Tile): Hand {
             let hand = this.createClone();
             hand.tiles.tiles.push(tile);
@@ -41,20 +49,42 @@ namespace Mahjong {
         }
 
         public isAllTerminalsOrHonors(): boolean {
-            return this.tiles.isAllTerminalsOrHonors();
+            return this.getAllTiles().isAllTerminalsOrHonors();
         }
 
         public isTanyao(): boolean {
-            return !this.tiles.hasTerminalsOrHonors();
+            return !this.getAllTiles().hasTerminalsOrHonors();
         }
 
         public isFullFlush(): boolean {
-            return !this.tiles.hasHonors() && this.tiles.isAllSameSuit();
+            let tiles = this.getAllTiles();
+            return !tiles.hasHonors() && tiles.isAllSameSuit();
+        }
+
+        public isAllGreen(): boolean {
+            return this.getAllTiles().tiles.findIndex(t => !t.isGreen()) < 0;
         }
 
         public isHalfFlush(): boolean {
-            let numberTiles = this.tiles.ofType(TileType.NUMBER);
-            return this.tiles.hasHonors() && !numberTiles.isEmpty() && numberTiles.isAllSameSuit();
+            let tiles = this.getAllTiles();
+            let numberTiles = tiles.ofType(TileType.NUMBER);
+            return tiles.hasHonors() && !numberTiles.isEmpty() && numberTiles.isAllSameSuit();
+        }
+
+        public isNineGates(): boolean {
+            if (!this.isFullFlush() || !this.isClosed()) {
+                return false;
+            }
+            let tiles = this.getAllTiles();
+            for (let i = 2; i < 9; i++) {
+                if (tiles.countValue(i) < 1) {
+                    return false;
+                }
+            }
+            if (tiles.countValue(1) < 3 || tiles.countValue(9) < 3) {
+                return false;
+            }
+            return true;
         }
 
         public isSevenPairs(): boolean {
@@ -71,7 +101,7 @@ namespace Mahjong {
         }
 
         public isKokushiMusou(): boolean {
-            if (!this.tiles.isAllHonors()) {
+            if (!this.tiles.isAllTerminalsOrHonors()) {
                 return false;
             }
             for (let tile of Tile.ofSuit(Suit.HONOR).concat(Tile.terminals())) {

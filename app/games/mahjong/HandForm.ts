@@ -22,6 +22,42 @@ namespace Mahjong {
             return this.melds.filter(m => m.type == MeldType.CHI);
         }
 
+        public getRunTiles(): Tile[] {
+            return this.getRuns().map(m => m.tiles.tiles).reduce((a, b) => a.concat(b), []);
+        }
+
+        public getPons(): Meld[] {
+            return this.melds.filter(m => m.type == MeldType.PON || m.type == MeldType.KAN);
+        }
+
+        public getKans(): Meld[] {
+            return this.melds.filter(m => m.type == MeldType.KAN);
+        }
+
+        public isLittleThreeDragons(): boolean {
+            return this.getDragonPons().length == 2 && this.remainingTiles.first().isDragon();
+        }
+
+        public getDragonPons(): Meld[] {
+            return this.melds.filter(meld => meld.first().isDragon());
+        }
+
+        public getWindPons(): Meld[] {
+            return this.melds.filter(meld => meld.first().isWind());
+        }
+
+        public isBigThreeDragons(): boolean {
+            return this.getDragonPons().length == 3;
+        }
+
+        public isLittleFourWinds(): boolean {
+            return this.getWindPons().length == 3 && this.remainingTiles.first().isWind();
+        }
+
+        public isBigFourWinds(): boolean {
+            return this.getWindPons().length == 4;
+        }
+
         public countDoubleRuns(): number {
             let doubleRuns: Meld[] = [];
             for (let meld of this.getRuns()) {
@@ -49,8 +85,55 @@ namespace Mahjong {
             }
         }
 
+        public hasMixedTriplePon(): boolean {
+            let pons = this.getPons();
+            if (pons.length >= 3) {
+                for (let i = 0; i < 2; i++) {
+                    let pon = pons[i];
+                    let ponTile = pon.first();
+                    if (ponTile.isNumber() &&
+                        this.hasPonOrKanWithDifferentSuit(ponTile, Suit.MAN) &&
+                        this.hasPonOrKanWithDifferentSuit(ponTile, Suit.PIN) &&
+                        this.hasPonOrKanWithDifferentSuit(ponTile, Suit.SOU)) {
+                        return true;
+                    }
+                }
+                return false;
+            } else {
+                return false;
+            }
+        }
+
+        public hasPureStraight(): boolean {
+            let runs = this.getRuns();
+            if (runs.length >= 3) {
+                for (let i = 0; i < 2; i++) {
+                    let suit = runs[i].first().suit;
+                    if (this.hasRunFrom(1, suit) && this.hasRunFrom(4, suit) && this.hasRunFrom(7, suit)) {
+                        return true;
+                    }
+                }
+                return false;
+            } else {
+                return false;
+            }
+        }
+
+        public hasTerminalOrHonorInEachMeld(): boolean {
+            return this.melds.findIndex(m => !m.tiles.hasTerminalsOrHonors()) < 0;
+        }
+
         public hasRunWithDifferentSuit(originalRun: Meld, checkedSuit: Suit): boolean {
             return this.count(originalRun.ofDifferentSuit(checkedSuit)) > 0;
+        }
+
+        public hasPonOrKanWithDifferentSuit(ponTile: Tile, checkedSuit: Suit): boolean {
+            return this.count(ponTile.ofDifferentSuit(checkedSuit).createPon()) > 0 ||
+                this.count(ponTile.ofDifferentSuit(checkedSuit).createKan()) > 0;
+        }
+
+        public hasRunFrom(startingValue: number, suit: Suit): boolean {
+            return this.getRuns().findIndex(m => m.first().value == startingValue && m.first().suit == suit) > -1;
         }
 
         public count(meld: Meld): number {

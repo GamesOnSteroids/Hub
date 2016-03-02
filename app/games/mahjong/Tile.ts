@@ -85,8 +85,39 @@ namespace Mahjong {
             return this.id == other.id;
         }
 
+        public isDragon(): boolean {
+            return this.type == TileType.DRAGON;
+        }
+
+        public isWind(): boolean {
+            return this.type == TileType.WIND;
+        }
+
+        public isGreen(): boolean {
+            let greenSouValues = [2, 3, 4, 6, 8];
+            let greenSou = this.suit == Suit.SOU && greenSouValues.indexOf(this.value) > -1;
+            return greenSou || this.id == TileId.GREEN;
+        }
+
+        public isNumber(): boolean {
+            return this.type == TileType.NUMBER;
+        }
+
+        public createPon(): Meld {
+            return Meld.fromTileArray([this, this, this], MeldType.PON);
+        }
+
+
+        public createKan(): Meld {
+            return Meld.fromTileArray([this, this, this, this], MeldType.KAN);
+        }
+
         public isTerminal(): boolean {
             return this.type == TileType.NUMBER && (this.value == 1 || this.value == 9);
+        }
+
+        public isWindType(type: Wind): boolean {
+            return TileId[this.id] == Wind[type];
         }
 
         public isHonor(): boolean {
@@ -94,7 +125,7 @@ namespace Mahjong {
         }
 
         public isTerminalOrHonor(): boolean {
-            return this.isTerminal() || this.isTerminalOrHonor();
+            return this.isTerminal() || this.isHonor();
         }
 
         public isAfter(other: Tile): boolean {
