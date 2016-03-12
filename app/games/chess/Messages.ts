@@ -5,7 +5,7 @@ namespace Chess {
     import IGameVariant = Play.IGameVariant;
 
 
-    export const LOCK_TIMER = 0;
+    export const LOCK_TIMER = 3;
     export const MOVEMENT_SPEED = 1 / (1000 * 0.5);
 
     export interface IChessVariant extends IGameVariant {
