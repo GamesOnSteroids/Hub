@@ -9,15 +9,15 @@ namespace Chess {
         public start: {x: number, y: number};
         public goal: {x: number, y: number} = null;
 
-        constructor(public type: PieceType, public id: number, public x: number, public y: number, public owner: IPlayerInfo) {
+        constructor(public type: PieceType, public id: number, public x: number, public y: number, public owner: IPlayerInfo<IChessPlayer>) {
         }
 
-        goTo(x: number, y: number) {
+        public goTo(x: number, y: number): void {
             this.start = {x: this.x, y: this.y};
             this.goal = {x: x, y: y};
         }
 
-        abstract getValidMoves(board: ChessBoard): IMove[];
+        public abstract getValidMoves(board: ChessBoard): IMove[];
 
 
         protected addIfValid(result: IMove[], board: ChessBoard, x: number, y: number, onlyMove?: boolean): boolean {
@@ -47,15 +47,15 @@ namespace Chess {
     interface IMove {
         x: number;
         y: number;
-        constraints: MoveType
+        constraints: MoveType;
     }
 
     export class King extends ChessPiece {
-        constructor(id: number, x: number, y: number, owner: IPlayerInfo) {
+        constructor(id: number, x: number, y: number, owner: IPlayerInfo<IChessPlayer>) {
             super(PieceType.King, id, x, y, owner);
         }
 
-        getValidMoves(board: ChessBoard): IMove[] {
+        public getValidMoves(board: ChessBoard): IMove[] {
             let result: IMove[] = [];
             for (let x = this.x - 1; x <= this.x + 1; x++) {
                 for (let y = this.y - 1; y <= this.y + 1; y++) {
@@ -67,11 +67,11 @@ namespace Chess {
     }
 
     export class Knight extends ChessPiece {
-        constructor(id: number, x: number, y: number, owner: IPlayerInfo) {
+        constructor(id: number, x: number, y: number, owner: IPlayerInfo<IChessPlayer>) {
             super(PieceType.Knight, id, x, y, owner);
         }
 
-        getValidMoves(board: ChessBoard): IMove[] {
+        public getValidMoves(board: ChessBoard): IMove[] {
             let result: IMove[] = [];
             this.addIfValid(result, board, this.x - 1, this.y - 2);
             this.addIfValid(result, board, this.x + 1, this.y - 2);
@@ -86,11 +86,11 @@ namespace Chess {
     }
 
     export class Bishop extends ChessPiece {
-        constructor(id: number, x: number, y: number, owner: IPlayerInfo) {
+        constructor(id: number, x: number, y: number, owner: IPlayerInfo<IChessPlayer>) {
             super(PieceType.Bishop, id, x, y, owner);
         }
 
-        getValidMoves(board: ChessBoard): IMove[] {
+        public getValidMoves(board: ChessBoard): IMove[] {
             let result: IMove[] = [];
             for (let i = 1; i < board.size; i++) {
                 if (!this.addIfValid(result, board, this.x + i, this.y + i)) {
@@ -117,11 +117,11 @@ namespace Chess {
     }
 
     export class Rook extends ChessPiece {
-        constructor(id: number, x: number, y: number, owner: IPlayerInfo) {
+        constructor(id: number, x: number, y: number, owner: IPlayerInfo<IChessPlayer>) {
             super(PieceType.Rook, id, x, y, owner);
         }
 
-        getValidMoves(board: ChessBoard): IMove[] {
+        public getValidMoves(board: ChessBoard): IMove[] {
             let result: IMove[] = [];
 
             for (let x = this.x + 1; x < board.size; x++) {
@@ -149,11 +149,11 @@ namespace Chess {
     }
 
     export class Pawn extends ChessPiece {
-        constructor(id: number, x: number, y: number, public direction: Direction4, owner: IPlayerInfo) {
+        constructor(id: number, x: number, y: number, public direction: Direction4, owner: IPlayerInfo<IChessPlayer>) {
             super(PieceType.Pawn, id, x, y, owner);
         }
 
-        getValidMoves(board: ChessBoard): IMove[] {
+        public getValidMoves(board: ChessBoard): IMove[] {
             let result: IMove[] = [];
 
             let dir: number;
@@ -169,13 +169,13 @@ namespace Chess {
                     this.addIfValid(result, board, this.x, this.y + 2 * dir, true);
                 }
                 {
-                    let piece = board.pieces.find(p=>p.x == this.x - 1 && p.y == this.y + dir);
+                    let piece = board.pieces.find(p => p.x == this.x - 1 && p.y == this.y + dir);
                     if (piece != null && piece.owner.team != this.owner.team) {
                         this.addIfValid(result, board, this.x - 1, this.y + dir);
                     }
                 }
                 {
-                    let piece = board.pieces.find(p=>p.x == this.x + 1 && p.y == this.y + dir);
+                    let piece = board.pieces.find(p => p.x == this.x + 1 && p.y == this.y + dir);
                     if (piece != null && piece.owner.team != this.owner.team) {
                         this.addIfValid(result, board, this.x + 1, this.y + dir);
                     }
@@ -187,13 +187,13 @@ namespace Chess {
                     this.addIfValid(result, board, this.x + 2 * dir, this.y, true);
                 }
                 {
-                    let piece = board.pieces.find(p=>p.x == this.x + dir && p.y == this.y - 1);
+                    let piece = board.pieces.find(p => p.x == this.x + dir && p.y == this.y - 1);
                     if (piece != null && piece.owner.team != this.owner.team) {
                         this.addIfValid(result, board, this.x + dir, this.y - 1);
                     }
                 }
                 {
-                    let piece = board.pieces.find(p=>p.x == this.x + dir && p.y == this.y + 1);
+                    let piece = board.pieces.find(p => p.x == this.x + dir && p.y == this.y + 1);
                     if (piece != null && piece.owner.team != this.owner.team) {
                         this.addIfValid(result, board, this.x + dir, this.y + 1);
                     }
@@ -206,11 +206,11 @@ namespace Chess {
     }
 
     export class Queen extends ChessPiece {
-        constructor(id: number, x: number, y: number, owner: IPlayerInfo) {
+        constructor(id: number, x: number, y: number, owner: IPlayerInfo<IChessPlayer>) {
             super(PieceType.Queen, id, x, y, owner);
         }
 
-        getValidMoves(board: ChessBoard): IMove[] {
+        public getValidMoves(board: ChessBoard): IMove[] {
             let result: IMove[] = [];
             for (let x = this.x + 1; x < board.size; x++) {
                 if (!this.addIfValid(result, board, x, this.y)) {
@@ -264,9 +264,9 @@ namespace Chess {
 
         }
 
-        abstract isValidPosition(x: number, y: number): boolean;
+        public abstract isValidPosition(x: number, y: number): boolean;
 
-        abstract initialize(players: IPlayerInfo[]): void;
+        public abstract initialize(players: IPlayerInfo<IChessPlayer>[]): void;
     }
 
     export class TwoPlayerChessBoard extends ChessBoard {
@@ -275,7 +275,7 @@ namespace Chess {
             super(8);
         }
 
-        isValidPosition(x: number, y: number): boolean {
+        public isValidPosition(x: number, y: number): boolean {
             if (x < 0 || y < 0 || x >= this.size || y >= this.size) {
                 return false;
             }
@@ -283,7 +283,7 @@ namespace Chess {
             return true;
         }
 
-        initialize(players: IPlayerInfo[]) {
+        public initialize(players: IPlayerInfo<IChessPlayer>[]) {
             for (let i = 0; i < 8; i++) {
                 this.pieces.push(new Pawn(this.pieces.length, i, 6, Direction4.Up, players[0]));
                 this.pieces.push(new Pawn(this.pieces.length, i, 1, Direction4.Down, players[1]));
@@ -313,7 +313,7 @@ namespace Chess {
             super(14);
         }
 
-        isValidPosition(x: number, y: number): boolean {
+        public isValidPosition(x: number, y: number): boolean {
             if (x < 0 || y < 0 || x >= this.size || y >= this.size) {
                 return false;
             }
@@ -333,7 +333,7 @@ namespace Chess {
             return true;
         }
 
-        initialize(players: IPlayerInfo[]) {
+        public initialize(players: IPlayerInfo<IChessPlayer>[]) {
             for (let i = 0; i < 8; i++) {
                 this.pieces.push(new Pawn(this.pieces.length, 3 + i, 12, Direction4.Up, players[0]));
                 this.pieces.push(new Pawn(this.pieces.length, 3 + i, 1, Direction4.Down, players[1]));

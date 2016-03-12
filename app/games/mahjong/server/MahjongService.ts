@@ -7,7 +7,7 @@ namespace Mahjong.Server {
     // import IPlayerInfo = Play.IPlayerInfo;
 
 
-    export class MahjongService extends GameService<IMahjongVariant> {
+    export class MahjongService extends GameService<IMahjongVariant, any> {
 
 
         constructor(lobby: ServerLobby) {

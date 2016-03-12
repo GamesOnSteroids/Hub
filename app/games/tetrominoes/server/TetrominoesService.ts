@@ -1,13 +1,12 @@
 namespace Tetrominoes.Server {
     "use strict";
 
-    // import Client = Play.Server.Client;
     import GameService = Play.Server.GameService;
     import ServerLobby = Play.Server.ServerLobby;
-    // import IPlayerInfo = Play.IPlayerInfo;
+    import IPlayerInfo = Play.IPlayerInfo;
 
 
-    export class TetrominoesService extends GameService<ITetrominoesVariant> { //  extends GameService<TetrominoesConfiguration, TetrominoesPlayerInfo> {
+    export class TetrominoesService extends GameService<ITetrominoesVariant, ITetrominoesPlayer> {
 
         private playfield: Playfield;
 
@@ -21,6 +20,7 @@ namespace Tetrominoes.Server {
             this.playfield = new Playfield(this.variant.width, this.variant.height, this.variant.gravity);
             for (let player of this.players) {
                 player.gameData = {
+                    score: 0,
                     lines: 0
                 };
             }
@@ -32,7 +32,7 @@ namespace Tetrominoes.Server {
         }
 
 
-        private onMoveRequest(player: PlayerInfo, message: MoveRequestMessage): void {
+        private onMoveRequest(player: IPlayerInfo<ITetrominoesPlayer>, message: MoveRequestMessage): void {
             console.log("TetrominoesService.onMoveRequest", player.id, message.type);
             let tetromino: Tetromino = this.playfield.tetrominoes.find(t => t.owner.id == player.id);
             if (tetromino == null) { // Can not move without active tetromino
@@ -62,7 +62,7 @@ namespace Tetrominoes.Server {
             }
         }
 
-        private generateTetromino(player: PlayerInfo): Tetromino {
+        private generateTetromino(player: IPlayerInfo<ITetrominoesPlayer>): Tetromino {
             // TODO: if this is first tile dont create S, Z, O
 
             let type = <TetrominoType>Math.floor(Math.random() * 7);
@@ -104,7 +104,7 @@ namespace Tetrominoes.Server {
 
             let boardUpdated = false;
 
-            let collidingPlayers: PlayerInfo[] = [];
+            let collidingPlayers: IPlayerInfo<ITetrominoesPlayer>[] = [];
 
             let i = this.playfield.tetrominoes.length;
             while (i-- != 0) {

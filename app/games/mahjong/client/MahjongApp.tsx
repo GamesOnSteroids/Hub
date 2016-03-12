@@ -4,7 +4,7 @@ namespace Mahjong.Client {
     import ClientLobby = Play.Client.ClientLobby;
 
 
-    export class MahjongApp extends React.Component<any, {players: PlayerInfo[]}> {
+    export class MahjongApp extends React.Component<any, {players: PlayerInfo<any>[]}> {
         private stateChangeToken: number;
 
         constructor() {

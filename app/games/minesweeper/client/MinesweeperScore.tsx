@@ -1,7 +1,7 @@
 namespace Minesweeper.Client {
     "use strict";
 
-    export class MinesweeperScore extends React.Component<{players: PlayerInfo[], remainingMines: number}, any> {
+    export class MinesweeperScore extends React.Component<{players: PlayerInfo<IMinesweeperPlayer>[], remainingMines: number}, any> {
         public render(): JSX.Element {
             var totalFlags: number = 0;
             for (let player of this.props.players) {
@@ -41,7 +41,7 @@ namespace Minesweeper.Client {
                                             <td>{p.gameData.score}</td>
                                             <td>{p.gameData.flags}</td>
                                             <td>{p.gameData.mines}</td>
-                                        </tr>)
+                                        </tr>);
                                         })}
                                 </tbody>
                             </table>

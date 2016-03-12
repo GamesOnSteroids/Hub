@@ -4,7 +4,7 @@ namespace Tetrominoes.Client {
     import ClientLobby = Play.Client.ClientLobby;
 
 
-    export class TetrominoesApp extends React.Component<any, {players: PlayerInfo[], level: number}> {
+    export class TetrominoesApp extends React.Component<any, {players: PlayerInfo<any>[], level: number}> {
         private stateChangeToken: number;
 
         constructor() {

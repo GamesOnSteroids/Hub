@@ -3,11 +3,17 @@ namespace Tetrominoes {
 
     import GameMessage = Play.GameMessage;
     import IGameVariant = Play.IGameVariant;
+    import IPlayerInfo = Play.IPlayerInfo;
 
     export interface ITetrominoesVariant extends IGameVariant {
         width: number;
         height: number;
         gravity: number;
+    }
+
+    export interface ITetrominoesPlayer {
+        score: number;
+        lines: number;
     }
 
     export var DROP_GRAVITY = 1 / 16;
@@ -19,7 +25,7 @@ namespace Tetrominoes {
     }
 
     export class Cell {
-        public owner: PlayerInfo = null;
+        public owner: IPlayerInfo<ITetrominoesPlayer> = null;
         public type: CellType = CellType.Empty;
     }
 
@@ -49,7 +55,7 @@ namespace Tetrominoes {
             }
         }
 
-        public set(x: number, y: number, owner: PlayerInfo, type: CellType) {
+        public set(x: number, y: number, owner: IPlayerInfo<ITetrominoesPlayer>, type: CellType): void {
             this.board[x + y * this.width].owner = owner;
             this.board[x + y * this.width].type = type;
         }
@@ -250,7 +256,7 @@ namespace Tetrominoes {
 
         public timer: number = 0;
 
-        constructor(public type: TetrominoType, public owner: PlayerInfo, public x: number, public y: number, public orientation: number, public gravity: number) {
+        constructor(public type: TetrominoType, public owner: IPlayerInfo<ITetrominoesPlayer>, public x: number, public y: number, public orientation: number, public gravity: number) {
 
         }
 

@@ -11,7 +11,7 @@ namespace Mahjong.Client {
 
     const TILE_SIZE = 30;
 
-    export class MahjongGame extends Game<IMahjongVariant> {
+    export class MahjongGame extends Game<IMahjongVariant, any> {
 
         private camera: Camera;
         private assets: any;

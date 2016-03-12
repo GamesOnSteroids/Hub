@@ -6,7 +6,7 @@ namespace Anagrams.Server {
     import Client = Play.Server.Client;
 
 
-    export class AnagramsService extends GameService<IAnagramsVariant> {
+    export class AnagramsService extends GameService<IAnagramsVariant, any> {
 
         constructor(lobby: ServerLobby) {
             super(lobby);
@@ -14,7 +14,7 @@ namespace Anagrams.Server {
             this.on(MessageId.CMSG_WORD_GUESS, this.onWordGuess.bind(this));
         }
 
-        private onWordGuess(player: Client, message: WordGuessMessage): void {
+        private onWordGuess(player: Client<any>, message: WordGuessMessage): void {
             // todo: implement
         }
 

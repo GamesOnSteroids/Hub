@@ -4,7 +4,7 @@ namespace Minesweeper.Client {
     import ClientLobby = Play.Client.ClientLobby;
 
 
-    export class MinesweeperApp extends React.Component<any, {players: PlayerInfo[], remainingMines: number}> {
+    export class MinesweeperApp extends React.Component<any, {players: PlayerInfo<IMinesweeperPlayer>[], remainingMines: number}> {
         private stateChangeToken: number;
 
         constructor() {

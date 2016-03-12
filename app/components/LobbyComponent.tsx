@@ -34,7 +34,7 @@ class GameOver extends React.Component<any, any> {
     }
 }
 
-class PlayerInfoComponent extends React.Component<{key: string, player: PlayerInfo}, any> {
+class PlayerInfoComponent extends React.Component<{key: string, player: PlayerInfo<any>}, any> {
     public render(): JSX.Element {
         let teamIcon = `app/games/${ClientLobby.current.configuration.gameConfiguration.id}/assets/images/teams/${this.props.player.team}.png`;
         return (
@@ -48,7 +48,7 @@ class PlayerInfoComponent extends React.Component<{key: string, player: PlayerIn
         );
     }
 }
-class PlayerList extends React.Component<{players: PlayerInfo[]}, any> {
+class PlayerList extends React.Component<{players: PlayerInfo<any>[]}, any> {
     public render(): JSX.Element {
         return (
             <div className="row">
@@ -62,7 +62,7 @@ class PlayerList extends React.Component<{players: PlayerInfo[]}, any> {
                             </tr>
                         </thead>
                         <tbody>
-                            {this.props.players.map( (player: PlayerInfo) => {
+                            {this.props.players.map( (player: PlayerInfo<any>) => {
                                 return <PlayerInfoComponent key={player.id} player={player}/>;
                                 })}
                         </tbody>
@@ -73,7 +73,7 @@ class PlayerList extends React.Component<{players: PlayerInfo[]}, any> {
     }
 }
 
-class LobbyComponent extends React.Component<any, {state: LobbyState, players: PlayerInfo[]}> {
+class LobbyComponent extends React.Component<any, {state: LobbyState, players: PlayerInfo<any>[]}> {
 
     private changeListenerToken: number;
 

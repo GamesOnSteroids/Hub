@@ -9,7 +9,7 @@ namespace Play {
 
     export interface ILobbyService {
         findLobby(gameConfiguration: LobbyConfiguration): Promise<ClientLobby>;
-        onClientJoined(lobby: ServerLobby, client: Client): void;
+        onClientJoined(lobby: ServerLobby, client: Client<any>): void;
     }
 
     export interface ILobbyDescription {
@@ -22,7 +22,7 @@ namespace Play {
 
     export class FirebaseLobbyService implements ILobbyService {
 
-        public onClientJoined(lobby: ServerLobby, client: Client): void {
+        public onClientJoined(lobby: ServerLobby, client: Client<any>): void {
 
             let firebase = new Firebase(config.get(environment).firebaseURL);
             let lobbyRef = firebase.child("lobby").child(lobby.lobbyId);
@@ -102,7 +102,7 @@ namespace Play {
 
 
                                 let localServerConnection = new LocalServerConnection(localClient);
-                                localServerConnection.messageHandler = (client: Client, msg: Message) => {
+                                localServerConnection.messageHandler = (client: Client<any>, msg: Message) => {
                                     serverLobby.onMessage(localClient, <any>msg);
                                 };
                                 clientLobby.serverConnection = localServerConnection;

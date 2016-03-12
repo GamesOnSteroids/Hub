@@ -24,7 +24,7 @@ namespace Play.Client {
         CLICK
     }
 
-    export class Game<TVariant extends IGameVariant>{
+    export class Game<TVariant extends IGameVariant, TPlayerData>{
         public changeListener = new EventDispatcher<this>();
 
         protected canvas: HTMLCanvasElement;
@@ -33,11 +33,11 @@ namespace Play.Client {
         private lobby: ClientLobby;
         private lastFrame: number;
 
-        get players(): PlayerInfo[] {
+        get players(): PlayerInfo<TPlayerData>[] {
             return this.lobby.players;
         }
 
-        get localPlayer(): PlayerInfo {
+        get localPlayer(): PlayerInfo<TPlayerData> {
             return this.lobby.localPlayer;
         }
 
@@ -211,6 +211,11 @@ namespace Play.Client {
             this.lobby.sendToServer(msg);
         }
 
+
+        protected playSound(sound: HTMLAudioElement): void {
+            sound.currentTime = 0;
+            sound.play();
+        }
 
         protected loadAsset(assetName: string): Promise<any> {
 

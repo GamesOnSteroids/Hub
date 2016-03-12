@@ -57,8 +57,8 @@ class GameDescription extends React.Component<{ gameConfiguration: IGameConfigur
     // todo: DEBUG ONLY
     protected componentDidMount(): void {
         if (environment == EnvironmentType.Development) {
-            if (this.props.gameConfiguration.id == "tetrominoes") {
-                //this.startGame(this.props.game.variants.find((v: any) => v.development == true));
+            if (this.props.gameConfiguration.id == "chess") {
+        //        this.startGame(this.props.gameConfiguration.variants.find((v: any) => v.development == true));
             }
         }
     }

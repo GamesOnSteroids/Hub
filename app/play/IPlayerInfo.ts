@@ -1,9 +1,9 @@
 namespace Play {
     "use strict";
 
-    export interface IPlayerInfo {
+    export interface IPlayerInfo<T> {
         id: string;
         team: number;
-        gameData: any;
+        gameData: T;
     }
 }

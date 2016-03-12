@@ -2,7 +2,7 @@ namespace Mahjong {
     "use strict";
 
     export class Hand {
-        public owner: PlayerInfo[];
+        public owner: PlayerInfo<any>[];
         public tiles: Tiles;
         public openMelds: Meld[] = [];
         public closedKans: Meld[] = [];

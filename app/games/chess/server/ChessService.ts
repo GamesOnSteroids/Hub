@@ -1,18 +1,14 @@
 namespace Chess.Server {
     "use strict";
 
-    import IGameVariant = Play.IGameVariant;
+    import IPlayerInfo = Play.IPlayerInfo;
     import GameService = Play.Server.GameService;
     import ServerLobby = Play.Server.ServerLobby;
     import MessageId = Chess.MessageId;
     import CreatePieceMessage = Chess.CreatePieceMessage;
-    import Client = Play.Server.Client;
 
-    export interface IChessVariant extends IGameVariant {
-        boardType: string;
-    }
 
-    export class ChessService extends GameService<IChessVariant> {
+    export class ChessService extends GameService<IChessVariant, IChessPlayer> {
 
         private static scores = new Map<PieceType, number>(
             [
@@ -46,6 +42,14 @@ namespace Chess.Server {
                 this.createPiece(piece);
             }
 
+            for (let player of this.players) {
+                player.gameData = {
+                    pieces: 0,
+                    score: 0,
+                    isAlive: true,
+                };
+            }
+
             window.requestAnimationFrame(this.tick);
         }
 
@@ -69,6 +73,7 @@ namespace Chess.Server {
                             this.destroyPiece(collision);
 
                             let score = ChessService.scores.get(piece.type);
+                            piece.owner.gameData.score += score;
                             this.lobby.broadcast(new ScoreMessage(piece.owner.id, score));
                         }
                     }
@@ -79,7 +84,19 @@ namespace Chess.Server {
                         piece.movementProgress = 0;
                         piece.timer = LOCK_TIMER;
 
-                        // todo: if this is last row, change to queen
+                        if (piece.type == PieceType.Pawn) {
+                            let pawn = piece as Pawn;
+                            if (pawn.direction == Direction4.Up && pawn.y == 0 ||
+                                pawn.direction == Direction4.Down && pawn.y == this.chessBoard.size - 1 ||
+                                pawn.direction == Direction4.Left && pawn.x == 0 ||
+                                pawn.direction == Direction4.Right && pawn.x == this.chessBoard.size - 1) {
+                                this.destroyPiece(piece);
+
+                                let promotion = new Queen(pawn.id, pawn.x, pawn.y, pawn.owner);
+                                this.chessBoard.pieces.push(promotion);
+                                this.createPiece(promotion);
+                            }
+                        }
                     }
                 }
                 if (piece.timer > 0) {
@@ -92,7 +109,21 @@ namespace Chess.Server {
             this.chessBoard.pieces.splice(this.chessBoard.pieces.indexOf(piece), 1);
             this.lobby.broadcast(new DestroyPieceMessage(piece.id));
             if (piece.type == PieceType.King) {
-                this.gameOver();
+                piece.owner.gameData.isAlive = false;
+                let i = 0;
+                while (i < this.chessBoard.pieces.length) {
+                    let otherPiece = this.chessBoard.pieces[i];
+                    if (otherPiece.owner == piece.owner) {
+                        this.destroyPiece(otherPiece);
+                    } else {
+                        i++;
+                    }
+                }
+
+                let alivePlayers = this.players.filter(p => p.gameData.isAlive).length;
+                if (alivePlayers <= 1) {
+                    this.gameOver();
+                }
             }
         }
 
@@ -101,7 +132,7 @@ namespace Chess.Server {
         }
 
 
-        private onMovePieceRequest(player: Client, message: MovePieceRequestMessage): void {
+        private onMovePieceRequest(player: IPlayerInfo<IChessPlayer>, message: MovePieceRequestMessage): void {
             let piece = this.chessBoard.pieces.find(p => p.id == message.pieceId);
             if (piece != null) {
                 // todo: check if move is valid

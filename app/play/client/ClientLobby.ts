@@ -25,11 +25,11 @@ namespace Play.Client {
     export class ClientLobby {
         public static current: ClientLobby;
 
-        public game: Game<IGameVariant>;
+        public game: Game<IGameVariant, any>;
 
         public clientGUID: string;
-        public localPlayer: PlayerInfo;
-        public players: PlayerInfo[] = [];
+        public localPlayer: PlayerInfo<any>;
+        public players: PlayerInfo<any>[] = [];
 
         public configuration: LobbyConfiguration;
 
@@ -133,7 +133,7 @@ namespace Play.Client {
             console.log("ClientLobby.onGameStart");
 
 
-            this.game = new (ClassUtils.resolveClass<Game<IGameVariant>>(this.configuration.gameConfiguration.gameClass))(this);
+            this.game = new (ClassUtils.resolveClass<Game<IGameVariant, any>>(this.configuration.gameConfiguration.gameClass))(this);
 
             this.state = LobbyState.GAME_RUNNING;
             this.emitChange();

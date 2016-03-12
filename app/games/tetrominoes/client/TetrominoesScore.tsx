@@ -1,7 +1,7 @@
 namespace Tetrominoes.Client {
     "use strict";
 
-    export class TetrominoesScore extends React.Component<{players: PlayerInfo[], level: number}, any> {
+    export class TetrominoesScore extends React.Component<{players: PlayerInfo<ITetrominoesPlayer>[], level: number}, any> {
         public render(): JSX.Element {
             return (
                 <div>

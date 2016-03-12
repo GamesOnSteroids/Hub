@@ -34,6 +34,9 @@ class Guid {
 
 class MathUtils {
 
+    public static random(low: number, high: number): number {
+        return Math.floor(Math.random() * high + low);
+    }
     public static lerp(v0: number, v1: number, t: number): number {
         return (1 - t) * v0 + t * v1;
     }

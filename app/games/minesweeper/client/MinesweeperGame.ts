@@ -30,7 +30,7 @@ namespace Minesweeper.Client {
         public invalidmove: HTMLAudioElement;
     }
 
-    export class MinesweeperGame extends Game<IMinesweeperVariant> {
+    export class MinesweeperGame extends Game<IMinesweeperVariant, IMinesweeperPlayer> {
         public remainingMines: number;
 
         private camera: Camera;
@@ -306,11 +306,6 @@ namespace Minesweeper.Client {
                 this.playSound(this.assets.tilesingle);
             }
 
-        }
-
-        private playSound(sound: HTMLAudioElement): void {
-            sound.currentTime = 0;
-            sound.play();
         }
 
         private load(): void {

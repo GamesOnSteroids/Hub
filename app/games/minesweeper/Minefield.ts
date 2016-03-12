@@ -1,12 +1,13 @@
 namespace Minesweeper {
     "use strict";
+
     import IPlayerInfo = Play.IPlayerInfo;
 
     export class Field {
         public isRevealed: boolean;
         public hasFlag: boolean;
         public hasMine: boolean;
-        public owner: IPlayerInfo;
+        public owner: IPlayerInfo<any>;
         public adjacentMines: number;
     }
 

@@ -16,11 +16,11 @@ namespace Play.Server {
 
     export class LocalServerConnection implements IConnection {
 
-        public messageHandler: (client: Client, msg: Message) => void;
+        public messageHandler: (client: Client<any>, msg: Message) => void;
 
-        private client: Client;
+        private client: Client<any>;
 
-        constructor(client: Client) {
+        constructor(client: Client<any>) {
             this.client = client;
         }
 
@@ -41,13 +41,13 @@ namespace Play.Server {
     }
 
 
-    export class Client implements IPlayerInfo {
+    export class Client<T> implements IPlayerInfo<T> {
         public id: string;
         public name: string;
         public team: number;
         public isReady: boolean;
         public connection: IConnection;
-        public gameData: any;
+        public gameData: T;
         public isConnected: boolean = false;
 
 

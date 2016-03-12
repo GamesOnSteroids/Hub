@@ -4,7 +4,7 @@ namespace Play.Server {
     import GameMessage = Play.GameMessage;
 
 
-    export abstract class GameService<TVariant extends IGameVariant> extends Service {
+    export abstract class GameService<TVariant extends IGameVariant, TPlayerData> extends Service {
 
         private lastFrame: number;
 
@@ -22,7 +22,7 @@ namespace Play.Server {
             // nothing to do
         }
 
-        protected get players(): PlayerInfo[] {
+        protected get players(): IPlayerInfo<TPlayerData>[] {
             return this.lobby.clients;
         }
 
@@ -35,7 +35,7 @@ namespace Play.Server {
          * @param id Id of the message
          * @param handler Callback to call when message arrives
          */
-        protected on<T extends GameMessage>(id: number, handler: (client: Client, msg: T) => void): void {
+        protected on<T extends GameMessage>(id: number, handler: (client: IPlayerInfo<TPlayerData>, msg: T) => void): void {
             this.lobby.on(ServiceType.Game, id, <any>handler);
         }
 

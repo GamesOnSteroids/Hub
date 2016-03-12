@@ -1,13 +1,12 @@
 namespace Minesweeper.Server {
     "use strict";
 
-    import Client = Play.Server.Client;
     import GameService = Play.Server.GameService;
     import ServerLobby = Play.Server.ServerLobby;
     import IPlayerInfo = Play.IPlayerInfo;
 
 
-    export class MinesweeperService extends GameService<IMinesweeperVariant> {
+    export class MinesweeperService extends GameService<IMinesweeperVariant, IMinesweeperPlayer> {
 
         private static SCORE_INCORRECT_FLAG = -500;
         private static SCORE_CORRECT_FLAG = 250;
@@ -30,6 +29,14 @@ namespace Minesweeper.Server {
 
             this.minefield = new Minefield(this.variant.width, this.variant.height);
             this.mines = this.variant.mines;
+
+            for (let player of this.players) {
+                player.gameData = {
+                    score: 0,
+                    mines: 0,
+                    flags: 0,
+                };
+            }
         }
 
         private checkGameOver(): void {
@@ -53,12 +60,13 @@ namespace Minesweeper.Server {
         }
 
 
-        private score(client: IPlayerInfo, score: number): void {
+        private score(client: IPlayerInfo<IMinesweeperPlayer>, score: number): void {
+            client.gameData.score += score;
             this.lobby.broadcast(new ScoreMessage(client.id, score));
         }
 
 
-        private flag(client: Client, fieldId: number, flag: boolean): void {
+        private flag(client: IPlayerInfo<IMinesweeperPlayer>, fieldId: number, flag: boolean): void {
             let field = this.minefield.get(fieldId);
             if (field.isRevealed) {
                 return;
@@ -84,7 +92,7 @@ namespace Minesweeper.Server {
 
         }
 
-        private massReveal(client: Client, fieldId: number): void {
+        private massReveal(client: IPlayerInfo<IMinesweeperPlayer>, fieldId: number): void {
 
             let field = this.minefield.get(fieldId);
             if (!field.isRevealed || field.adjacentMines == 0 || field.hasMine) {
@@ -116,7 +124,7 @@ namespace Minesweeper.Server {
         }
 
 
-        private reveal(client: Client, fieldId: number, doubt?: boolean): void {
+        private reveal(player: IPlayerInfo<any>, fieldId: number, doubt?: boolean): void {
 
             let field = this.minefield.get(fieldId);
             if (field.isRevealed) {
@@ -124,7 +132,7 @@ namespace Minesweeper.Server {
             }
             if (field.hasFlag) {
                 // can not reveal your own flags
-                if (field.owner.team == client.team) {
+                if (field.owner.team == player.team) {
                     return;
                 }
                 // can only doubt flags of other players
@@ -135,10 +143,10 @@ namespace Minesweeper.Server {
 
             let oldOwner = field.owner;
             field.isRevealed = true;
-            field.owner = client;
+            field.owner = player;
             field.hasFlag = false;
 
-            this.lobby.broadcast(new RevealMessage(client.id, fieldId, field.adjacentMines, field.hasMine));
+            this.lobby.broadcast(new RevealMessage(player.id, fieldId, field.adjacentMines, field.hasMine));
 
             if (field.hasFlag) {
                 if (field.hasMine) { // doubt mine
@@ -160,7 +168,7 @@ namespace Minesweeper.Server {
                         this.minefield.forAdjacent(fieldId, (id) => {
                             let adjacentField = this.minefield.get(id);
                             if (!adjacentField.hasMine && !adjacentField.isRevealed && !adjacentField.hasFlag) {
-                                this.reveal(client, id);
+                                this.reveal(player, id);
                             }
                         });
                     }
@@ -168,20 +176,20 @@ namespace Minesweeper.Server {
             }
         }
 
-        private onFlagRequest(client: Client, msg: FlagRequestMessage): void {
+        private onFlagRequest(client: IPlayerInfo<IMinesweeperPlayer>, msg: FlagRequestMessage): void {
             this.flag(client, msg.fieldId, msg.flag);
         }
 
-        private onMassRevealRequest(client: Client, msg: MassRevealRequestMessage): void {
+        private onMassRevealRequest(client: IPlayerInfo<IMinesweeperPlayer>, msg: MassRevealRequestMessage): void {
 
             this.massReveal(client, msg.fieldId);
         }
 
-        private onRevealRequest(client: Client, msg: RevealRequestMessage): void {
+        private onRevealRequest(client: IPlayerInfo<IMinesweeperPlayer>, msg: RevealRequestMessage): void {
             // todo: sanitize input
 
             if (!this.generated) {
-                this.generate(msg.fieldId)
+                this.generate(msg.fieldId);
             }
 
             this.reveal(client, msg.fieldId, msg.doubt);

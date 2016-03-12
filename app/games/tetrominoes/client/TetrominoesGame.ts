@@ -11,7 +11,7 @@ namespace Tetrominoes.Client {
     const TILE_SIZE = 32;
 
 
-    export class TetrominoesGame extends Game<ITetrominoesVariant> {
+    export class TetrominoesGame extends Game<ITetrominoesVariant, ITetrominoesPlayer> {
 
         private camera: Camera;
         private assets: any;
@@ -35,6 +35,7 @@ namespace Tetrominoes.Client {
 
             for (let player of this.players) {
                 player.gameData = {
+                    lines: 0,
                     score: 0,
                 };
             }

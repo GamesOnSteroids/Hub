@@ -4,7 +4,7 @@ namespace Chess.Client {
     import ClientLobby = Play.Client.ClientLobby;
 
 
-    export class ChessApp extends React.Component<any, {players: PlayerInfo[]}> {
+    export class ChessApp extends React.Component<any, {players: PlayerInfo<IChessPlayer>[]}> {
         private stateChangeToken: number;
 
         constructor() {
@@ -14,7 +14,7 @@ namespace Chess.Client {
 
             this.state = {
                 players: ClientLobby.current.players,
-            }
+            };
         }
 
         protected componentDidMount(): void {
@@ -27,7 +27,7 @@ namespace Chess.Client {
                 console.log("ChessApp.changeListener");
                 this.setState({
                     players: ClientLobby.current.players
-                })
+                });
             });
         }
 

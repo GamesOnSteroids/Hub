@@ -4,6 +4,12 @@ namespace Minesweeper {
     import GameMessage = Play.GameMessage;
     import IGameVariant = Play.IGameVariant;
 
+    export interface IMinesweeperPlayer {
+        score: number;
+        flags: number;
+        mines: number;
+    }
+
     export interface IMinesweeperVariant extends IGameVariant {
         width: number;
         height: number;

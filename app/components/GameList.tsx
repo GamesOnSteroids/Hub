@@ -8,15 +8,18 @@ class GameList extends React.Component<any, {lobbies: ILobbyDescription[]}> {
     constructor() {
         super();
 
-        let lobbyService = new FirebaseLobbyService();
-        lobbyService.getLobbyList().then( (lobbies) => {
-           this.setState({
-               lobbies: lobbies
-           });
-        });
         this.state = {
             lobbies: []
         };
+    }
+
+    protected componentDidMount(): void {
+        let lobbyService = new FirebaseLobbyService();
+        lobbyService.getLobbyList().then( (lobbies) => {
+            this.setState({
+                lobbies: lobbies
+            });
+        });
     }
 
     public render(): JSX.Element {

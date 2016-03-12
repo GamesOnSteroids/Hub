@@ -2,11 +2,21 @@ namespace Chess {
     "use strict";
 
     import GameMessage = Play.GameMessage;
+    import IGameVariant = Play.IGameVariant;
 
 
-    export const LOCK_TIMER = 3;
+    export const LOCK_TIMER = 0;
     export const MOVEMENT_SPEED = 1 / (1000 * 0.5);
 
+    export interface IChessVariant extends IGameVariant {
+        boardType: string;
+    }
+
+    export interface IChessPlayer {
+        score: number;
+        pieces: number;
+        isAlive: boolean;
+    }
 
     export enum PieceType {
         Pawn = 1,

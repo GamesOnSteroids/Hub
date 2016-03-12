@@ -4,7 +4,7 @@ namespace Anagrams.Client {
     import ClientLobby = Play.Client.ClientLobby;
 
 
-    export class AnagramsApp extends React.Component<any, {players: PlayerInfo[]}> {
+    export class AnagramsApp extends React.Component<any, {players: PlayerInfo<any>[]}> {
         private stateChangeToken: number;
 
         constructor() {
@@ -30,13 +30,13 @@ namespace Anagrams.Client {
             });
         }
 
-        componentWillUnmount() {
+        protected componentWillUnmount(): void {
             let game = ClientLobby.current.game as AnagramsGame;
             game.changeListener.unregister(this.stateChangeToken);
 
         }
 
-        render() {
+        public render(): JSX.Element {
             return (
                 <div style={{position: "relative", textAlign: "center"}}>
                     <div className="row">
