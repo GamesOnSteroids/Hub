@@ -45,8 +45,19 @@ namespace Play {
                 connection.messageHandler = (msg) => server.onMessage(client, msg);
                 client.connection = connection;
 
+                pc.oniceconnectionstatechange = (e) => {
+                    console.log("PeerConnection.onIceConnectionStateChange", e);
+                    if (pc.iceConnectionState == "closed" || pc.iceConnectionState == "disconnected" || pc.iceConnectionState == "failed") {
+                        if (connection.onDisconnect != null) {
+                            connection.onDisconnect();
+                        }
+                    }
+                };
                 pc.ondatachannel = (e) => {
                     connection.dataChannel = <RTCDataChannel>((<any>e)["channel"]);
+                    connection.dataChannel.onclose = (e) => {
+                        console.log("DataChannel.onClose", e);
+                    };
                     connection.dataChannel.onmessage = (e) => {
                         let message = JSON.parse(e.data);
                         connection.messageHandler(message);
@@ -141,6 +152,14 @@ namespace Play {
 
             lobby.serverConnection = connection;
 
+            pc.oniceconnectionstatechange = (e) => {
+                console.log("PeerConnection.onIceConnectionStateChange", e);
+                if (pc.iceConnectionState == "closed" || pc.iceConnectionState == "disconnected" || pc.iceConnectionState == "failed") {
+                    if (connection.onDisconnect != null) {
+                        connection.onDisconnect();
+                    }
+                }
+            };
             dataChannel.onopen = (event) => {
                 console.log("SignalingService.dataChannel.onopen");
                 let readyState = dataChannel.readyState;

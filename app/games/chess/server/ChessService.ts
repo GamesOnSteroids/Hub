@@ -39,6 +39,7 @@ namespace Chess.Server {
         public start(): void {
             this.chessBoard.initialize(this.players);
             for (let piece of this.chessBoard.pieces) {
+                piece.timer = LOCK_TIMER;
                 this.createPiece(piece);
             }
 
@@ -93,6 +94,7 @@ namespace Chess.Server {
                                 this.destroyPiece(piece);
 
                                 let promotion = new Queen(pawn.id, pawn.x, pawn.y, pawn.owner);
+                                promotion.timer = LOCK_TIMER;
                                 this.chessBoard.pieces.push(promotion);
                                 this.createPiece(promotion);
                             }

@@ -4,37 +4,8 @@ import LobbyState = Play.Client.LobbyState;
 import PlayerInfo = Play.Client.PlayerInfo;
 import ClientLobby = Play.Client.ClientLobby;
 import LobbyConfiguration = Play.LobbyConfiguration;
+import ServerLobby = Play.Server.ServerLobby;
 
-
-class GameOver extends React.Component<any, any> {
-
-    public render(): JSX.Element {
-        var overlayStyle = {
-            position: "absolute",
-            right: 0,
-            bottom: 0,
-            left: 0,
-            top: 0,
-            background: "rgba(1,1,1,0.4)",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            color: "white",
-            textShadow: "-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000",
-            textAlign: "center"
-        };
-        return (
-            <div style={overlayStyle}>
-                <div>
-                    <h2>GAME OVER</h2>
-                    <br/>
-                    <button className="btn btn-default" type="submit" onClick={this.props.onBackToLobby}>Back to Lobby
-                    </button>
-                </div>
-            </div>
-        );
-    }
-}
 
 class PlayerInfoComponent extends React.Component<{key: string, player: PlayerInfo<any>}, any> {
     public render(): JSX.Element {
@@ -79,6 +50,10 @@ class LobbyComponent extends React.Component<any, {state: LobbyState, players: P
 
     private changeListenerToken: number;
 
+    public static onLeave(): void {
+
+    }
+
     public static onEnter(nextState: ReactRouter.RouterState, replaceState: ReactRouter.RedirectFunction, callback?: Function): any {
         if (ClientLobby.current == null) {
             let configuration = new LobbyConfiguration();
@@ -111,11 +86,22 @@ class LobbyComponent extends React.Component<any, {state: LobbyState, players: P
         console.log("LobbyComponent.componentWillUnmount");
         let lobby = ClientLobby.current;
         lobby.changeListener.unregister(this.changeListenerToken);
+        Firebase.goOffline(); //TODO: this should not be here
+        ClientLobby.current.leave();
+        if (ServerLobby.current != null) {
+            ServerLobby.current.destroy();
+            ServerLobby.current = null;
+        }
     }
 
     private backToLobby(): void {
         console.log("LobbyComponent.backToLobby");
-        ClientLobby.current.backToLobby();
+        let lobby = ClientLobby.current;
+        if (lobby.players.length < lobby.configuration.variant.maxPlayers) {
+            ReactRouter.hashHistory.pushState(null, "/");
+        } else {
+            ClientLobby.current.backToLobby();
+        }
     }
 
     public render(): JSX.Element {

@@ -5,10 +5,10 @@ import ChatLog = Play.Client.ChatLog;
 class ChatMessageComponent extends React.Component<ChatLog, any> {
 
     public render(): JSX.Element {
-        var date = this.props.date;
-        var formattedTime = `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+        //var date = this.props.date;
+        //var formattedTime = `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
         return (
-            <div>[{formattedTime}] {this.props.author}: {this.props.text}</div>
+            <div>[{this.props.author}] {this.props.text}</div>
         );
     }
 }

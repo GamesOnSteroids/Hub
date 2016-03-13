@@ -75,7 +75,7 @@ class GameDescription extends React.Component<{ gameConfiguration: IGameConfigur
         lobbyService.findLobby(lobbyConfiguration).then((lobby) => {
             Play.Client.ClientLobby.current = lobby;
 
-            ReactRouter.hashHistory.pushState(undefined, `/lobby/${lobby.configuration.lobbyId}`);
+            ReactRouter.hashHistory.pushState(null, `/lobby/${lobby.configuration.lobbyId}`);
         });
     }
 

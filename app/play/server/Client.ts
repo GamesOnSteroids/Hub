@@ -3,14 +3,21 @@ namespace Play.Server {
 
     export interface IConnection {
         send(msg: Message): void;
+        disconnect(): void;
+        onDisconnect: () => void;
     }
 
     export class LocalClientConnection implements IConnection {
 
         public messageHandler: (msg: Message) => void;
+        public onDisconnect: () => void;
 
         public send(msg: Message): void {
             this.messageHandler(msg);
+        }
+
+        public disconnect(): void {
+
         }
     }
 
@@ -19,6 +26,7 @@ namespace Play.Server {
         public messageHandler: (client: Client<any>, msg: Message) => void;
 
         private client: Client<any>;
+        public onDisconnect: () => void;
 
         constructor(client: Client<any>) {
             this.client = client;
@@ -27,6 +35,10 @@ namespace Play.Server {
         public send(msg: any): void {
             this.messageHandler(this.client, msg);
         }
+
+        public disconnect(): void {
+
+        }
     }
 
     export class Peer2PeerConnection implements IConnection {
@@ -34,9 +46,15 @@ namespace Play.Server {
         public peerConnection: RTCPeerConnection;
         public dataChannel: RTCDataChannel;
         public messageHandler: (msg: Message) => void;
+        public onDisconnect: () => void;
 
         public send(msg: Message): void {
             this.dataChannel.send(JSON.stringify(msg));
+        }
+
+        public disconnect(): void {
+            this.dataChannel.close();
+            this.peerConnection.close();
         }
     }
 

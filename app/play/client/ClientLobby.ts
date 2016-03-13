@@ -50,11 +50,10 @@ namespace Play.Client {
 
             this.on<GameStartMessage>(ServiceType.Lobby, LobbyMessageId.SMSG_GAME_START, this.onGameStart.bind(this));
             this.on<PlayerJoinedMessage>(ServiceType.Lobby, LobbyMessageId.SMSG_PLAYER_JOINED, this.onJoin.bind(this));
+            this.on<PlayerLeftMessage>(ServiceType.Lobby, LobbyMessageId.SMSG_PLAYER_LEFT, this.onLeft.bind(this));
             this.on<GameOverMessage>(ServiceType.Lobby, LobbyMessageId.SMSG_GAME_OVER, this.onGameOver.bind(this));
             this.on<PlayerReadyMessage>(ServiceType.Lobby, LobbyMessageId.SMSG_PLAYER_READY, this.onPlayerReady.bind(this));
             this.on<PlayerChatMessage>(ServiceType.Lobby, LobbyMessageId.SMSG_PLAYER_CHAT, this.onPlayerChat.bind(this));
-
-
         }
 
         public sendToServer<T extends Message>(msg: T): void {
@@ -76,11 +75,18 @@ namespace Play.Client {
         public sendChat(message: string): void {
             this.sendToServer(new ChatMessage(message));
         }
+
         public backToLobby(): void {
             this.state = LobbyState.IN_LOBBY;
             this.emitChange(() => {
                 this.ready();
             });
+        }
+
+
+        public leave(): void {
+            console.log("ClientLobby.leave");
+            this.serverConnection.disconnect();
         }
 
         public join(): void {
@@ -104,8 +110,7 @@ namespace Play.Client {
         }
 
         private onPlayerChat(message: PlayerChatMessage): void {
-            let player = this.players.find(p => p.id == message.playerId);
-            this.messageLog.push(new ChatLog(new Date(), player.name, message.text));
+            this.messageLog.push(new ChatLog(new Date(), message.name, message.text));
             this.emitChange();
         }
 
@@ -113,6 +118,18 @@ namespace Play.Client {
             console.log("ClientLobby.onPlayerReady");
             let player = this.players.find(p => p.id == message.playerId);
             player.isReady = true;
+            this.emitChange();
+        }
+
+
+        public onServerDisconnect(): void {
+            this.players.splice(0, this.players.length);
+            this.players.push(this.localPlayer);
+            this.messageHandlers.get(ServiceType.Game).clear();
+            this.state = LobbyState.GAME_OVER;
+
+            this.messageLog.push(new ChatLog(new Date(), "System", "Server has disconnected."));
+
             this.emitChange();
         }
 
@@ -136,6 +153,15 @@ namespace Play.Client {
             this.emitChange();
         }
 
+        private onLeft(message: PlayerLeftMessage): void {
+            console.log("ClientLobby.onLeft", message);
+            let player = this.players.find(p => p.id == message.playerId);
+            this.players.splice(this.players.indexOf(player), 1);
+            this.messageLog.push(new ChatLog(new Date(), "System", `${player.name} has left.`));
+
+            this.emitChange();
+        }
+
         private onJoin(message: PlayerJoinedMessage): void {
             console.log("ClientLobby.onJoin", message);
 
@@ -150,6 +176,8 @@ namespace Play.Client {
             if (message.isYou) {
                 this.configuration.gameConfiguration = message.configuration;
                 this.localPlayer = player;
+            } else {
+                this.messageLog.push(new ChatLog(new Date(), "System", `${player.name} has joined.`));
             }
 
             this.emitChange();

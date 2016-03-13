@@ -58,7 +58,7 @@ ReactDOM.render(
             <ReactRouter.Route path="/" component={App}>
                 <ReactRouter.IndexRoute component={GameList}/>
                 <ReactRouter.Route path="/games" component={GameList}/>
-                <ReactRouter.Route path="/lobby/:lobbyId" component={LobbyComponent} onEnter={LobbyComponent.onEnter}/>
+                <ReactRouter.Route path="/lobby/:lobbyId" component={LobbyComponent} onLeave={LobbyComponent.onLeave} onEnter={LobbyComponent.onEnter}/>
                 <ReactRouter.Route path="*" component={NoMatch}/>
             </ReactRouter.Route>
         </ReactRouter.Router>

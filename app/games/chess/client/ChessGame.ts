@@ -278,26 +278,28 @@ namespace Chess.Client {
         }
 
         private onCreatePiece(message: CreatePieceMessage): void {
-            console.log("ChessGame.onCreatePiece", message.pieceId, PieceType[message.pieceType], message.x, message.y);
+            //console.log("ChessGame.onCreatePiece", message.pieceId, PieceType[message.pieceType], message.x, message.y);
             let player = this.players.find(p => p.id == message.playerId);
             player.gameData.pieces++;
+            let piece: ChessPiece;
             if (message.pieceType == PieceType.Queen) {
-                let queen = new Queen(message.pieceId, message.x, message.y, player);
-                this.chessBoard.pieces.push(queen);
-                if (queen.owner != this.localPlayer) {
-                    this.checkForCheck(queen); // promotion
-                }
+                piece = new Queen(message.pieceId, message.x, message.y, player);
             } else if (message.pieceType == PieceType.King) {
-                this.chessBoard.pieces.push(new King(message.pieceId, message.x, message.y, player));
+                piece = new King(message.pieceId, message.x, message.y, player);
             } else if (message.pieceType == PieceType.Knight) {
-                this.chessBoard.pieces.push(new Knight(message.pieceId, message.x, message.y, player));
+                piece = new Knight(message.pieceId, message.x, message.y, player);
             } else if (message.pieceType == PieceType.Bishop) {
-                this.chessBoard.pieces.push(new Bishop(message.pieceId, message.x, message.y, player));
+                piece = new Bishop(message.pieceId, message.x, message.y, player);
             } else if (message.pieceType == PieceType.Rook) {
-                this.chessBoard.pieces.push(new Rook(message.pieceId, message.x, message.y, player));
+                piece = new Rook(message.pieceId, message.x, message.y, player);
             } else if (message.pieceType == PieceType.Pawn) {
-                this.chessBoard.pieces.push(new Pawn(message.pieceId, message.x, message.y, message.direction, player));
+                piece = new Pawn(message.pieceId, message.x, message.y, message.direction, player);
             }
+            if (piece.owner != this.localPlayer) {
+                this.checkForCheck(piece); // promotion
+            }
+            piece.timer = LOCK_TIMER;
+            this.chessBoard.pieces.push(piece);
             this.emitChange();
         }
 

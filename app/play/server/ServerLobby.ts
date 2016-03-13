@@ -14,6 +14,7 @@ namespace Play.Server {
 
 
     export class ServerLobby {
+        public static current: ServerLobby;
 
         public clients: Client<any>[] = [];
 
@@ -27,7 +28,7 @@ namespace Play.Server {
         ]);
 
         constructor(configuration: LobbyConfiguration) {
-
+            ServerLobby.current = this;
             this.configuration = configuration;
 
             this.on<JoinRequestMessage>(ServiceType.Lobby, LobbyMessageId.CMSG_JOIN_REQUEST, this.onJoinRequest.bind(this));
@@ -41,6 +42,9 @@ namespace Play.Server {
             this.messageHandlers.get(service).set(messageId, callback);
         }
 
+        public destroy() {
+            this.clients.forEach(c => c.connection.disconnect());
+        }
 
         public onMessage(client: Client<any>, msg: Message): void {
             let handler = this.messageHandlers.get(msg.service).get(msg.id);
@@ -80,7 +84,7 @@ namespace Play.Server {
 
 
         private onChat(client: Client<any>, msg: ChatMessage): void {
-            this.broadcast(new PlayerChatMessage(client.id, msg.text));
+            this.broadcast(new PlayerChatMessage(client.name, msg.text));
         }
 
         private onReady(client: Client<any>, msg: ReadyMessage): void {
@@ -104,9 +108,22 @@ namespace Play.Server {
             }
         }
 
+
+        private onDisconnect(client: Client<any>): void {
+            if (client.isConnected) {
+                client.isConnected = false;
+
+                this.clients.splice(this.clients.indexOf(client), 1);
+                this.broadcast(new PlayerLeftMessage(client.id));
+                this.gameOver();
+            }
+        }
+
         private onJoinRequest(client: Client<any>, msg: JoinRequestMessage): void {
             console.log("ServerLobby.onJoinRequest", msg);
             // todo: if the game is already running, disconnect client
+
+            client.connection.onDisconnect = this.onDisconnect.bind(this, client);
 
             client.name = msg.name;
 

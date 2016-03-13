@@ -24,7 +24,7 @@ namespace Chess.Client {
             game.initialize();
 
             this.stateChangeToken = game.changeListener.register((game: ChessGame) => {
-                console.log("ChessApp.changeListener");
+                //console.log("ChessApp.changeListener");
                 this.setState({
                     players: ClientLobby.current.players
                 });

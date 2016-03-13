@@ -27,16 +27,7 @@ namespace Play {
             let firebase = new Firebase(config.get(environment).firebaseURL);
             let lobbyRef = firebase.child("lobby").child(lobby.configuration.lobbyId);
 
-            lobbyRef.transaction((data) => {
-                if (data != null) {
-                    data.playerCount += 1;
-                }
-                return data;
-            }, (error, commited, snapshot) => {
-                if (error != null) {
-                    console.error(error);
-                }
-            }, true);
+            lobbyRef.child("playerCount").set(lobby.clients.length, () => { });
         }
 
         public getLobbyList(): Promise<ILobbyDescription[]> {
@@ -54,6 +45,7 @@ namespace Play {
 
         public findLobby(configuration: LobbyConfiguration): Promise<ClientLobby> {
             return new Promise<ClientLobby>((resolve, reject) => {
+                Firebase.goOnline();
 
                 // no desired game
                 if (configuration.lobbyId == null) {
@@ -132,7 +124,6 @@ namespace Play {
             };
             clientLobby.serverConnection = localServerConnection;
 
-
             let localClientConnection = new LocalClientConnection();
             localClientConnection.messageHandler = (msg) => {
                 clientLobby.onMessage(<any>msg);
@@ -153,6 +144,7 @@ namespace Play {
             let signalingService = new SignalingService();
             let ref = new Firebase(config.get(environment).firebaseURL).child("lobby").child(lobby.configuration.lobbyId).child("sdp");
             signalingService.createSignalingClient(lobby, new FirebaseSignalingChannel(ref));
+            lobby.serverConnection.onDisconnect = lobby.onServerDisconnect.bind(lobby);
 
             resolve(lobby);
         };

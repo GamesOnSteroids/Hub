@@ -34,7 +34,8 @@ namespace Play {
         CMSG_READY = 5,
         SMSG_PLAYER_READY = 6,
         CMSG_CHAT = 7,
-        SMSG_PLAYER_CHAT = 8
+        SMSG_PLAYER_CHAT = 8,
+        SMSG_PLAYER_LEFT = 9,
     }
 
 
@@ -62,8 +63,13 @@ namespace Play {
         }
     }
 
+    export class PlayerLeftMessage extends LobbyMessage {
+        constructor(public playerId: string) {
+            super(LobbyMessageId.SMSG_PLAYER_LEFT);
+        }
+    }
     export class PlayerChatMessage extends LobbyMessage {
-        constructor(public playerId: string, public text: string) {
+        constructor(public name: string, public text: string) {
             super(LobbyMessageId.SMSG_PLAYER_CHAT);
         }
     }
