@@ -10,7 +10,7 @@ gulp.task("default", ["compile-typescript", "copy-files"], function () {
 
 gulp.task('copy-files', function() {
 
-    return gulp.src(["CNAME", "favicon.ico", "index.html", "./app/**/*.{html,css,png}"], {base: "."})
+    return gulp.src(["CNAME", "favicon.ico", "index.html", "./app/**/*.{html,css,png,ogg,wav}"], {base: "."})
         .pipe(gulp.dest(".dist"));
 });
 

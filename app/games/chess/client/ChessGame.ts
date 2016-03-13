@@ -85,18 +85,7 @@ namespace Chess.Client {
                         this.playSound(this.assets.movepiece[MathUtils.random(0, this.assets.movepiece.length)]);
 
                         if (piece.owner != this.localPlayer) {
-                            let validMoves = piece.getValidMoves(this.chessBoard);
-                            for (let validMove of validMoves) {
-                                if (validMove.constraints == MoveType.Capture) {
-                                    let capturePiece = this.chessBoard.pieces.find(p => p.x == validMove.x && p.y == validMove.y);
-                                    if (capturePiece.type == PieceType.King) {
-                                        if (capturePiece.owner == this.localPlayer) {
-                                            this.playSound(this.assets.check);
-                                        }
-                                    }
-                                }
-
-                            }
+                            this.checkForCheck(piece);
                         }
                     }
                 }
@@ -105,6 +94,19 @@ namespace Chess.Client {
                 }
             }
 
+        }
+
+        private checkForCheck(piece: ChessPiece): void {
+            let validMoves = piece.getValidMoves(this.chessBoard);
+            for (let validMove of validMoves) {
+                if (validMove.constraints == MoveType.Capture) {
+                    let capturePiece = this.chessBoard.pieces.find(p => p.x == validMove.x && p.y == validMove.y);
+                    if (capturePiece.type == PieceType.King) {
+                        this.playSound(this.assets.check);
+                    }
+                }
+
+            }
         }
 
         private rotate2D(x: number, y: number): {x: number, y: number} {
@@ -201,11 +203,8 @@ namespace Chess.Client {
             if (Mouse.button == 1) {
                 let piece = this.chessBoard.pieces.find(p => p.x == x && p.y == y);
                 if (piece != null && piece.timer <= 0 && piece.movementProgress == 0 && piece.owner.id == this.localPlayer.id) {
-
-                    console.log("Select", PieceType[piece.type], x, y);
                     this.selectedPiece = piece;
                 } else if (this.selectedPiece != null) {
-                    console.log("MoveTo", PieceType[this.selectedPiece.type], x, y);
                     let validMoves = this.selectedPiece.getValidMoves(this.chessBoard);
                     if (validMoves.find(m => m.x == x && m.y == y) != null) {
                         this.movePiece(this.selectedPiece, x, y);
@@ -214,7 +213,6 @@ namespace Chess.Client {
 
                 }
             } else if (Mouse.button == 2) {
-                console.log("Deselect");
                 this.selectedPiece = null;
             }
         }
@@ -286,7 +284,11 @@ namespace Chess.Client {
             let player = this.players.find(p => p.id == message.playerId);
             player.gameData.pieces++;
             if (message.pieceType == PieceType.Queen) {
-                this.chessBoard.pieces.push(new Queen(message.pieceId, message.x, message.y, player));
+                let queen = new Queen(message.pieceId, message.x, message.y, player);
+                this.chessBoard.pieces.push(queen);
+                if (queen.owner != this.localPlayer) {
+                    this.checkForCheck(queen); // promotion
+                }
             } else if (message.pieceType == PieceType.King) {
                 this.chessBoard.pieces.push(new King(message.pieceId, message.x, message.y, player));
             } else if (message.pieceType == PieceType.Knight) {
@@ -324,10 +326,10 @@ namespace Chess.Client {
             }
 
             // reflection
-            ctx.globalAlpha = 0.5;
+            ctx.globalAlpha = 0.3;
             ctx.save();
             ctx.scale(1, -1);
-            ctx.drawImage(image, 0, 0, image.width, image.height, x - image.width / 2 + TILE_WIDTH / 2, - y - image.height - TILE_WIDTH / 5, image.width, image.height);
+            ctx.drawImage(image, 0, 0, image.width, image.height, x - image.width / 2 + TILE_WIDTH / 2, -y - image.height - TILE_WIDTH / 5, image.width, image.height);
             ctx.restore();
 
             ctx.globalAlpha = 1;
