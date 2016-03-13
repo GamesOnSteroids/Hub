@@ -62,22 +62,23 @@ var Chess;
                             piece.timer = Chess.LOCK_TIMER;
                             this.playSound(this.assets.movepiece[MathUtils.random(0, this.assets.movepiece.length)]);
                             if (piece.owner != this.localPlayer) {
-                                let validMoves = piece.getValidMoves(this.chessBoard);
-                                for (let validMove of validMoves) {
-                                    if (validMove.constraints == Chess.MoveType.Capture) {
-                                        let capturePiece = this.chessBoard.pieces.find(p => p.x == validMove.x && p.y == validMove.y);
-                                        if (capturePiece.type == Chess.PieceType.King) {
-                                            if (capturePiece.owner == this.localPlayer) {
-                                                this.playSound(this.assets.check);
-                                            }
-                                        }
-                                    }
-                                }
+                                this.checkForCheck(piece);
                             }
                         }
                     }
                     if (piece.timer > 0) {
                         piece.timer -= delta * (1 / 1000);
+                    }
+                }
+            }
+            checkForCheck(piece) {
+                let validMoves = piece.getValidMoves(this.chessBoard);
+                for (let validMove of validMoves) {
+                    if (validMove.constraints == Chess.MoveType.Capture) {
+                        let capturePiece = this.chessBoard.pieces.find(p => p.x == validMove.x && p.y == validMove.y);
+                        if (capturePiece.type == Chess.PieceType.King) {
+                            this.playSound(this.assets.check);
+                        }
                     }
                 }
             }
@@ -166,11 +167,9 @@ var Chess;
                 if (Mouse.button == 1) {
                     let piece = this.chessBoard.pieces.find(p => p.x == x && p.y == y);
                     if (piece != null && piece.timer <= 0 && piece.movementProgress == 0 && piece.owner.id == this.localPlayer.id) {
-                        console.log("Select", Chess.PieceType[piece.type], x, y);
                         this.selectedPiece = piece;
                     }
                     else if (this.selectedPiece != null) {
-                        console.log("MoveTo", Chess.PieceType[this.selectedPiece.type], x, y);
                         let validMoves = this.selectedPiece.getValidMoves(this.chessBoard);
                         if (validMoves.find(m => m.x == x && m.y == y) != null) {
                             this.movePiece(this.selectedPiece, x, y);
@@ -179,7 +178,6 @@ var Chess;
                     }
                 }
                 else if (Mouse.button == 2) {
-                    console.log("Deselect");
                     this.selectedPiece = null;
                 }
             }
@@ -242,7 +240,11 @@ var Chess;
                 let player = this.players.find(p => p.id == message.playerId);
                 player.gameData.pieces++;
                 if (message.pieceType == Chess.PieceType.Queen) {
-                    this.chessBoard.pieces.push(new Chess.Queen(message.pieceId, message.x, message.y, player));
+                    let queen = new Chess.Queen(message.pieceId, message.x, message.y, player);
+                    this.chessBoard.pieces.push(queen);
+                    if (queen.owner != this.localPlayer) {
+                        this.checkForCheck(queen);
+                    }
                 }
                 else if (message.pieceType == Chess.PieceType.King) {
                     this.chessBoard.pieces.push(new Chess.King(message.pieceId, message.x, message.y, player));
@@ -280,7 +282,7 @@ var Chess;
                     x = p.x * TILE_WIDTH;
                     y = p.y * TILE_HEIGHT;
                 }
-                ctx.globalAlpha = 0.5;
+                ctx.globalAlpha = 0.3;
                 ctx.save();
                 ctx.scale(1, -1);
                 ctx.drawImage(image, 0, 0, image.width, image.height, x - image.width / 2 + TILE_WIDTH / 2, -y - image.height - TILE_WIDTH / 5, image.width, image.height);
