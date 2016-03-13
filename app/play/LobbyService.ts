@@ -25,7 +25,7 @@ namespace Play {
         public onClientJoined(lobby: ServerLobby, client: Client<any>): void {
 
             let firebase = new Firebase(config.get(environment).firebaseURL);
-            let lobbyRef = firebase.child("lobby").child(lobby.lobbyId);
+            let lobbyRef = firebase.child("lobby").child(lobby.configuration.lobbyId);
 
             lobbyRef.transaction((data) => {
                 if (data != null) {
@@ -44,7 +44,7 @@ namespace Play {
                 let lobbiesRef = new Firebase(config.get(environment).firebaseURL).child("lobby");
                 lobbiesRef.once("value", (snapshot) => {
                     let result: ILobbyDescription[] = [];
-                    snapshot.forEach( (lobbySnapshot) => {
+                    snapshot.forEach((lobbySnapshot) => {
                         result.push(lobbySnapshot.val());
                     });
                     resolve(result);
@@ -54,10 +54,10 @@ namespace Play {
 
         public findLobby(configuration: LobbyConfiguration): Promise<ClientLobby> {
             return new Promise<ClientLobby>((resolve, reject) => {
-                let lobbiesRef = new Firebase(config.get(environment).firebaseURL).child("lobby");
 
                 // no desired game
                 if (configuration.lobbyId == null) {
+                    let lobbiesRef = new Firebase(config.get(environment).firebaseURL).child("lobby");
 
                     // try to find relevant games
                     lobbiesRef.once("value", (snapshot) => {
@@ -81,64 +81,81 @@ namespace Play {
 
                             let lobbyRef = lobbiesRef.push();
                             lobbyRef.set(lobbyDescription, () => {
-                                lobbyRef.onDisconnect().remove()
+                                lobbyRef.onDisconnect().remove();
 
                                 let lobbyId = lobbyRef.key();
+                                configuration.lobbyId = lobbyId;
 
-                                let clientLobby = new ClientLobby(lobbyId, configuration);
-                                clientLobby.clientGUID = Guid.generate();
-
-                                let localClient = new Client();
-                                localClient.id = clientLobby.clientGUID;
-                                localClient.name = "server";
-                                localClient.team = 0;
-
-
-                                let serverLobby = new ServerLobby(lobbyId, configuration);
-
-                                let signalingService = new SignalingService();
-                                let ref = new Firebase(config.get(environment).firebaseURL).child("lobby").child(serverLobby.lobbyId).child("sdp");
-                                signalingService.createSignalingServer(serverLobby, new FirebaseSignalingChannel(ref));
-
-
-                                let localServerConnection = new LocalServerConnection(localClient);
-                                localServerConnection.messageHandler = (client: Client<any>, msg: Message) => {
-                                    serverLobby.onMessage(localClient, <any>msg);
-                                };
-                                clientLobby.serverConnection = localServerConnection;
-
-
-                                let localClientConnection = new LocalClientConnection();
-                                localClientConnection.messageHandler = (msg) => {
-                                    clientLobby.onMessage(<any>msg);
-                                };
-                                localClient.connection = localClientConnection;
-
-
-                                serverLobby.clients.push(localClient);
-                                clientLobby.join();
-
-                                resolve(clientLobby);
+                                this.createLobby(configuration, resolve);
                             });
                         } else {
                             let lobbyId = lobbyRef.key();
-                            let lobby = new ClientLobby(lobbyId, configuration);
-                            lobby.clientGUID = Guid.generate();
-
-                            let signalingService = new SignalingService();
-                            let ref = new Firebase(config.get(environment).firebaseURL).child("lobby").child(lobby.lobbyId).child("sdp");
-                            signalingService.createSignalingClient(lobby, new FirebaseSignalingChannel(ref));
-
-                            resolve(lobby);
+                            configuration.lobbyId = lobbyId;
+                            this.joinLobby(configuration, resolve);
                         }
                     });
 
                 } else {
-                    // let lobbyRef = lobbies.child(configuration.lobbyId);
-                    throw "Not implemented";
+                    new Firebase(config.get(environment).firebaseURL).child(`lobby/${configuration.lobbyId}`).once("value", (snapshot) => {
+                        let lobbyId = snapshot.key();
+                        let description = snapshot.val();
+                        configuration.lobbyId = lobbyId;
+                        configuration.gameConfiguration = gamesConfiguration.find(g => g.id == description.gameId);
+                        configuration.variant = configuration.gameConfiguration.variants.find(v => v.id == description.gameVariant);
+
+                        this.joinLobby(configuration, resolve);
+                    });
                 }
             });
         }
+
+        private createLobby(configuration: LobbyConfiguration, resolve: (lobby: ClientLobby) => void): void {
+            let clientLobby = new ClientLobby(configuration);
+            clientLobby.clientGUID = Guid.generate();
+
+            let localClient = new Client();
+            localClient.id = clientLobby.clientGUID;
+            localClient.name = "server";
+            localClient.team = 0;
+
+
+            let serverLobby = new ServerLobby(configuration);
+
+            let signalingService = new SignalingService();
+            let ref = new Firebase(config.get(environment).firebaseURL).child("lobby").child(serverLobby.configuration.lobbyId).child("sdp");
+            signalingService.createSignalingServer(serverLobby, new FirebaseSignalingChannel(ref));
+
+
+            let localServerConnection = new LocalServerConnection(localClient);
+            localServerConnection.messageHandler = (client: Client<any>, msg: Message) => {
+                serverLobby.onMessage(localClient, <any>msg);
+            };
+            clientLobby.serverConnection = localServerConnection;
+
+
+            let localClientConnection = new LocalClientConnection();
+            localClientConnection.messageHandler = (msg) => {
+                clientLobby.onMessage(<any>msg);
+            };
+            localClient.connection = localClientConnection;
+
+
+            serverLobby.clients.push(localClient);
+            clientLobby.join();
+
+            resolve(clientLobby);
+        };
+
+        private joinLobby(configuration: LobbyConfiguration, resolve: (lobby: ClientLobby) => void): void {
+            let lobby = new ClientLobby(configuration);
+            lobby.clientGUID = Guid.generate();
+
+            let signalingService = new SignalingService();
+            let ref = new Firebase(config.get(environment).firebaseURL).child("lobby").child(lobby.configuration.lobbyId).child("sdp");
+            signalingService.createSignalingClient(lobby, new FirebaseSignalingChannel(ref));
+
+            resolve(lobby);
+        };
 
     }
 

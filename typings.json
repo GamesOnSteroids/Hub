@@ -3,6 +3,7 @@
   "ambientDependencies": {
     "MediaStream": "github:DefinitelyTyped/DefinitelyTyped/webrtc/MediaStream.d.ts#bcd5761826eb567876c197ccc6a87c4d05731054",
     "RTCPeerConnection": "github:DefinitelyTyped/DefinitelyTyped/webrtc/RTCPeerConnection.d.ts#bcd5761826eb567876c197ccc6a87c4d05731054",
+    "fbsdk": "github:DefinitelyTyped/DefinitelyTyped/fbsdk/fbsdk.d.ts#9b2017029ee6e4ab368731608d5445a58f519f6c",
     "firebase": "github:DefinitelyTyped/DefinitelyTyped/firebase/firebase.d.ts#bcd5761826eb567876c197ccc6a87c4d05731054",
     "history": "github:DefinitelyTyped/DefinitelyTyped/react-router/history.d.ts#bcd5761826eb567876c197ccc6a87c4d05731054",
     "jasmine": "github:DefinitelyTyped/DefinitelyTyped/jasmine/jasmine.d.ts#dd638012d63e069f2c99d06ef4dcc9616a943ee4",

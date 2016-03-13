@@ -4,7 +4,7 @@ import ChatLog = Play.Client.ChatLog;
 
 class ChatMessageComponent extends React.Component<ChatLog, any> {
 
-    render() {
+    public render(): JSX.Element {
         var date = this.props.date;
         var formattedTime = `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
         return (
@@ -29,26 +29,26 @@ class Chat extends React.Component<any, {messageLog: ChatLog[] }> {
             this.setState({
                 messageLog: lobby.messageLog
             }, () => {
-                var chatLog = document.getElementById("chatLog");
+                let chatLog = document.getElementById("chatLog");
                 chatLog.scrollTop = chatLog.scrollHeight;
             })
         });
     }
 
-    componentWillUnmount() {
+    protected componentWillUnmount(): void {
         let lobby = ClientLobby.current;
         lobby.changeListener.unregister(this.stateChangeToken);
     }
 
 
-    sendMessage(e: React.SyntheticEvent) {
+    public sendMessage(e: React.SyntheticEvent): void {
         let input = document.getElementById("chatMessage") as HTMLInputElement;
         ClientLobby.current.sendChat(input.value);
         input.value = "";
         e.preventDefault();
     }
 
-    render() {
+    public render(): JSX.Element {
         return (
             <div>
                 <div id="chatLog" style={{height: "250px", overflowY:"scroll", textAlign:"left"}}>

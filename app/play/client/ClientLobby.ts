@@ -40,15 +40,12 @@ namespace Play.Client {
         public state: LobbyState = LobbyState.IN_LOBBY;
         public changeListener = new EventDispatcher<ClientLobby>();
 
-        public lobbyId: string;
-
         private messageHandlers = new Map<ServiceType, Map<number, (msg: Message) => void>>([
             [ServiceType.Lobby, new Map<number, (msg: Message) => void>()],
             [ServiceType.Game, new Map<number, (msg: Message) => void>()]
         ]);
 
-        constructor(lobbyId: string, configuration: LobbyConfiguration) {
-            this.lobbyId = lobbyId;
+        constructor(configuration: LobbyConfiguration) {
             this.configuration = configuration;
 
             this.on<GameStartMessage>(ServiceType.Lobby, LobbyMessageId.SMSG_GAME_START, this.onGameStart.bind(this));
@@ -90,7 +87,7 @@ namespace Play.Client {
             this.sendToServer<JoinRequestMessage>({
                 service: ServiceType.Lobby,
                 id: <number>LobbyMessageId.CMSG_JOIN_REQUEST,
-                name: localStorage.getItem("nickname"),
+                name: authentization.displayName,
                 team: 1,
             });
             this.ready();

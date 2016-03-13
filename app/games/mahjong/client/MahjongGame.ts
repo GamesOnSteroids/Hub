@@ -77,8 +77,8 @@ namespace Mahjong.Client {
             super.initialize();
 
 
-            this.canvas.width = 672;
-            this.canvas.height = 504;
+            this.canvas.width = 651;
+            this.canvas.height = 458;
             (this.context as any).imageSmoothingEnabled = false;
 
 
@@ -240,8 +240,8 @@ namespace Mahjong.Client {
 
             let moves = this.table.getAvailableMoves(TileId.MAN_3, this.hand);
 
-            let x = 160;
-            let y = 400;
+            let x = 165;
+            let y = 399;
             for (let tile of hand.tiles.tiles) {
                 let drawn = false;
                 for (let move of moves) {

@@ -18,7 +18,6 @@ namespace Play.Server {
         public clients: Client<any>[] = [];
 
         public configuration: LobbyConfiguration;
-        public lobbyId: string;
         public state: LobbyState = LobbyState.IN_LOBBY;
         public gameService: GameService<IGameVariant, any>;
 
@@ -27,9 +26,8 @@ namespace Play.Server {
             [ServiceType.Game, new Map<number, (client: Client<any>, msg: Message) => void>()]
         ]);
 
-        constructor(lobbyId: string, configuration: LobbyConfiguration) {
+        constructor(configuration: LobbyConfiguration) {
 
-            this.lobbyId = lobbyId;
             this.configuration = configuration;
 
             this.on<JoinRequestMessage>(ServiceType.Lobby, LobbyMessageId.CMSG_JOIN_REQUEST, this.onJoinRequest.bind(this));

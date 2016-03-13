@@ -7,7 +7,7 @@ namespace Mahjong {
         }
 
         public static parse(tilesStr: string): Tiles {
-            let suit = null;
+            let suit: Suit = null;
             let tiles: Tile[] = [];
             for (let i = 0; i < tilesStr.length; i++) {
                 let c = tilesStr.charAt(i);

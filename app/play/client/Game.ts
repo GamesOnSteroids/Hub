@@ -127,7 +127,7 @@ namespace Play.Client {
         }
 
         protected onTouchMove(e: TouchEvent): void {
-
+            console.log("Game.onTouchMove");
         }
         protected onTouchStart(e: TouchEvent): void {
             console.log("Game.onTouchStart", e);

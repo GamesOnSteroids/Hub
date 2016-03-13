@@ -25,6 +25,16 @@ enum EnvironmentType {
 //    return false;
 //};
 
+interface IAuthentization {
+    displayName: string;
+    isLoggedIn: boolean;
+}
+
+var authentization: IAuthentization = {
+    displayName:  "Guest #" + MathUtils.random(100, 9999),
+    isLoggedIn: false,
+};
+
 var environment: EnvironmentType = EnvironmentType.Production;
 
 
@@ -39,6 +49,7 @@ var environment: EnvironmentType = EnvironmentType.Production;
 
 
 interface IApplicationConfiguration {
+    facebookAppId: string;
     firebaseURL: string;
 }
 
@@ -46,12 +57,14 @@ var config = new Map<EnvironmentType, IApplicationConfiguration>([
     [
         EnvironmentType.Development,
         {
+            facebookAppId: "137637839961946",
             firebaseURL: "https://gos-dev.firebaseio.com/",
         },
     ],
     [
         EnvironmentType.Production,
         {
+            facebookAppId: "102248536834210",
             firebaseURL: "https://games-on-steroids.firebaseio.com/",
         },
     ],

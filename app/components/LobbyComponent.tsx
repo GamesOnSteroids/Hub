@@ -1,7 +1,9 @@
 "use strict";
+
 import LobbyState = Play.Client.LobbyState;
 import PlayerInfo = Play.Client.PlayerInfo;
 import ClientLobby = Play.Client.ClientLobby;
+import LobbyConfiguration = Play.LobbyConfiguration;
 
 
 class GameOver extends React.Component<any, any> {
@@ -77,17 +79,33 @@ class LobbyComponent extends React.Component<any, {state: LobbyState, players: P
 
     private changeListenerToken: number;
 
+    public static onEnter(nextState: ReactRouter.RouterState, replaceState: ReactRouter.RedirectFunction, callback?: Function): any {
+        if (ClientLobby.current == null) {
+            let configuration = new LobbyConfiguration();
+            configuration.lobbyId = nextState.params["lobbyId"];
+            new FirebaseLobbyService().findLobby(configuration).then((lobby) => {
+                Play.Client.ClientLobby.current = lobby;
+
+                callback();
+            });
+        } else {
+            callback();
+        }
+    }
+
     constructor() {
         super();
         console.log("LobbyComponent.constructor");
         let lobby = ClientLobby.current;
+
         this.state = {state: lobby.state, players: lobby.players};
 
         this.changeListenerToken = lobby.changeListener.register((lobby, completed) => {
             console.log("LobbyComponent.changeListener");
             this.setState({state: lobby.state, players: lobby.players}, completed);
         });
-    }
+    };
+
 
     protected componentWillUnmount(): void {
         console.log("LobbyComponent.componentWillUnmount");

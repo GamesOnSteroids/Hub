@@ -57,8 +57,8 @@ class GameDescription extends React.Component<{ gameConfiguration: IGameConfigur
     // todo: DEBUG ONLY
     protected componentDidMount(): void {
         if (environment == EnvironmentType.Development) {
-            if (this.props.gameConfiguration.id == "chess") {
-        //        this.startGame(this.props.gameConfiguration.variants.find((v: any) => v.development == true));
+            if (this.props.gameConfiguration.id == "mahjong") {
+      //          this.startGame(this.props.gameConfiguration.variants.find((v: any) => v.development == true));
             }
         }
     }
@@ -75,7 +75,7 @@ class GameDescription extends React.Component<{ gameConfiguration: IGameConfigur
         lobbyService.findLobby(lobbyConfiguration).then((lobby) => {
             Play.Client.ClientLobby.current = lobby;
 
-            ReactRouter.hashHistory.pushState(undefined, `/lobby/${lobby.lobbyId}`);
+            ReactRouter.hashHistory.pushState(undefined, `/lobby/${lobby.configuration.lobbyId}`);
         });
     }
 
