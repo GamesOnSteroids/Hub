@@ -119,9 +119,8 @@ var Chess;
                 for (let y = 0; y < this.chessBoard.size; y++) {
                     for (let x = 0; x < this.chessBoard.size; x++) {
                         if (this.chessBoard.isValidPosition(x, y)) {
-                            let isWhite = (x % 2) == (y % 2);
                             let tile;
-                            if (isWhite) {
+                            if ((x % 2) == (y % 2)) {
                                 tile = this.assets.white;
                             }
                             else {
@@ -149,8 +148,8 @@ var Chess;
                     }
                 }
                 const sortPieces = (a, b) => {
-                    let p1 = this.rotate2D(a.x, a.y);
-                    let p2 = this.rotate2D(b.x, b.y);
+                    let p1 = this.getPieceOffset(a);
+                    let p2 = this.getPieceOffset(b);
                     return p1.y - p2.y;
                 };
                 for (let piece of this.chessBoard.pieces.sort(sortPieces)) {
@@ -268,37 +267,43 @@ var Chess;
                 this.send(new Chess.MovePieceRequestMessage(piece.id, x, y));
             }
             drawPiece(ctx, piece) {
+                let p = this.getPieceOffset(piece);
                 let image = this.assets[piece.type][piece.owner.team];
-                let x;
-                let y;
-                if (piece.goal != null) {
-                    let start = this.rotate2D(piece.start.x, piece.start.y);
-                    let goal = this.rotate2D(piece.goal.x, piece.goal.y);
-                    x = MathUtils.lerp(start.x, goal.x, piece.movementProgress) * TILE_WIDTH;
-                    y = MathUtils.lerp(start.y, goal.y, piece.movementProgress) * TILE_HEIGHT;
-                }
-                else {
-                    let p = this.rotate2D(piece.x, piece.y);
-                    x = p.x * TILE_WIDTH;
-                    y = p.y * TILE_HEIGHT;
-                }
                 ctx.globalAlpha = 0.3;
                 ctx.save();
                 ctx.scale(1, -1);
-                ctx.drawImage(image, 0, 0, image.width, image.height, x - image.width / 2 + TILE_WIDTH / 2, -y - image.height - TILE_WIDTH / 5, image.width, image.height);
+                ctx.drawImage(image, 0, 0, image.width, image.height, p.x - image.width / 2 + TILE_WIDTH / 2, -p.y - image.height - TILE_WIDTH / 5, image.width, image.height);
                 ctx.restore();
                 ctx.globalAlpha = 1;
-                ctx.drawImage(image, 0, 0, image.width, image.height, x - image.width / 2 + TILE_WIDTH / 2, y - image.height + TILE_WIDTH / 1.3, image.width, image.height);
+                ctx.drawImage(image, 0, 0, image.width, image.height, p.x - image.width / 2 + TILE_WIDTH / 2, p.y - image.height + TILE_WIDTH / 1.3, image.width, image.height);
                 if (piece.timer > 0) {
-                    ctx.globalAlpha = 0.9;
-                    ctx.fillStyle = "#FF0000";
+                    ctx.globalAlpha = 0.8;
+                    ctx.fillStyle = "#FF3B30";
                     ctx.beginPath();
                     let progress = (piece.timer * Math.PI * 2) / Chess.LOCK_TIMER;
-                    ctx.moveTo(x + TILE_WIDTH / 2, y + TILE_HEIGHT / 2);
-                    ctx.arc(x + TILE_WIDTH / 2, y + TILE_HEIGHT / 2, TILE_WIDTH / 3, 0, progress);
+                    ctx.moveTo(p.x + TILE_WIDTH / 2, p.y + TILE_HEIGHT / 2);
+                    ctx.arc(p.x + TILE_WIDTH / 2, p.y + TILE_HEIGHT / 2, TILE_WIDTH / 3, 0, progress);
                     ctx.fill();
                 }
             }
+            getPieceOffset(piece) {
+                if (piece.goal != null) {
+                    let start = this.rotate2D(piece.start.x, piece.start.y);
+                    let goal = this.rotate2D(piece.goal.x, piece.goal.y);
+                    return {
+                        x: MathUtils.lerp(start.x, goal.x, piece.movementProgress) * TILE_WIDTH,
+                        y: MathUtils.lerp(start.y, goal.y, piece.movementProgress) * TILE_HEIGHT
+                    };
+                }
+                else {
+                    let p = this.rotate2D(piece.x, piece.y);
+                    return {
+                        x: p.x * TILE_WIDTH,
+                        y: p.y * TILE_HEIGHT
+                    };
+                }
+            }
+            ;
         }
         Client.ChessGame = ChessGame;
     })(Client = Chess.Client || (Chess.Client = {}));
