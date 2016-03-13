@@ -39,14 +39,37 @@ var Mahjong;
         equals(other) {
             return this.id == other.id;
         }
+        isDragon() {
+            return this.type == Mahjong.TileType.DRAGON;
+        }
+        isWind() {
+            return this.type == Mahjong.TileType.WIND;
+        }
+        isGreen() {
+            let greenSouValues = [2, 3, 4, 6, 8];
+            let greenSou = this.suit == Mahjong.Suit.SOU && greenSouValues.indexOf(this.value) > -1;
+            return greenSou || this.id == Mahjong.TileId.GREEN;
+        }
+        isNumber() {
+            return this.type == Mahjong.TileType.NUMBER;
+        }
+        createPon() {
+            return Mahjong.Meld.fromTileArray([this, this, this], Mahjong.MeldType.PON);
+        }
+        createKan() {
+            return Mahjong.Meld.fromTileArray([this, this, this, this], Mahjong.MeldType.KAN);
+        }
         isTerminal() {
             return this.type == Mahjong.TileType.NUMBER && (this.value == 1 || this.value == 9);
+        }
+        isWindType(type) {
+            return Mahjong.TileId[this.id] == Mahjong.Wind[type];
         }
         isHonor() {
             return this.suit == Mahjong.Suit.HONOR;
         }
         isTerminalOrHonor() {
-            return this.isTerminal() || this.isTerminalOrHonor();
+            return this.isTerminal() || this.isHonor();
         }
         isAfter(other) {
             if (other == null) {

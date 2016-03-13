@@ -18,6 +18,13 @@ var Mahjong;
             hand.riichi = this.riichi;
             return hand;
         }
+        getAllTiles() {
+            let all = this.tiles.tiles.slice();
+            for (let meld of this.openMelds.concat(this.closedKans)) {
+                all = all.concat(meld.tiles.tiles);
+            }
+            return new Mahjong.Tiles(all);
+        }
         createCloneWithNewTile(tile) {
             let hand = this.createClone();
             hand.tiles.tiles.push(tile);
@@ -35,17 +42,37 @@ var Mahjong;
             return forms;
         }
         isAllTerminalsOrHonors() {
-            return this.tiles.isAllTerminalsOrHonors();
+            return this.getAllTiles().isAllTerminalsOrHonors();
         }
         isTanyao() {
-            return !this.tiles.hasTerminalsOrHonors();
+            return !this.getAllTiles().hasTerminalsOrHonors();
         }
         isFullFlush() {
-            return !this.tiles.hasHonors() && this.tiles.isAllSameSuit();
+            let tiles = this.getAllTiles();
+            return !tiles.hasHonors() && tiles.isAllSameSuit();
+        }
+        isAllGreen() {
+            return this.getAllTiles().tiles.findIndex(t => !t.isGreen()) < 0;
         }
         isHalfFlush() {
-            let numberTiles = this.tiles.ofType(Mahjong.TileType.NUMBER);
-            return this.tiles.hasHonors() && !numberTiles.isEmpty() && numberTiles.isAllSameSuit();
+            let tiles = this.getAllTiles();
+            let numberTiles = tiles.ofType(Mahjong.TileType.NUMBER);
+            return tiles.hasHonors() && !numberTiles.isEmpty() && numberTiles.isAllSameSuit();
+        }
+        isNineGates() {
+            if (!this.isFullFlush() || !this.isClosed()) {
+                return false;
+            }
+            let tiles = this.getAllTiles();
+            for (let i = 2; i < 9; i++) {
+                if (tiles.countValue(i) < 1) {
+                    return false;
+                }
+            }
+            if (tiles.countValue(1) < 3 || tiles.countValue(9) < 3) {
+                return false;
+            }
+            return true;
         }
         isSevenPairs() {
             let uniqueTiles = this.tiles.unique();
@@ -60,7 +87,7 @@ var Mahjong;
             return true;
         }
         isKokushiMusou() {
-            if (!this.tiles.isAllHonors()) {
+            if (!this.tiles.isAllTerminalsOrHonors()) {
                 return false;
             }
             for (let tile of Mahjong.Tile.ofSuit(Mahjong.Suit.HONOR).concat(Mahjong.Tile.terminals())) {

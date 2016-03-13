@@ -120,6 +120,7 @@ var Play;
             onMouseUp(e) {
             }
             onTouchMove(e) {
+                console.log("Game.onTouchMove");
             }
             onTouchStart(e) {
                 console.log("Game.onTouchStart", e);
@@ -192,6 +193,10 @@ var Play;
             }
             send(msg) {
                 this.lobby.sendToServer(msg);
+            }
+            playSound(sound) {
+                sound.currentTime = 0;
+                sound.play();
             }
             loadAsset(assetName) {
                 return new Promise((resolve, reject) => {

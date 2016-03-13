@@ -23,8 +23,8 @@ var Mahjong;
             else {
                 moves.push(new Mahjong.Move(Mahjong.MoveType.DISCARD, hand.tiles.getTileIds().concat(newTile.id)));
             }
-            let winningHandTypes = this.winningLogic.getWinningHandTypes(newTile, hand);
-            if (winningHandTypes.length > 0) {
+            let winningHands = this.winningLogic.getWinningHands(newTile, hand);
+            if (winningHands.length > 0) {
                 moves.push(new Mahjong.Move(Mahjong.MoveType.TSUMO, [newTile.id]));
             }
             return moves;
@@ -40,7 +40,7 @@ var Mahjong;
                     moves.push(new Mahjong.Move(moveType, meld.getTileIds()));
                 });
             }
-            let winningHandTypes = this.winningLogic.getWinningHandTypes(newTile, hand);
+            let winningHandTypes = this.winningLogic.getWinningHands(newTile, hand);
             if (winningHandTypes.length > 0) {
                 moves.push(new Mahjong.Move(Mahjong.MoveType.RON, [newTile.id]));
             }

@@ -22,6 +22,13 @@ var Chess;
                 for (let piece of this.chessBoard.pieces) {
                     this.createPiece(piece);
                 }
+                for (let player of this.players) {
+                    player.gameData = {
+                        pieces: 0,
+                        score: 0,
+                        isAlive: true,
+                    };
+                }
                 window.requestAnimationFrame(this.tick);
             }
             update(delta) {
@@ -39,6 +46,7 @@ var Chess;
                             if (collision != null) {
                                 this.destroyPiece(collision);
                                 let score = ChessService.scores.get(piece.type);
+                                piece.owner.gameData.score += score;
                                 this.lobby.broadcast(new Chess.ScoreMessage(piece.owner.id, score));
                             }
                         }
@@ -47,6 +55,18 @@ var Chess;
                             piece.start = null;
                             piece.movementProgress = 0;
                             piece.timer = Chess.LOCK_TIMER;
+                            if (piece.type == Chess.PieceType.Pawn) {
+                                let pawn = piece;
+                                if (pawn.direction == Direction4.Up && pawn.y == 0 ||
+                                    pawn.direction == Direction4.Down && pawn.y == this.chessBoard.size - 1 ||
+                                    pawn.direction == Direction4.Left && pawn.x == 0 ||
+                                    pawn.direction == Direction4.Right && pawn.x == this.chessBoard.size - 1) {
+                                    this.destroyPiece(piece);
+                                    let promotion = new Chess.Queen(pawn.id, pawn.x, pawn.y, pawn.owner);
+                                    this.chessBoard.pieces.push(promotion);
+                                    this.createPiece(promotion);
+                                }
+                            }
                         }
                     }
                     if (piece.timer > 0) {
@@ -58,7 +78,21 @@ var Chess;
                 this.chessBoard.pieces.splice(this.chessBoard.pieces.indexOf(piece), 1);
                 this.lobby.broadcast(new Chess.DestroyPieceMessage(piece.id));
                 if (piece.type == Chess.PieceType.King) {
-                    this.gameOver();
+                    piece.owner.gameData.isAlive = false;
+                    let i = 0;
+                    while (i < this.chessBoard.pieces.length) {
+                        let otherPiece = this.chessBoard.pieces[i];
+                        if (otherPiece.owner == piece.owner) {
+                            this.destroyPiece(otherPiece);
+                        }
+                        else {
+                            i++;
+                        }
+                    }
+                    let alivePlayers = this.players.filter(p => p.gameData.isAlive).length;
+                    if (alivePlayers <= 1) {
+                        this.gameOver();
+                    }
                 }
             }
             gameOver() {

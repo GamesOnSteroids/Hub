@@ -225,10 +225,6 @@ var Minesweeper;
                     this.playSound(this.assets.tilesingle);
                 }
             }
-            playSound(sound) {
-                sound.currentTime = 0;
-                sound.play();
-            }
             load() {
                 this.assets = new MinesweeperAssets();
                 let root = "app/games/minesweeper/assets/";

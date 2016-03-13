@@ -4,6 +4,10 @@ var EnvironmentType;
     EnvironmentType[EnvironmentType["Production"] = 0] = "Production";
     EnvironmentType[EnvironmentType["Development"] = 1] = "Development";
 })(EnvironmentType || (EnvironmentType = {}));
+var authentization = {
+    displayName: "Guest #" + MathUtils.random(100, 9999),
+    isLoggedIn: false,
+};
 var environment = EnvironmentType.Production;
 {
     let host = window.location.hostname;
@@ -18,12 +22,14 @@ var config = new Map([
     [
         EnvironmentType.Development,
         {
+            facebookAppId: "137637839961946",
             firebaseURL: "https://gos-dev.firebaseio.com/",
         },
     ],
     [
         EnvironmentType.Production,
         {
+            facebookAppId: "102248536834210",
             firebaseURL: "https://games-on-steroids.firebaseio.com/",
         },
     ],

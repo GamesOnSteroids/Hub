@@ -21,7 +21,7 @@ class GameDescription extends React.Component {
     }
     componentDidMount() {
         if (environment == EnvironmentType.Development) {
-            if (this.props.gameConfiguration.id == "tetrominoes") {
+            if (this.props.gameConfiguration.id == "mahjong") {
             }
         }
     }
@@ -33,7 +33,7 @@ class GameDescription extends React.Component {
         let lobbyService = new Play.FirebaseLobbyService();
         lobbyService.findLobby(lobbyConfiguration).then((lobby) => {
             Play.Client.ClientLobby.current = lobby;
-            ReactRouter.hashHistory.pushState(undefined, `/lobby/${lobby.lobbyId}`);
+            ReactRouter.hashHistory.pushState(undefined, `/lobby/${lobby.configuration.lobbyId}`);
         });
     }
 }

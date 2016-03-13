@@ -110,6 +110,29 @@ var Mahjong;
             this.tiles = tiles;
             this.type = type;
         }
+        static parse(meldStr) {
+            let tiles = Mahjong.Tiles.parse(meldStr);
+            return new Meld(tiles, Meld.detectType(tiles));
+        }
+        static detectType(tiles) {
+            let tileArray = tiles.tiles;
+            if (tileArray.length == 3 || tileArray.length == 4) {
+                if (tiles.isAllSameSuit()) {
+                    if (tileArray.length == 3 && tileArray[0].value == tileArray[1].value - 1 && tileArray[0].value == tileArray[2].value - 2) {
+                        return MeldType.CHI;
+                    }
+                    else if (tileArray[0].id == tileArray[1].id && tileArray[0].id == tileArray[2].id) {
+                        if (tileArray.length == 4 && tileArray[0].id == tileArray[3].id) {
+                            return MeldType.KAN;
+                        }
+                        else if (tileArray.length == 3) {
+                            return MeldType.PON;
+                        }
+                    }
+                }
+            }
+            throw new Error("Unknown meld type for " + tiles.toString());
+        }
         static fromTileArray(tiles, type) {
             return new Meld(new Mahjong.Tiles(tiles), type);
         }
@@ -132,11 +155,11 @@ var Mahjong;
             return this.tiles.last().id == tile.id;
         }
         wasOpenWait(tile) {
-            if (!this.contains(tile)) {
-                throw new Error("Tile " + tile.toString() + " does not appear in meld " + this.toString());
-            }
             if (this.type != MeldType.CHI) {
                 throw new Error("Open wait can be only determined on " + MeldType[MeldType.CHI] + " meld type");
+            }
+            if (!this.contains(tile)) {
+                return false;
             }
             let first = this.tiles.first();
             if (tile.value == first.value + 1) {

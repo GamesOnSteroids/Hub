@@ -2,6 +2,7 @@
 var LobbyState = Play.Client.LobbyState;
 var PlayerInfo = Play.Client.PlayerInfo;
 var ClientLobby = Play.Client.ClientLobby;
+var LobbyConfiguration = Play.LobbyConfiguration;
 class GameOver extends React.Component {
     render() {
         var overlayStyle = {
@@ -45,6 +46,20 @@ class LobbyComponent extends React.Component {
             this.setState({ state: lobby.state, players: lobby.players }, completed);
         });
     }
+    static onEnter(nextState, replaceState, callback) {
+        if (ClientLobby.current == null) {
+            let configuration = new LobbyConfiguration();
+            configuration.lobbyId = nextState.params["lobbyId"];
+            new FirebaseLobbyService().findLobby(configuration).then((lobby) => {
+                Play.Client.ClientLobby.current = lobby;
+                callback();
+            });
+        }
+        else {
+            callback();
+        }
+    }
+    ;
     componentWillUnmount() {
         console.log("LobbyComponent.componentWillUnmount");
         let lobby = ClientLobby.current;

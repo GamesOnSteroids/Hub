@@ -20,6 +20,33 @@ var Mahjong;
         getRuns() {
             return this.melds.filter(m => m.type == Mahjong.MeldType.CHI);
         }
+        getRunTiles() {
+            return this.getRuns().map(m => m.tiles.tiles).reduce((a, b) => a.concat(b), []);
+        }
+        getPons() {
+            return this.melds.filter(m => m.type == Mahjong.MeldType.PON || m.type == Mahjong.MeldType.KAN);
+        }
+        getKans() {
+            return this.melds.filter(m => m.type == Mahjong.MeldType.KAN);
+        }
+        isLittleThreeDragons() {
+            return this.getDragonPons().length == 2 && this.remainingTiles.first().isDragon();
+        }
+        getDragonPons() {
+            return this.melds.filter(meld => meld.first().isDragon());
+        }
+        getWindPons() {
+            return this.melds.filter(meld => meld.first().isWind());
+        }
+        isBigThreeDragons() {
+            return this.getDragonPons().length == 3;
+        }
+        isLittleFourWinds() {
+            return this.getWindPons().length == 3 && this.remainingTiles.first().isWind();
+        }
+        isBigFourWinds() {
+            return this.getWindPons().length == 4;
+        }
         countDoubleRuns() {
             let doubleRuns = [];
             for (let meld of this.getRuns()) {
@@ -46,8 +73,52 @@ var Mahjong;
                 return false;
             }
         }
+        hasMixedTriplePon() {
+            let pons = this.getPons();
+            if (pons.length >= 3) {
+                for (let i = 0; i < 2; i++) {
+                    let pon = pons[i];
+                    let ponTile = pon.first();
+                    if (ponTile.isNumber() &&
+                        this.hasPonOrKanWithDifferentSuit(ponTile, Mahjong.Suit.MAN) &&
+                        this.hasPonOrKanWithDifferentSuit(ponTile, Mahjong.Suit.PIN) &&
+                        this.hasPonOrKanWithDifferentSuit(ponTile, Mahjong.Suit.SOU)) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+            else {
+                return false;
+            }
+        }
+        hasPureStraight() {
+            let runs = this.getRuns();
+            if (runs.length >= 3) {
+                for (let i = 0; i < 2; i++) {
+                    let suit = runs[i].first().suit;
+                    if (this.hasRunFrom(1, suit) && this.hasRunFrom(4, suit) && this.hasRunFrom(7, suit)) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+            else {
+                return false;
+            }
+        }
+        hasTerminalOrHonorInEachMeld() {
+            return this.melds.findIndex(m => !m.tiles.hasTerminalsOrHonors()) < 0;
+        }
         hasRunWithDifferentSuit(originalRun, checkedSuit) {
             return this.count(originalRun.ofDifferentSuit(checkedSuit)) > 0;
+        }
+        hasPonOrKanWithDifferentSuit(ponTile, checkedSuit) {
+            return this.count(ponTile.ofDifferentSuit(checkedSuit).createPon()) > 0 ||
+                this.count(ponTile.ofDifferentSuit(checkedSuit).createKan()) > 0;
+        }
+        hasRunFrom(startingValue, suit) {
+            return this.getRuns().findIndex(m => m.first().value == startingValue && m.first().suit == suit) > -1;
         }
         count(meld) {
             return this.melds.filter(m => m.equals(meld)).length;

@@ -18,7 +18,7 @@ var Play;
         }
         Client.ChatLog = ChatLog;
         class ClientLobby {
-            constructor(lobbyId, configuration) {
+            constructor(configuration) {
                 this.players = [];
                 this.messageLog = [];
                 this.state = LobbyState.IN_LOBBY;
@@ -27,7 +27,6 @@ var Play;
                     [Play.ServiceType.Lobby, new Map()],
                     [Play.ServiceType.Game, new Map()]
                 ]);
-                this.lobbyId = lobbyId;
                 this.configuration = configuration;
                 this.on(Play.ServiceType.Lobby, Play.LobbyMessageId.SMSG_GAME_START, this.onGameStart.bind(this));
                 this.on(Play.ServiceType.Lobby, Play.LobbyMessageId.SMSG_PLAYER_JOINED, this.onJoin.bind(this));
@@ -60,7 +59,7 @@ var Play;
                 this.sendToServer({
                     service: Play.ServiceType.Lobby,
                     id: Play.LobbyMessageId.CMSG_JOIN_REQUEST,
-                    name: localStorage.getItem("nickname"),
+                    name: authentization.displayName,
                     team: 1,
                 });
                 this.ready();

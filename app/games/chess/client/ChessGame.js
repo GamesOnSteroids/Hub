@@ -6,8 +6,8 @@ var Chess;
         var Camera = Play.Client.Camera;
         var Game = Play.Client.Game;
         var Mouse = Play.Client.Mouse;
-        const TILE_WIDTH = 52;
-        const TILE_HEIGHT = 42;
+        const TILE_WIDTH = 48;
+        const TILE_HEIGHT = 48;
         class ChessGame extends Game {
             constructor(lobby) {
                 super(lobby);
@@ -22,6 +22,7 @@ var Chess;
                     player.gameData = {
                         pieces: 0,
                         score: 0,
+                        isAlive: true,
                     };
                 }
                 if (this.variant.boardType == "4player") {
@@ -33,12 +34,12 @@ var Chess;
             }
             initialize() {
                 super.initialize();
-                this.canvas.width = this.chessBoard.size * TILE_WIDTH + TILE_WIDTH * 2;
-                this.canvas.height = this.chessBoard.size * TILE_HEIGHT + TILE_HEIGHT * 2;
+                this.canvas.width = this.chessBoard.size * TILE_WIDTH + TILE_WIDTH * 0;
+                this.canvas.height = this.chessBoard.size * TILE_HEIGHT + TILE_HEIGHT * 1;
                 this.canvas.style.cursor = "pointer";
                 this.camera = new Camera(this.canvas);
-                this.camera.translateX = TILE_WIDTH;
-                this.camera.translateY = TILE_HEIGHT;
+                this.camera.translateX = TILE_WIDTH * 0;
+                this.camera.translateY = TILE_HEIGHT * 1;
                 this.emitChange();
             }
             update(delta) {
@@ -59,10 +60,49 @@ var Chess;
                             piece.start = null;
                             piece.movementProgress = 0;
                             piece.timer = Chess.LOCK_TIMER;
+                            this.playSound(this.assets.movepiece[MathUtils.random(0, this.assets.movepiece.length)]);
+                            if (piece.owner != this.localPlayer) {
+                                let validMoves = piece.getValidMoves(this.chessBoard);
+                                for (let validMove of validMoves) {
+                                    if (validMove.constraints == Chess.MoveType.Capture) {
+                                        let capturePiece = this.chessBoard.pieces.find(p => p.x == validMove.x && p.y == validMove.y);
+                                        if (capturePiece.type == Chess.PieceType.King) {
+                                            if (capturePiece.owner == this.localPlayer) {
+                                                this.playSound(this.assets.check);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                     if (piece.timer > 0) {
                         piece.timer -= delta * (1 / 1000);
+                    }
+                }
+            }
+            rotate2D(x, y) {
+                let localPlayerId = this.localPlayer.team;
+                if (this.players.length == 2) {
+                    if (localPlayerId == 1) {
+                        return { x: x, y: this.chessBoard.size - 1 - y };
+                    }
+                    else {
+                        return { x: x, y: y };
+                    }
+                }
+                else {
+                    if (localPlayerId == 1) {
+                        return { x: x, y: this.chessBoard.size - 1 - y };
+                    }
+                    else if (localPlayerId == 2) {
+                        return { x: y, y: x };
+                    }
+                    else if (localPlayerId == 3) {
+                        return { x: this.chessBoard.size - 1 - y, y: this.chessBoard.size - 1 - x };
+                    }
+                    else {
+                        return { x: x, y: y };
                     }
                 }
             }
@@ -78,20 +118,22 @@ var Chess;
                 for (let y = 0; y < this.chessBoard.size; y++) {
                     for (let x = 0; x < this.chessBoard.size; x++) {
                         if (this.chessBoard.isValidPosition(x, y)) {
-                            if ((x % 2) == (y % 2)) {
-                                ctx.fillStyle = "#000000";
-                                ctx.fillRect(x * TILE_WIDTH, y * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT);
+                            let isWhite = (x % 2) == (y % 2);
+                            let tile;
+                            if (isWhite) {
+                                tile = this.assets.white;
                             }
                             else {
-                                ctx.fillStyle = "#FFFFFF";
-                                ctx.fillRect(x * TILE_WIDTH, y * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT);
+                                tile = this.assets.black;
                             }
+                            ctx.drawImage(tile, 0, 0, this.assets.white.width, this.assets.white.height, x * TILE_WIDTH, y * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT);
                         }
                     }
                 }
                 if (this.selectedPiece != null) {
                     ctx.fillStyle = "#FFCC00";
-                    ctx.fillRect(this.selectedPiece.x * TILE_WIDTH, this.selectedPiece.y * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT);
+                    let p = this.rotate2D(this.selectedPiece.x, this.selectedPiece.y);
+                    ctx.fillRect(p.x * TILE_WIDTH, p.y * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT);
                     ctx.globalAlpha = 0.6;
                     let validMoves = this.selectedPiece.getValidMoves(this.chessBoard);
                     for (let validMove of validMoves) {
@@ -99,12 +141,18 @@ var Chess;
                             ctx.fillStyle = "#FF3B30";
                         }
                         else {
-                            ctx.fillStyle = "#4CD964";
+                            ctx.fillStyle = "#8CA4E9";
                         }
-                        ctx.fillRect(validMove.x * TILE_WIDTH, validMove.y * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT);
+                        let p = this.rotate2D(validMove.x, validMove.y);
+                        ctx.fillRect(p.x * TILE_WIDTH, p.y * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT);
                     }
                 }
-                for (let piece of this.chessBoard.pieces.sort((a, b) => a.y - b.y)) {
+                const sortPieces = (a, b) => {
+                    let p1 = this.rotate2D(a.x, a.y);
+                    let p2 = this.rotate2D(b.x, b.y);
+                    return p1.y - p2.y;
+                };
+                for (let piece of this.chessBoard.pieces.sort(sortPieces)) {
                     this.drawPiece(ctx, piece);
                 }
             }
@@ -112,6 +160,9 @@ var Chess;
                 let position = this.camera.unproject(e.offsetX, e.offsetY);
                 let x = Math.floor(position.x / TILE_WIDTH);
                 let y = Math.floor(position.y / TILE_HEIGHT);
+                let p = this.rotate2D(x, y);
+                x = p.x;
+                y = p.y;
                 if (Mouse.button == 1) {
                     let piece = this.chessBoard.pieces.find(p => p.x == x && p.y == y);
                     if (piece != null && piece.timer <= 0 && piece.movementProgress == 0 && piece.owner.id == this.localPlayer.id) {
@@ -139,6 +190,21 @@ var Chess;
             }
             load() {
                 let root = "app/games/chess/assets/";
+                this.assets.movepiece = [];
+                this.assets.movepiece[0] = new Audio(root + "sounds/movepiece1.wav");
+                this.assets.movepiece[1] = new Audio(root + "sounds/movepiece2.wav");
+                this.assets.movepiece[2] = new Audio(root + "sounds/movepiece3.wav");
+                this.assets.movepiece[3] = new Audio(root + "sounds/movepiece4.wav");
+                this.assets.movepiece[4] = new Audio(root + "sounds/movepiece5.wav");
+                this.assets.piecetaken = new Audio(root + "sounds/chess_piecetaken.wav");
+                this.assets.illegalmove = new Audio(root + "sounds/illegalmove.wav");
+                this.assets.check = new Audio(root + "sounds/check.wav");
+                this.assets.checkmatelose = new Audio(root + "sounds/checkmatelose.wav");
+                this.assets.checkmatewin = new Audio(root + "sounds/checkmatewin.wav");
+                this.assets.white = new Image();
+                this.assets.white.src = `${root}images/white.png`;
+                this.assets.black = new Image();
+                this.assets.black.src = `${root}images/black.png`;
                 for (let pieceType = 1; pieceType <= 6; pieceType++) {
                     this.assets[pieceType] = [];
                     for (let team = 0; team < 4; team++) {
@@ -160,6 +226,15 @@ var Chess;
                 }
                 this.chessBoard.pieces.splice(this.chessBoard.pieces.indexOf(piece), 1);
                 piece.owner.gameData.pieces--;
+                this.playSound(this.assets.piecetaken);
+                if (piece.type == Chess.PieceType.King) {
+                    if (piece.owner == this.localPlayer) {
+                        this.playSound(this.assets.checkmatelose);
+                    }
+                    else {
+                        this.playSound(this.assets.checkmatewin);
+                    }
+                }
                 this.emitChange();
             }
             onCreatePiece(message) {
@@ -195,15 +270,23 @@ var Chess;
                 let x;
                 let y;
                 if (piece.goal != null) {
-                    x = MathUtils.lerp(piece.start.x, piece.goal.x, piece.movementProgress) * TILE_WIDTH;
-                    y = MathUtils.lerp(piece.start.y, piece.goal.y, piece.movementProgress) * TILE_HEIGHT;
+                    let start = this.rotate2D(piece.start.x, piece.start.y);
+                    let goal = this.rotate2D(piece.goal.x, piece.goal.y);
+                    x = MathUtils.lerp(start.x, goal.x, piece.movementProgress) * TILE_WIDTH;
+                    y = MathUtils.lerp(start.y, goal.y, piece.movementProgress) * TILE_HEIGHT;
                 }
                 else {
-                    x = piece.x * TILE_WIDTH;
-                    y = piece.y * TILE_HEIGHT;
+                    let p = this.rotate2D(piece.x, piece.y);
+                    x = p.x * TILE_WIDTH;
+                    y = p.y * TILE_HEIGHT;
                 }
+                ctx.globalAlpha = 0.5;
+                ctx.save();
+                ctx.scale(1, -1);
+                ctx.drawImage(image, 0, 0, image.width, image.height, x - image.width / 2 + TILE_WIDTH / 2, -y - image.height - TILE_WIDTH / 5, image.width, image.height);
+                ctx.restore();
                 ctx.globalAlpha = 1;
-                ctx.drawImage(image, 0, 0, image.width, image.height, x - image.width / 2 + TILE_WIDTH / 2, y + TILE_HEIGHT - image.width - TILE_HEIGHT / 4, image.width, image.height);
+                ctx.drawImage(image, 0, 0, image.width, image.height, x - image.width / 2 + TILE_WIDTH / 2, y - image.height + TILE_WIDTH / 1.3, image.width, image.height);
                 if (piece.timer > 0) {
                     ctx.globalAlpha = 0.9;
                     ctx.fillStyle = "#FF0000";

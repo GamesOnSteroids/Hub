@@ -18,7 +18,7 @@ class Chat extends React.Component {
             this.setState({
                 messageLog: lobby.messageLog
             }, () => {
-                var chatLog = document.getElementById("chatLog");
+                let chatLog = document.getElementById("chatLog");
                 chatLog.scrollTop = chatLog.scrollHeight;
             });
         });

@@ -20,6 +20,7 @@ var Tetrominoes;
                 this.on(Tetrominoes.MessageId.SMSG_LEVEL_UP, this.onLevelUp.bind(this));
                 for (let player of this.players) {
                     player.gameData = {
+                        lines: 0,
                         score: 0,
                     };
                 }

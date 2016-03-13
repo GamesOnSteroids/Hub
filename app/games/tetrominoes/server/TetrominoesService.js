@@ -11,6 +11,7 @@ var Tetrominoes;
                 this.playfield = new Tetrominoes.Playfield(this.variant.width, this.variant.height, this.variant.gravity);
                 for (let player of this.players) {
                     player.gameData = {
+                        score: 0,
                         lines: 0
                     };
                 }

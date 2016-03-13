@@ -12,14 +12,13 @@ var Play;
         class ChatService extends Server.Service {
         }
         class ServerLobby {
-            constructor(lobbyId, configuration) {
+            constructor(configuration) {
                 this.clients = [];
                 this.state = LobbyState.IN_LOBBY;
                 this.messageHandlers = new Map([
                     [Play.ServiceType.Lobby, new Map()],
                     [Play.ServiceType.Game, new Map()]
                 ]);
-                this.lobbyId = lobbyId;
                 this.configuration = configuration;
                 this.on(Play.ServiceType.Lobby, Play.LobbyMessageId.CMSG_JOIN_REQUEST, this.onJoinRequest.bind(this));
                 this.on(Play.ServiceType.Lobby, Play.LobbyMessageId.CMSG_READY, this.onReady.bind(this));

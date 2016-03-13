@@ -5,6 +5,58 @@ var Mahjong;
         constructor(tiles) {
             this.tiles = tiles;
         }
+        static parse(tilesStr) {
+            let suit = null;
+            let tiles = [];
+            for (let i = 0; i < tilesStr.length; i++) {
+                let c = tilesStr.charAt(i);
+                let nextIsNumber = tilesStr.length > i + 1 && /[0-9]/.test(tilesStr.charAt(i + 1));
+                if ((c == "M" || c == "S" || c == "P") && nextIsNumber) {
+                    if (c == "M") {
+                        suit = Mahjong.Suit.MAN;
+                    }
+                    else if (c == "S") {
+                        suit = Mahjong.Suit.SOU;
+                    }
+                    else {
+                        suit = Mahjong.Suit.PIN;
+                    }
+                }
+                else {
+                    if (/[0-9]/.test(c) && suit != null) {
+                        tiles.push(Mahjong.Tile.findByValue(parseInt(c, 10), suit));
+                    }
+                    else {
+                        suit = null;
+                        switch (c) {
+                            case "E":
+                                tiles.push(Mahjong.Tile.EAST);
+                                break;
+                            case "S":
+                                tiles.push(Mahjong.Tile.SOUTH);
+                                break;
+                            case "W":
+                                tiles.push(Mahjong.Tile.WEST);
+                                break;
+                            case "N":
+                                tiles.push(Mahjong.Tile.NORTH);
+                                break;
+                            case "R":
+                                tiles.push(Mahjong.Tile.RED);
+                                break;
+                            case "G":
+                                tiles.push(Mahjong.Tile.GREEN);
+                                break;
+                            case " ":
+                                tiles.push(Mahjong.Tile.WHITE);
+                                break;
+                            default: throw new Error("Unknown tile code - " + c);
+                        }
+                    }
+                }
+            }
+            return new Tiles(tiles);
+        }
         isEmpty() {
             return this.size() == 0;
         }
@@ -93,6 +145,9 @@ var Mahjong;
             else {
                 return this.tiles.filter(t => t.id == tile.id).length;
             }
+        }
+        countValue(tileValue) {
+            return this.tiles.filter(t => t.value == tileValue).length;
         }
         getUniqueMelds() {
             let melds = [];

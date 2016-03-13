@@ -14,6 +14,13 @@ var Minesweeper;
                 this.on(Minesweeper.MessageId.CMSG_MASS_REVEAL_REQUEST, this.onMassRevealRequest.bind(this));
                 this.minefield = new Minesweeper.Minefield(this.variant.width, this.variant.height);
                 this.mines = this.variant.mines;
+                for (let player of this.players) {
+                    player.gameData = {
+                        score: 0,
+                        mines: 0,
+                        flags: 0,
+                    };
+                }
             }
             checkGameOver() {
                 if (this.flaggedMines == this.mines) {
@@ -35,6 +42,7 @@ var Minesweeper;
                 this.lobby.gameOver();
             }
             score(client, score) {
+                client.gameData.score += score;
                 this.lobby.broadcast(new Minesweeper.ScoreMessage(client.id, score));
             }
             flag(client, fieldId, flag) {
@@ -85,13 +93,13 @@ var Minesweeper;
                     });
                 }
             }
-            reveal(client, fieldId, doubt) {
+            reveal(player, fieldId, doubt) {
                 let field = this.minefield.get(fieldId);
                 if (field.isRevealed) {
                     return;
                 }
                 if (field.hasFlag) {
-                    if (field.owner.team == client.team) {
+                    if (field.owner.team == player.team) {
                         return;
                     }
                     if (!doubt) {
@@ -100,9 +108,9 @@ var Minesweeper;
                 }
                 let oldOwner = field.owner;
                 field.isRevealed = true;
-                field.owner = client;
+                field.owner = player;
                 field.hasFlag = false;
-                this.lobby.broadcast(new Minesweeper.RevealMessage(client.id, fieldId, field.adjacentMines, field.hasMine));
+                this.lobby.broadcast(new Minesweeper.RevealMessage(player.id, fieldId, field.adjacentMines, field.hasMine));
                 if (field.hasFlag) {
                     if (field.hasMine) {
                         this.score(oldOwner, MinesweeperService.SCORE_EXPLOSION);
@@ -126,7 +134,7 @@ var Minesweeper;
                             this.minefield.forAdjacent(fieldId, (id) => {
                                 let adjacentField = this.minefield.get(id);
                                 if (!adjacentField.hasMine && !adjacentField.isRevealed && !adjacentField.hasFlag) {
-                                    this.reveal(client, id);
+                                    this.reveal(player, id);
                                 }
                             });
                         }

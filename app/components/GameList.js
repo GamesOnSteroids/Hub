@@ -3,15 +3,17 @@ var FirebaseLobbyService = Play.FirebaseLobbyService;
 class GameList extends React.Component {
     constructor() {
         super();
+        this.state = {
+            lobbies: []
+        };
+    }
+    componentDidMount() {
         let lobbyService = new FirebaseLobbyService();
         lobbyService.getLobbyList().then((lobbies) => {
             this.setState({
                 lobbies: lobbies
             });
         });
-        this.state = {
-            lobbies: []
-        };
     }
     render() {
         let gameCounts = new Map();
