@@ -33,7 +33,7 @@ class GameDescription extends React.Component {
         let lobbyService = new Play.FirebaseLobbyService();
         lobbyService.findLobby(lobbyConfiguration).then((lobby) => {
             Play.Client.ClientLobby.current = lobby;
-            ReactRouter.hashHistory.pushState(undefined, `/lobby/${lobby.configuration.lobbyId}`);
+            ReactRouter.hashHistory.pushState(null, `/lobby/${lobby.configuration.lobbyId}`);
         });
     }
 }

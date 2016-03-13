@@ -16,7 +16,6 @@ var Chess;
                 let game = ClientLobby.current.game;
                 game.initialize();
                 this.stateChangeToken = game.changeListener.register((game) => {
-                    console.log("ChessApp.changeListener");
                     this.setState({
                         players: ClientLobby.current.players
                     });

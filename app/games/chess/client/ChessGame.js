@@ -235,31 +235,32 @@ var Chess;
                 this.emitChange();
             }
             onCreatePiece(message) {
-                console.log("ChessGame.onCreatePiece", message.pieceId, Chess.PieceType[message.pieceType], message.x, message.y);
                 let player = this.players.find(p => p.id == message.playerId);
                 player.gameData.pieces++;
+                let piece;
                 if (message.pieceType == Chess.PieceType.Queen) {
-                    let queen = new Chess.Queen(message.pieceId, message.x, message.y, player);
-                    this.chessBoard.pieces.push(queen);
-                    if (queen.owner != this.localPlayer) {
-                        this.checkForCheck(queen);
-                    }
+                    piece = new Chess.Queen(message.pieceId, message.x, message.y, player);
                 }
                 else if (message.pieceType == Chess.PieceType.King) {
-                    this.chessBoard.pieces.push(new Chess.King(message.pieceId, message.x, message.y, player));
+                    piece = new Chess.King(message.pieceId, message.x, message.y, player);
                 }
                 else if (message.pieceType == Chess.PieceType.Knight) {
-                    this.chessBoard.pieces.push(new Chess.Knight(message.pieceId, message.x, message.y, player));
+                    piece = new Chess.Knight(message.pieceId, message.x, message.y, player);
                 }
                 else if (message.pieceType == Chess.PieceType.Bishop) {
-                    this.chessBoard.pieces.push(new Chess.Bishop(message.pieceId, message.x, message.y, player));
+                    piece = new Chess.Bishop(message.pieceId, message.x, message.y, player);
                 }
                 else if (message.pieceType == Chess.PieceType.Rook) {
-                    this.chessBoard.pieces.push(new Chess.Rook(message.pieceId, message.x, message.y, player));
+                    piece = new Chess.Rook(message.pieceId, message.x, message.y, player);
                 }
                 else if (message.pieceType == Chess.PieceType.Pawn) {
-                    this.chessBoard.pieces.push(new Chess.Pawn(message.pieceId, message.x, message.y, message.direction, player));
+                    piece = new Chess.Pawn(message.pieceId, message.x, message.y, message.direction, player);
                 }
+                if (piece.owner != this.localPlayer) {
+                    this.checkForCheck(piece);
+                }
+                piece.timer = Chess.LOCK_TIMER;
+                this.chessBoard.pieces.push(piece);
                 this.emitChange();
             }
             movePiece(piece, x, y) {

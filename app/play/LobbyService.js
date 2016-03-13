@@ -9,16 +9,7 @@ var Play;
         onClientJoined(lobby, client) {
             let firebase = new Firebase(config.get(environment).firebaseURL);
             let lobbyRef = firebase.child("lobby").child(lobby.configuration.lobbyId);
-            lobbyRef.transaction((data) => {
-                if (data != null) {
-                    data.playerCount += 1;
-                }
-                return data;
-            }, (error, commited, snapshot) => {
-                if (error != null) {
-                    console.error(error);
-                }
-            }, true);
+            lobbyRef.child("playerCount").set(lobby.clients.length, () => { });
         }
         getLobbyList() {
             return new Promise((resolve, reject) => {
@@ -34,6 +25,7 @@ var Play;
         }
         findLobby(configuration) {
             return new Promise((resolve, reject) => {
+                Firebase.goOnline();
                 if (configuration.lobbyId == null) {
                     let lobbiesRef = new Firebase(config.get(environment).firebaseURL).child("lobby");
                     lobbiesRef.once("value", (snapshot) => {
@@ -112,6 +104,7 @@ var Play;
             let signalingService = new Play.SignalingService();
             let ref = new Firebase(config.get(environment).firebaseURL).child("lobby").child(lobby.configuration.lobbyId).child("sdp");
             signalingService.createSignalingClient(lobby, new Play.FirebaseSignalingChannel(ref));
+            lobby.serverConnection.onDisconnect = lobby.onServerDisconnect.bind(lobby);
             resolve(lobby);
         }
         ;

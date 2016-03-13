@@ -19,6 +19,7 @@ var Play;
                     [Play.ServiceType.Lobby, new Map()],
                     [Play.ServiceType.Game, new Map()]
                 ]);
+                ServerLobby.current = this;
                 this.configuration = configuration;
                 this.on(Play.ServiceType.Lobby, Play.LobbyMessageId.CMSG_JOIN_REQUEST, this.onJoinRequest.bind(this));
                 this.on(Play.ServiceType.Lobby, Play.LobbyMessageId.CMSG_READY, this.onReady.bind(this));
@@ -26,6 +27,9 @@ var Play;
             }
             on(service, messageId, callback) {
                 this.messageHandlers.get(service).set(messageId, callback);
+            }
+            destroy() {
+                this.clients.forEach(c => c.connection.disconnect());
             }
             onMessage(client, msg) {
                 let handler = this.messageHandlers.get(msg.service).get(msg.id);
@@ -53,7 +57,7 @@ var Play;
                 this.gameService.start();
             }
             onChat(client, msg) {
-                this.broadcast(new Play.PlayerChatMessage(client.id, msg.text));
+                this.broadcast(new Play.PlayerChatMessage(client.name, msg.text));
             }
             onReady(client, msg) {
                 console.log("ServerLobby.onReady");
@@ -72,8 +76,17 @@ var Play;
                     this.startGame();
                 }
             }
+            onDisconnect(client) {
+                if (client.isConnected) {
+                    client.isConnected = false;
+                    this.clients.splice(this.clients.indexOf(client), 1);
+                    this.broadcast(new Play.PlayerLeftMessage(client.id));
+                    this.gameOver();
+                }
+            }
             onJoinRequest(client, msg) {
                 console.log("ServerLobby.onJoinRequest", msg);
+                client.connection.onDisconnect = this.onDisconnect.bind(this, client);
                 client.name = msg.name;
                 let teamCount = this.configuration.variant.teamCount;
                 if (teamCount == null) {

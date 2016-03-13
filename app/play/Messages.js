@@ -18,6 +18,7 @@ var Play;
         LobbyMessageId[LobbyMessageId["SMSG_PLAYER_READY"] = 6] = "SMSG_PLAYER_READY";
         LobbyMessageId[LobbyMessageId["CMSG_CHAT"] = 7] = "CMSG_CHAT";
         LobbyMessageId[LobbyMessageId["SMSG_PLAYER_CHAT"] = 8] = "SMSG_PLAYER_CHAT";
+        LobbyMessageId[LobbyMessageId["SMSG_PLAYER_LEFT"] = 9] = "SMSG_PLAYER_LEFT";
     })(Play.LobbyMessageId || (Play.LobbyMessageId = {}));
     var LobbyMessageId = Play.LobbyMessageId;
     class Message {
@@ -48,10 +49,17 @@ var Play;
         }
     }
     Play.ChatMessage = ChatMessage;
-    class PlayerChatMessage extends LobbyMessage {
-        constructor(playerId, text) {
-            super(LobbyMessageId.SMSG_PLAYER_CHAT);
+    class PlayerLeftMessage extends LobbyMessage {
+        constructor(playerId) {
+            super(LobbyMessageId.SMSG_PLAYER_LEFT);
             this.playerId = playerId;
+        }
+    }
+    Play.PlayerLeftMessage = PlayerLeftMessage;
+    class PlayerChatMessage extends LobbyMessage {
+        constructor(name, text) {
+            super(LobbyMessageId.SMSG_PLAYER_CHAT);
+            this.name = name;
             this.text = text;
         }
     }

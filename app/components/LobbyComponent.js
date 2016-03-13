@@ -3,25 +3,7 @@ var LobbyState = Play.Client.LobbyState;
 var PlayerInfo = Play.Client.PlayerInfo;
 var ClientLobby = Play.Client.ClientLobby;
 var LobbyConfiguration = Play.LobbyConfiguration;
-class GameOver extends React.Component {
-    render() {
-        var overlayStyle = {
-            position: "absolute",
-            right: 0,
-            bottom: 0,
-            left: 0,
-            top: 0,
-            background: "rgba(1,1,1,0.4)",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            color: "white",
-            textShadow: "-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000",
-            textAlign: "center"
-        };
-        return (React.createElement("div", {style: overlayStyle}, React.createElement("div", null, React.createElement("h2", null, "GAME OVER"), React.createElement("br", null), React.createElement("button", {className: "btn btn-default", type: "submit", onClick: this.props.onBackToLobby}, "Back to Lobby"))));
-    }
-}
+var ServerLobby = Play.Server.ServerLobby;
 class PlayerInfoComponent extends React.Component {
     render() {
         let teamIcon = `app/games/${ClientLobby.current.configuration.gameConfiguration.id}/assets/images/teams/${this.props.player.team}.png`;
@@ -46,6 +28,8 @@ class LobbyComponent extends React.Component {
             this.setState({ state: lobby.state, players: lobby.players }, completed);
         });
     }
+    static onLeave() {
+    }
     static onEnter(nextState, replaceState, callback) {
         if (ClientLobby.current == null) {
             let configuration = new LobbyConfiguration();
@@ -64,10 +48,22 @@ class LobbyComponent extends React.Component {
         console.log("LobbyComponent.componentWillUnmount");
         let lobby = ClientLobby.current;
         lobby.changeListener.unregister(this.changeListenerToken);
+        Firebase.goOffline();
+        ClientLobby.current.leave();
+        if (ServerLobby.current != null) {
+            ServerLobby.current.destroy();
+            ServerLobby.current = null;
+        }
     }
     backToLobby() {
         console.log("LobbyComponent.backToLobby");
-        ClientLobby.current.backToLobby();
+        let lobby = ClientLobby.current;
+        if (lobby.players.length < lobby.configuration.variant.maxPlayers) {
+            ReactRouter.hashHistory.pushState(null, "/");
+        }
+        else {
+            ClientLobby.current.backToLobby();
+        }
     }
     render() {
         if (this.state.state == LobbyState.IN_LOBBY) {

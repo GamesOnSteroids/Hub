@@ -7,6 +7,8 @@ var Play;
             send(msg) {
                 this.messageHandler(msg);
             }
+            disconnect() {
+            }
         }
         Server.LocalClientConnection = LocalClientConnection;
         class LocalServerConnection {
@@ -16,11 +18,17 @@ var Play;
             send(msg) {
                 this.messageHandler(this.client, msg);
             }
+            disconnect() {
+            }
         }
         Server.LocalServerConnection = LocalServerConnection;
         class Peer2PeerConnection {
             send(msg) {
                 this.dataChannel.send(JSON.stringify(msg));
+            }
+            disconnect() {
+                this.dataChannel.close();
+                this.peerConnection.close();
             }
         }
         Server.Peer2PeerConnection = Peer2PeerConnection;

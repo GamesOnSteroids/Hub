@@ -2,9 +2,7 @@
 var ChatLog = Play.Client.ChatLog;
 class ChatMessageComponent extends React.Component {
     render() {
-        var date = this.props.date;
-        var formattedTime = `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
-        return (React.createElement("div", null, "[", formattedTime, "] ", this.props.author, ": ", this.props.text));
+        return (React.createElement("div", null, "[", this.props.author, "] ", this.props.text));
     }
 }
 class Chat extends React.Component {

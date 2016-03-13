@@ -20,6 +20,7 @@ var Chess;
             start() {
                 this.chessBoard.initialize(this.players);
                 for (let piece of this.chessBoard.pieces) {
+                    piece.timer = Chess.LOCK_TIMER;
                     this.createPiece(piece);
                 }
                 for (let player of this.players) {
@@ -63,6 +64,7 @@ var Chess;
                                     pawn.direction == Direction4.Right && pawn.x == this.chessBoard.size - 1) {
                                     this.destroyPiece(piece);
                                     let promotion = new Chess.Queen(pawn.id, pawn.x, pawn.y, pawn.owner);
+                                    promotion.timer = Chess.LOCK_TIMER;
                                     this.chessBoard.pieces.push(promotion);
                                     this.createPiece(promotion);
                                 }

@@ -30,6 +30,7 @@ var Play;
                 this.configuration = configuration;
                 this.on(Play.ServiceType.Lobby, Play.LobbyMessageId.SMSG_GAME_START, this.onGameStart.bind(this));
                 this.on(Play.ServiceType.Lobby, Play.LobbyMessageId.SMSG_PLAYER_JOINED, this.onJoin.bind(this));
+                this.on(Play.ServiceType.Lobby, Play.LobbyMessageId.SMSG_PLAYER_LEFT, this.onLeft.bind(this));
                 this.on(Play.ServiceType.Lobby, Play.LobbyMessageId.SMSG_GAME_OVER, this.onGameOver.bind(this));
                 this.on(Play.ServiceType.Lobby, Play.LobbyMessageId.SMSG_PLAYER_READY, this.onPlayerReady.bind(this));
                 this.on(Play.ServiceType.Lobby, Play.LobbyMessageId.SMSG_PLAYER_CHAT, this.onPlayerChat.bind(this));
@@ -55,6 +56,10 @@ var Play;
                     this.ready();
                 });
             }
+            leave() {
+                console.log("ClientLobby.leave");
+                this.serverConnection.disconnect();
+            }
             join() {
                 this.sendToServer({
                     service: Play.ServiceType.Lobby,
@@ -72,14 +77,21 @@ var Play;
                 this.changeListener.dispatch(this, completed);
             }
             onPlayerChat(message) {
-                let player = this.players.find(p => p.id == message.playerId);
-                this.messageLog.push(new ChatLog(new Date(), player.name, message.text));
+                this.messageLog.push(new ChatLog(new Date(), message.name, message.text));
                 this.emitChange();
             }
             onPlayerReady(message) {
                 console.log("ClientLobby.onPlayerReady");
                 let player = this.players.find(p => p.id == message.playerId);
                 player.isReady = true;
+                this.emitChange();
+            }
+            onServerDisconnect() {
+                this.players.splice(0, this.players.length);
+                this.players.push(this.localPlayer);
+                this.messageHandlers.get(Play.ServiceType.Game).clear();
+                this.state = LobbyState.GAME_OVER;
+                this.messageLog.push(new ChatLog(new Date(), "System", "Server has disconnected."));
                 this.emitChange();
             }
             onGameOver(message) {
@@ -97,6 +109,13 @@ var Play;
                 this.state = LobbyState.GAME_RUNNING;
                 this.emitChange();
             }
+            onLeft(message) {
+                console.log("ClientLobby.onLeft", message);
+                let player = this.players.find(p => p.id == message.playerId);
+                this.players.splice(this.players.indexOf(player), 1);
+                this.messageLog.push(new ChatLog(new Date(), "System", `${player.name} has left.`));
+                this.emitChange();
+            }
             onJoin(message) {
                 console.log("ClientLobby.onJoin", message);
                 let player = new Client.PlayerInfo();
@@ -108,6 +127,9 @@ var Play;
                 if (message.isYou) {
                     this.configuration.gameConfiguration = message.configuration;
                     this.localPlayer = player;
+                }
+                else {
+                    this.messageLog.push(new ChatLog(new Date(), "System", `${player.name} has joined.`));
                 }
                 this.emitChange();
             }
