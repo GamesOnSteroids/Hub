@@ -15,7 +15,7 @@ class DebugConsole extends React.Component {
             if (console["messages"] == null) {
                 console["messages"] = [];
             }
-            console["messages"].push(JSON.stringify(params));
+            console["messages"].unshift(JSON.stringify(params));
             oldCallback.apply(console, params);
             this.setState({
                 messages: console["messages"]
@@ -28,8 +28,7 @@ class DebugConsole extends React.Component {
 }
 class App extends React.Component {
     render() {
-        console.log(navigator.userAgent);
-        return (React.createElement("div", null, React.createElement(Header, null), environment == EnvironmentType.Development ? React.createElement(DebugConsole, null) : "", React.createElement("div", {className: "container-fluid"}, this.props.children)));
+        return (React.createElement("div", null, React.createElement(Header, null), environment == EnvironmentType.Development && (typeof window.orientation !== "undefined") ? React.createElement(DebugConsole, null) : "", React.createElement("div", {className: "container-fluid"}, this.props.children)));
     }
 }
 document.onkeydown = function (event) {
