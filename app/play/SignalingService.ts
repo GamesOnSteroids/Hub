@@ -137,12 +137,13 @@ namespace Play {
         }
 
         public createSignalingClient(lobby: ClientLobby, channel: ISignalingChannel): void {
-
+            console.log("SignallingService.createSignalingClient");
             channel.onReceive((data: any) => {
                 return this.onClientSdpMessage(lobby, data);
             });
 
             let pc = new RTCPeerConnection(servers);
+
             let dataChannel = pc.createDataChannel(lobby.clientGUID, {ordered: true});
 
             let connection = new Peer2PeerConnection();
@@ -181,7 +182,8 @@ namespace Play {
                     });
                 }
             };
-            pc.createOffer((offer) => {
+            console.log("createoffer");
+            pc.createOffer((offer: RTCSessionDescription) => {
                 console.log("SignalingService.createOffer");
                 pc.setLocalDescription(offer, () => {
                     channel.send({

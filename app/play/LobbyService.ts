@@ -45,14 +45,19 @@ namespace Play {
 
         public findLobby(configuration: LobbyConfiguration): Promise<ClientLobby> {
             return new Promise<ClientLobby>((resolve, reject) => {
+                console.log("LobbyService.findLobby");
+
                 Firebase.goOnline();
+                console.log("Firebase online");
 
                 // no desired game
                 if (configuration.lobbyId == null) {
+                    console.log("Looking for random lobby");
                     let lobbiesRef = new Firebase(config.get(environment).firebaseURL).child("lobby");
 
                     // try to find relevant games
                     lobbiesRef.once("value", (snapshot) => {
+                        console.log("Lobbies fetched");
                         let lobbyRef: Firebase = null;
                         let found = snapshot.forEach((lobbySnapshot) => {
                             let value = lobbySnapshot.val();
@@ -62,7 +67,7 @@ namespace Play {
                             }
                         });
                         if (!found) {
-
+                            console.log("No lobby found");
                             let lobbyDescription = {
                                 playerCount: 0,
                                 maxPlayers: configuration.variant.maxPlayers,
@@ -81,6 +86,7 @@ namespace Play {
                                 this.createLobby(configuration, resolve);
                             });
                         } else {
+                            console.log("Lobby found");
                             let lobbyId = lobbyRef.key();
                             configuration.lobbyId = lobbyId;
                             this.joinLobby(configuration, resolve);

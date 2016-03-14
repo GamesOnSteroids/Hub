@@ -1,7 +1,7 @@
 "use strict";
 
 
-window.RTCPeerConnection = window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection;
+window.RTCPeerConnection = window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection || window.msRT;
 window.RTCSessionDescription = window.RTCSessionDescription || window.mozRTCSessionDescription || window.webkitRTCSessionDescription;
 window.RTCIceCandidate = window.mozRTCIceCandidate || window.RTCIceCandidate;
 
@@ -16,17 +16,25 @@ class DebugConsole extends React.Component<any, any> {
         };
     }
 
-    protected componentDidMount(): void {
-        let oldCallback = console.log;
-        console.log = (...params: any[]) => {
+    private replaceImplementation(obj: any, func: string): void {
+        let oldCallback = obj[func];
+        obj[func] = (...params: any[]) => {
             if (console["messages"] == null) {
                 console["messages"] = [];
             }
-            console["messages"].push(JSON.stringify(params));
+            console["messages"].unshift("[" + func + "] " + JSON.stringify(params));
             oldCallback.apply(console, params);
             this.setState({
                 messages: console["messages"]
             });
+        };
+    }
+
+    protected componentDidMount(): void {
+        this.replaceImplementation(console, "log");
+        this.replaceImplementation(console, "error");
+        window.onerror = (...params: any[]) => {
+          console.error(params);
         };
     }
 
@@ -39,11 +47,11 @@ class DebugConsole extends React.Component<any, any> {
 
 class App extends React.Component<any, any> {
     public render(): JSX.Element {
-        console.log(navigator.userAgent);
         return (
             <div>
                 <Header />
-                {environment == EnvironmentType.Development ? <DebugConsole/>:""}
+                {environment == EnvironmentType.Development && (typeof window.orientation !== "undefined") ?
+                <DebugConsole/>:""}
                 <div className="container-fluid">
                     {this.props.children}
                 </div>
@@ -82,14 +90,14 @@ document.onkeydown = function (event) {
 };
 
 
-
 ReactDOM.render(
     (
         <ReactRouter.Router history={ReactRouter.hashHistory}>
             <ReactRouter.Route path="/" component={App}>
                 <ReactRouter.IndexRoute component={GameList}/>
                 <ReactRouter.Route path="/games" component={GameList}/>
-                <ReactRouter.Route path="/lobby/:lobbyId" component={LobbyComponent} onLeave={LobbyComponent.onLeave} onEnter={LobbyComponent.onEnter}/>
+                <ReactRouter.Route path="/lobby/:lobbyId" component={LobbyComponent} onLeave={LobbyComponent.onLeave}
+                                   onEnter={LobbyComponent.onEnter}/>
                 <ReactRouter.Route path="*" component={NoMatch}/>
             </ReactRouter.Route>
         </ReactRouter.Router>
