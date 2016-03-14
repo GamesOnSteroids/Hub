@@ -2,9 +2,34 @@
 window.RTCPeerConnection = window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection;
 window.RTCSessionDescription = window.RTCSessionDescription || window.mozRTCSessionDescription || window.webkitRTCSessionDescription;
 window.RTCIceCandidate = window.mozRTCIceCandidate || window.RTCIceCandidate;
+class DebugConsole extends React.Component {
+    constructor() {
+        super();
+        this.state = {
+            messages: []
+        };
+    }
+    componentDidMount() {
+        let oldCallback = console.log;
+        console.log = (...params) => {
+            if (console["messages"] == null) {
+                console["messages"] = [];
+            }
+            console["messages"].push(JSON.stringify(params));
+            oldCallback.apply(console, params);
+            this.setState({
+                messages: console["messages"]
+            });
+        };
+    }
+    render() {
+        return (React.createElement("div", {className: "console"}, this.state.messages.map((m, i) => React.createElement("div", {key: i, className: "console-message"}, m))));
+    }
+}
 class App extends React.Component {
     render() {
-        return (React.createElement("div", null, React.createElement(Header, null), ",", React.createElement("div", {className: "container-fluid"}, this.props.children)));
+        console.log(navigator.userAgent);
+        return (React.createElement("div", null, React.createElement(Header, null), environment == EnvironmentType.Development ? React.createElement(DebugConsole, null) : "", React.createElement("div", {className: "container-fluid"}, this.props.children)));
     }
 }
 document.onkeydown = function (event) {

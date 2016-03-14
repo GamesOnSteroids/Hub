@@ -11,7 +11,7 @@ var authentization = {
 var environment = EnvironmentType.Production;
 {
     let host = window.location.hostname;
-    if (host == "gamesonsteroids.com") {
+    if (host == "gamesonsteroids.com" && window.location.search.indexOf("debug") == -1) {
         environment = EnvironmentType.Production;
     }
     else {
