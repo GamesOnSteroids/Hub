@@ -7,12 +7,43 @@ window.RTCIceCandidate = window.mozRTCIceCandidate || window.RTCIceCandidate;
 
 // navigator.getUserMedia = navigator.getUserMedia || navigator.mozGetUserMedia || navigator.webkitGetUserMedia || navigator.msGetUserMedia;
 
+class DebugConsole extends React.Component<any, any> {
+
+    constructor() {
+        super();
+        this.state = {
+            messages: []
+        };
+    }
+
+    protected componentDidMount(): void {
+        let oldCallback = console.log;
+        console.log = (...params: any[]) => {
+            if (console["messages"] == null) {
+                console["messages"] = [];
+            }
+            console["messages"].push(JSON.stringify(params));
+            oldCallback.apply(console, params);
+            this.setState({
+                messages: console["messages"]
+            });
+        };
+    }
+
+    public render(): JSX.Element {
+        return (<div className="console">
+            {this.state.messages.map((m, i) => <div key={i} className="console-message">{m}</div>)}
+        </div>);
+    }
+}
 
 class App extends React.Component<any, any> {
     public render(): JSX.Element {
+        console.log(navigator.userAgent);
         return (
             <div>
-                <Header />,
+                <Header />
+                {environment == EnvironmentType.Development ? <DebugConsole/>:""}
                 <div className="container-fluid">
                     {this.props.children}
                 </div>
