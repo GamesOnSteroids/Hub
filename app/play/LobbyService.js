@@ -25,10 +25,14 @@ var Play;
         }
         findLobby(configuration) {
             return new Promise((resolve, reject) => {
+                console.log("LobbyService.findLobby");
                 Firebase.goOnline();
+                console.log("Firebase online");
                 if (configuration.lobbyId == null) {
+                    console.log("Looking for random lobby");
                     let lobbiesRef = new Firebase(config.get(environment).firebaseURL).child("lobby");
                     lobbiesRef.once("value", (snapshot) => {
+                        console.log("Lobbies fetched");
                         let lobbyRef = null;
                         let found = snapshot.forEach((lobbySnapshot) => {
                             let value = lobbySnapshot.val();
@@ -38,6 +42,7 @@ var Play;
                             }
                         });
                         if (!found) {
+                            console.log("No lobby found");
                             let lobbyDescription = {
                                 playerCount: 0,
                                 maxPlayers: configuration.variant.maxPlayers,
@@ -54,6 +59,7 @@ var Play;
                             });
                         }
                         else {
+                            console.log("Lobby found");
                             let lobbyId = lobbyRef.key();
                             configuration.lobbyId = lobbyId;
                             this.joinLobby(configuration, resolve);
