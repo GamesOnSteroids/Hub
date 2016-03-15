@@ -88,9 +88,9 @@ var Minesweeper;
                     for (let x = 0; x < this.minefield.width; x++) {
                         let field = this.minefield.get(x + y * this.minefield.width);
                         if (field.isRevealed) {
-                            this.drawTile(ctx, this.assets.reveal[field.owner.team], x, y);
+                            this.drawTile(ctx, this.assets.reveal[this.getPlayerColor(field.owner)], x, y);
                             if (field.hasMine) {
-                                this.drawTile(ctx, this.assets.mines[field.owner.team], x, y);
+                                this.drawTile(ctx, this.assets.mines[this.getPlayerColor(field.owner)], x, y);
                             }
                             else {
                                 if (field.adjacentMines > 0) {
@@ -102,12 +102,12 @@ var Minesweeper;
                             let mousePosition = this.camera.unproject(Mouse.x, Mouse.y);
                             if (field.hasFlag) {
                                 this.drawTile(ctx, this.assets.hidden, x, y);
-                                this.drawTile(ctx, this.assets.flags[field.owner.team], x, y);
+                                this.drawTile(ctx, this.assets.flags[this.getPlayerColor(field.owner)], x, y);
                             }
                             else {
                                 if (x == Math.floor(mousePosition.x / TILE_SIZE) && y == Math.floor(mousePosition.y / TILE_SIZE)) {
                                     if (Mouse.button == 1) {
-                                        this.drawTile(ctx, this.assets.reveal[this.localPlayer.team], x, y);
+                                        this.drawTile(ctx, this.assets.reveal[this.getPlayerColor(this.localPlayer)], x, y);
                                     }
                                     else {
                                         this.drawTile(ctx, this.assets.over, x, y);

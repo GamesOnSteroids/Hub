@@ -6,7 +6,7 @@ var LobbyConfiguration = Play.LobbyConfiguration;
 var ServerLobby = Play.Server.ServerLobby;
 class PlayerInfoComponent extends React.Component {
     render() {
-        let teamIcon = `app/games/${ClientLobby.current.configuration.gameConfiguration.id}/assets/images/teams/${this.props.player.team}.png`;
+        let teamIcon = `app/games/${ClientLobby.current.configuration.gameConfiguration.id}/assets/images/teams/${ClientLobby.current.getPlayerColor(this.props.player)}.png`;
         return (React.createElement("tr", null, React.createElement("td", null, React.createElement("img", {src: teamIcon})), React.createElement("td", null, this.props.player.name), React.createElement("td", null, this.props.player.isReady ? React.createElement("span", {className: "glyphicon glyphicon-ok"}) : "")));
     }
 }

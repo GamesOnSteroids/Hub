@@ -84,19 +84,19 @@ var Play;
     }
     Play.PlayerReadyMessage = PlayerReadyMessage;
     class JoinRequestMessage extends LobbyMessage {
-        constructor(name, team) {
+        constructor(name) {
             super(LobbyMessageId.CMSG_JOIN_REQUEST);
             this.name = name;
-            this.team = team;
         }
     }
     Play.JoinRequestMessage = JoinRequestMessage;
     class PlayerJoinedMessage extends LobbyMessage {
-        constructor(playerId, name, team, configuration, isYou) {
+        constructor(playerId, name, team, position, configuration, isYou) {
             super(LobbyMessageId.SMSG_PLAYER_JOINED);
             this.playerId = playerId;
             this.name = name;
             this.team = team;
+            this.position = position;
             this.configuration = configuration;
             this.isYou = isYou;
         }

@@ -83,7 +83,7 @@ var Chess;
                 }
             }
             rotate2D(x, y) {
-                let localPlayerId = this.localPlayer.team;
+                let localPlayerId = this.localPlayer.position;
                 if (this.players.length == 2) {
                     if (localPlayerId == 1) {
                         return { x: x, y: this.chessBoard.size - 1 - y };
@@ -204,9 +204,9 @@ var Chess;
                 this.assets.black.src = `${root}images/black.png`;
                 for (let pieceType = 1; pieceType <= 6; pieceType++) {
                     this.assets[pieceType] = [];
-                    for (let team = 0; team < 4; team++) {
-                        this.assets[pieceType][team] = new Image();
-                        this.assets[pieceType][team].src = `${root}images/${pieceType}-${team}.png`;
+                    for (let color = 0; color < 4; color++) {
+                        this.assets[pieceType][color] = new Image();
+                        this.assets[pieceType][color].src = `${root}images/${pieceType}-${color}.png`;
                     }
                 }
             }
@@ -269,7 +269,7 @@ var Chess;
             }
             drawPiece(ctx, piece) {
                 let p = this.getPieceOffset(piece);
-                let image = this.assets[piece.type][piece.owner.team];
+                let image = this.assets[piece.type][this.getPlayerColor(piece.owner)];
                 ctx.globalAlpha = 0.3;
                 ctx.save();
                 ctx.scale(1, -1);

@@ -114,6 +114,13 @@ var gamesConfiguration = [
                 boardType: "4player"
             },
             {
+                id: "team4players",
+                name: "4 Players (Team Game)",
+                maxPlayers: 4,
+                boardType: "4player",
+                teamCount: 2,
+            },
+            {
                 id: "debug",
                 name: "debug",
                 development: true,

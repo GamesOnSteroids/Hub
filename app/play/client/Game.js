@@ -42,6 +42,9 @@ var Play;
             emitChange() {
                 this.changeListener.dispatch(this);
             }
+            getPlayerColor(player) {
+                return this.lobby.getPlayerColor(player);
+            }
             initialize() {
                 this.canvas = document.getElementById("game-canvas");
                 this.context = this.canvas.getContext("2d");

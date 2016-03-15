@@ -1,5 +1,5 @@
 "use strict";
-window.RTCPeerConnection = window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection;
+window.RTCPeerConnection = window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection || window.msRT;
 window.RTCSessionDescription = window.RTCSessionDescription || window.mozRTCSessionDescription || window.webkitRTCSessionDescription;
 window.RTCIceCandidate = window.mozRTCIceCandidate || window.RTCIceCandidate;
 class DebugConsole extends React.Component {
@@ -9,17 +9,24 @@ class DebugConsole extends React.Component {
             messages: []
         };
     }
-    componentDidMount() {
-        let oldCallback = console.log;
-        console.log = (...params) => {
+    replaceImplementation(obj, func) {
+        let oldCallback = obj[func];
+        obj[func] = (...params) => {
             if (console["messages"] == null) {
                 console["messages"] = [];
             }
-            console["messages"].unshift(JSON.stringify(params));
+            console["messages"].unshift("[" + func + "] " + JSON.stringify(params));
             oldCallback.apply(console, params);
             this.setState({
                 messages: console["messages"]
             });
+        };
+    }
+    componentDidMount() {
+        this.replaceImplementation(console, "log");
+        this.replaceImplementation(console, "error");
+        window.onerror = (...params) => {
+            console.error(params);
         };
     }
     render() {
@@ -28,7 +35,8 @@ class DebugConsole extends React.Component {
 }
 class App extends React.Component {
     render() {
-        return (React.createElement("div", null, React.createElement(Header, null), environment == EnvironmentType.Development && (typeof window.orientation !== "undefined") ? React.createElement(DebugConsole, null) : "", React.createElement("div", {className: "container-fluid"}, this.props.children)));
+        return (React.createElement("div", null, React.createElement(Header, null), environment == EnvironmentType.Development && (typeof window.orientation !== "undefined") ?
+            React.createElement(DebugConsole, null) : "", React.createElement("div", {className: "container-fluid"}, this.props.children)));
     }
 }
 document.onkeydown = function (event) {

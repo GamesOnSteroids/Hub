@@ -92,16 +92,15 @@ var Play;
                 if (teamCount == null) {
                     teamCount = this.configuration.variant.maxPlayers;
                 }
+                client.position = this.clients.indexOf(client);
                 client.team = Math.floor(this.clients.indexOf(client) % teamCount);
                 client.isConnected = true;
+                client.connection.send(new Play.PlayerJoinedMessage(client.id, client.name, client.team, client.position, this.configuration.gameConfiguration, true));
                 for (let other of this.clients) {
-                    if (other.id == client.id) {
-                        client.connection.send(new Play.PlayerJoinedMessage(other.id, other.name, other.team, this.configuration.gameConfiguration, true));
-                    }
-                    else {
+                    if (other.id != client.id) {
                         if (other.isConnected) {
-                            client.connection.send(new Play.PlayerJoinedMessage(other.id, other.name, other.team));
-                            other.connection.send(new Play.PlayerJoinedMessage(client.id, client.name, client.team));
+                            client.connection.send(new Play.PlayerJoinedMessage(other.id, other.name, other.team, other.position));
+                            other.connection.send(new Play.PlayerJoinedMessage(client.id, client.name, client.team, client.position));
                         }
                     }
                 }

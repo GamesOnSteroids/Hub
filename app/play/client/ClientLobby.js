@@ -35,6 +35,22 @@ var Play;
                 this.on(Play.ServiceType.Lobby, Play.LobbyMessageId.SMSG_PLAYER_READY, this.onPlayerReady.bind(this));
                 this.on(Play.ServiceType.Lobby, Play.LobbyMessageId.SMSG_PLAYER_CHAT, this.onPlayerChat.bind(this));
             }
+            getPlayerColor(player) {
+                if (this.configuration.variant.teamCount == null) {
+                    return player.position;
+                }
+                else {
+                    if (player.id == this.localPlayer.id) {
+                        return 0;
+                    }
+                    else if (player.team == this.localPlayer.team) {
+                        return 1;
+                    }
+                    else {
+                        return 2;
+                    }
+                }
+            }
             sendToServer(msg) {
                 this.serverConnection.send(msg);
             }
@@ -64,8 +80,7 @@ var Play;
                 this.sendToServer({
                     service: Play.ServiceType.Lobby,
                     id: Play.LobbyMessageId.CMSG_JOIN_REQUEST,
-                    name: authentization.displayName,
-                    team: 1,
+                    name: authentization.displayName
                 });
                 this.ready();
             }
@@ -123,6 +138,7 @@ var Play;
                 player.id = message.playerId;
                 player.name = message.name;
                 player.team = message.team;
+                player.position = message.position;
                 this.players.push(player);
                 if (message.isYou) {
                     this.configuration.gameConfiguration = message.configuration;

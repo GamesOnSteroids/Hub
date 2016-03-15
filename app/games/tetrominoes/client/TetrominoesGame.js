@@ -120,14 +120,14 @@ var Tetrominoes;
                     for (let x = 0; x < this.playfield.width; x++) {
                         let cell = this.playfield.board[x + y * this.playfield.width];
                         if (cell.type == Tetrominoes.CellType.Full) {
-                            let image = this.assets.tiles[cell.owner.team];
+                            let image = this.assets.tiles[this.getPlayerColor(cell.owner)];
                             ctx.drawImage(image, 0, 0, image.width, image.height, x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
                         }
                     }
                 }
             }
             drawTetromino(ctx, tetromino) {
-                let image = this.assets.tiles[tetromino.owner.team];
+                let image = this.assets.tiles[this.getPlayerColor(tetromino.owner)];
                 let shape = tetromino.getShape();
                 for (let y = 0; y < shape.length; y++) {
                     for (let x = 0; x < shape[y].length; x++) {

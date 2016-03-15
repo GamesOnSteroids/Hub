@@ -99,6 +99,7 @@ var Play;
             return false;
         }
         createSignalingClient(lobby, channel) {
+            console.log("SignallingService.createSignalingClient");
             channel.onReceive((data) => {
                 return this.onClientSdpMessage(lobby, data);
             });
@@ -137,6 +138,7 @@ var Play;
                     });
                 }
             };
+            console.log("createoffer");
             pc.createOffer((offer) => {
                 console.log("SignalingService.createOffer");
                 pc.setLocalDescription(offer, () => {
